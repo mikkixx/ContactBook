@@ -1,18 +1,21 @@
 import sqlite3
-import os
+from pathlib import Path
 
-DB_FILE = "ContactBook.db"
-SCHEMA_FILE = "schema.sql"
+BASE_DIR = Path(__file__).parent
+
+DB_FILE = BASE_DIR / "ContactBook.db"
+
+SCHEMA_FILE = BASE_DIR / "schema.sql"
 
 def get_db_connection():
-    conn = sqlite3.connect(DB_FILE)
+    conn = sqlite3.connect(str(DB_FILE))
     conn.execute("PRAGMA foreign_keys = ON;")
     conn.row_factory = sqlite3.Row
     return conn
 
 def init_database(conn):
-    if not os.path.exists(SCHEMA_FILE):
-        raise FileNotFoundError(f"Файл схемы {SCHEMA_FILE} не найден в директории проекта")
+    if not SCHEMA_FILE.exists():
+        raise FileNotFoundError(f" Файл схемы не найден: {SCHEMA_FILE}")
     
     with open(SCHEMA_FILE, "r", encoding="utf-8") as f:
         conn.executescript(f.read())
