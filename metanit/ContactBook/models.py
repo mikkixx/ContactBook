@@ -28,6 +28,7 @@ class Employee(models.Model):
 
     department = models.ForeignKey(Department, on_delete=models.PROTECT, verbose_name='Отдел') 
     subdivision = models.ForeignKey(Subdivision, on_delete=models.SET_NULL, blank=True, null=True, verbose_name='Подразделение')
+    position = models.CharField(max_length=100, verbose_name='Должность')
 
     phone = models.CharField(max_length=20, unique=True, verbose_name='Телефон')
     floor = models.CharField(max_length=50, verbose_name='Этаж')
