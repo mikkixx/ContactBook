@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}ContactBook{% endblock %}</title>
+    <style>
+        .alert { padding: 10px; margin: 10px 0; border-radius: 4px; }
+        .alert-success{ background: #d4edda; color: #155724;}
+        .alert-error, .alert-denger {background: #f8d7da; color: #721c24; }
+        .alert-warning {background: #fff3cd; color: #856404; }
+        .alert-info {background: #d1ecf1; color: #0c5460; }
+        form, select, button { margin: 5px 0; padding: 8pc; }
+    </style>
+</head>
+<body>
+    {% if masseges %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+    {% endfor %}
+
+    <nav>
+        <a href="{% url 'contactbook:employee_list' %}">Сотрудники</a> |
+        <a href="{% url 'contactbook:favorite_list' %}">Избранное</a> |
+        <a href="{% url 'contactbook:my_profile' %}">Профиль</a> |
+        {% if is_admin %}<a href="{% url 'contactbook:organization_structure' %}">Структура</a>{% endif %} |
+        <form action="{% url 'contactbool:logout' %}" method="POST" style="display: inline;">
+            {% csrf_token %}
+            <button type="submit">Выйти</button>
+        </form>
+    </nav>
+
+    {% block content %}{% endblock %}
+</body>
+</html>

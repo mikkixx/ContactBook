@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Редактирование: {{ employee.last_name }} {{ employee.first_name }}</h2>
+<from method="POST">
+    {% csrf_token %}
+    <label>Фамилия: <input type="text" name="last_name" value="{{ employee.last_name }}" required></label><br>
+    <label>Имя: <input type="text" name="first_name" value="{{ employee.first_name }}" required></label><br>
+    <label>Отчество: <input type="text" name="middle_name" value="{{employee.middle_name|default:''}}" required></label><br>
+    <label>Должность: <input type="text" name="position" value="{{ employee.position|default:'' }}" required></label><br>
+
+    <label>Отдел:
+        <select name="department" required>
+            {% for dept in department %}
+                <option value="{{ dept.id }}" {% if dept.id == employee.deportment_id %}selected{% endif %}> {{ deprt.name }}</option>
+            {% endfor %}
+        </select>
+    </label><br>
+
+    <label>Подразделение:
+        <select name="department" required>
+            {% for dept in department %}
+                <option value="{{ dept.id }}" {% if dept.id == employee.department_id %}selected{% endif %}>{{ dept.name }}</option>
+            {% endfor %}
+        </select>
+    </label><br>
+
+    <label>Телефон: <input type="tel" name="phone" value="{{ employee.phone }}" required></label><br>
+    <labal>Этаж: <input type="text" name="floor" value="{{ employee.floor }}" required></labal><br>
+    <label>Кабинет: <input type="text" name="cabinet" value="{{ employee.cabinet|default:'' }}"></label><br>
+    <label>Email: <input type="email" name="email" value="{{ employee.user_account.email }}" required></label><br>
+    <label>Роль:
+        <select name="role">
+            <option value="user" {% if employee.role == 'user' %}selected{%endif}>Пользователь</option>
+            <option value="admin" {% if employee.role == 'admin' %}selected{%endif}>Администратор</option>
+        </select>
+    </label><br>
+
+    <button type="submit">Сохранить</button>
+    <a href="{% url 'contactbook:emplyee_detail' employee.pk}">Отмена</a>
+</from>
+{% endblock %}

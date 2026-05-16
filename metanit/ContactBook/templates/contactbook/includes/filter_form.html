@@ -1,0 +1,21 @@
+<form method="GET" class="filter-form">
+    <input type="text" name="search" value="{{ search|default:'' }}" placeholder="Поиск по ФИО...">
+
+    <select name="department">
+        <option value="">Все отделы</option>
+        {% for dept in departments %}
+            <option value="{{ dept.id }}" {% if dept.id|stringformat:"s" == dept_id %}selected{% endif %}>{{ dept.name }}</option>
+        {% endfor %}
+    </select>
+
+    <select name="subdivision">
+        <option value="">Все подразделения</option>
+        {% for sub in subdivision %}
+            <option value="{{ sub.id }}" {% if sub.id|stringformat:"s" == sub_id %}selected{% endif %}>{{ sub.name }}</option>
+        {% endfor %}
+    </select>
+
+    <input type="text" name="position" value="{{ position|default:'' }}" placeholder="Должность...">
+    <button type="submit">Применить</button>
+    <a href="{% url 'contactbook:employee_list' %}">Сбросить</a>
+</form>
