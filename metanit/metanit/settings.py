@@ -93,5 +93,12 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
-
+DEBUG = True 
 STATIC_URL = 'static/'
+
+# Куда перенаправлять неавторизованных пользователей
+LOGIN_URL = 'contactbook:login'
+# Куда перенаправлять после успешного входа
+LOGIN_REDIRECT_URL = 'contactbook:employee_list'
+# Куда перенаправлять после выхода
+LOGOUT_REDIRECT_URL = 'contactbook:employee_list'

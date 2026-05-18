@@ -1,0 +1,49 @@
+body{
+    width: 100%;
+    height: 100%;
+    background-color: #ffffff;
+    font-family: "Inter", sans-serif;
+    padding: 0;
+    margin: 0;
+}
+
+header{
+    width: 100%;
+    height: 10%;
+    background-color: #0a1220;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 100px;
+}
+.header{
+    width: 80%;
+    height: 41%;
+    display: flex;
+    justify-content: right;
+}
+.header > ul{
+    display: flex;
+    justify-content: center;
+    gap: 70px;
+}
+.header > ul > li{
+    list-style-type: none;
+}
+.header > ul > li > a{
+    color: #ffffff92;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    font-size: 20px;
+    font-weight: 400;
+    text-align: center;
+}
+.header > ul > li > a:hover{
+    color: #ffffff;
+    font-size: 22px;
+}
+
+#logo{
+    width: 10%;
+    height: 41%;
+}

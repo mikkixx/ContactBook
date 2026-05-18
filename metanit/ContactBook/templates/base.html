@@ -1,35 +1,47 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}ContactBook{% endblock %}</title>
-    <style>
-        .alert { padding: 10px; margin: 10px 0; border-radius: 4px; }
-        .alert-success{ background: #d4edda; color: #155724;}
-        .alert-error, .alert-denger {background: #f8d7da; color: #721c24; }
-        .alert-warning {background: #fff3cd; color: #856404; }
-        .alert-info {background: #d1ecf1; color: #0c5460; }
-        form, select, button { margin: 5px 0; padding: 8pc; }
-    </style>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
 </head>
 <body>
-    {% if masseges %}
-        {% for message in messages %}
-            <div class="alert alert-{{ message.tags }}">{{ message }}</div>
-        {% endfor %}
-    {% endfor %}
+    <header>
+        <img src="{% static 'img/logo.png' %}" alt="" id="logo">
+        <nav class="header">
+            <ul>
+                <li><a href="{% url 'contactbook:employee_list' %}">Сотрудники</a></li>
+                <li><a href="{% url 'contactbook:favorite_list' %}">Избранное</a></li>
+                <li><a href="{% url 'contactbook:my_profile' %}">Профиль</a></li>
+                {% if request.user.is_authenticated and request.user.employee_profile.role == 'admin' %}
+                    <li><a href="{% url 'contactbook:organization_structure' %}">Структура</a></li>
+                {% endif %}
+            </ul>
+            
+            <div class="leave">
+                {% if request.user.is_authenticated %}
+                    <form method="post" action="{% url 'contactbook:logout' %}">
+                        {% csrf_token %}
+                        <button type="submit">Выйти</button>
+                    </form>
+                {% endif %}
+            </div>
+        </nav>
+    </header>
 
-    <nav>
-        <a href="{% url 'contactbook:employee_list' %}">Сотрудники</a> |
-        <a href="{% url 'contactbook:favorite_list' %}">Избранное</a> |
-        <a href="{% url 'contactbook:my_profile' %}">Профиль</a> |
-        {% if is_admin %}<a href="{% url 'contactbook:organization_structure' %}">Структура</a>{% endif %} |
-        <form action="{% url 'contactbool:logout' %}" method="POST" style="display: inline;">
-            {% csrf_token %}
-            <button type="submit">Выйти</button>
-        </form>
-    </nav>
+    <div class="container">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
 
-    {% block content %}{% endblock %}
+        {% block content %}{% endblock %}
+    </div>
 </body>
 </html>

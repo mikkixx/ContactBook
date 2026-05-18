@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Вход в систему{% endblock %}
+
+{% block content %}
+<div class="auth-wrapper">
+    <div class="auth-card">
+        <h2>Вход в ContactBook</h2>
+        
+        <form method="post" action="{% url 'contactbook:login' %}">
+            {% csrf_token %}
+            
+            {{ form.as_p }}
+            
+            {% if form.non_field_errors %}
+                <div class="error-box">
+                    {{ form.non_field_errors }}
+                </div>
+            {% endif %}
+            
+            <button type="submit" class="btn-auth">Войти</button>
+        </form>
+    </div>
+</div>
+{% endblock %}
