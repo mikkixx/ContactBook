@@ -2,14 +2,19 @@
 {% block title %}Вход в систему{% endblock %}
 
 {% block content %}
-<div class="auth-wrapper">
-    <div class="auth-card">
-        <h2>Вход в ContactBook</h2>
-        
-        <form method="post" action="{% url 'contactbook:login' %}">
-            {% csrf_token %}
-            
-            {{ form.as_p }}
+<div class="auth-card">
+    <form method="post" action="{% url 'contactbook:login' %}">
+        {% csrf_token %}
+        <div class="form">
+            <h1>Вход</h1>
+            <div class="row">
+                <label for="login">Логин: </label>
+                <input type="email" placeholder="Введите email" id="login" name="username" required>
+            </div>
+            <div class="row">
+                <label for="pass">Пароль:</label>
+                <input type="password" placeholder="Введите пароль" id="pass" name="password" required>
+            </div>
             
             {% if form.non_field_errors %}
                 <div class="error-box">
@@ -17,8 +22,12 @@
                 </div>
             {% endif %}
             
-            <button type="submit" class="btn-auth">Войти</button>
-        </form>
-    </div>
+            <button type="submit" href="{% url 'contactbook:employee_list' %}">Войти</button>
+            <div class="link">
+                <p>Нет аккаунта?</p>
+                <a href="{% url 'contactbook:register' %}">Зарегистрироваться</a>
+            </div>
+        </div>
+    </form>
 </div>
 {% endblock %}

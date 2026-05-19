@@ -19,7 +19,7 @@ def is_admin(user):
 
 @login_required
 def employee_list(request):
-    qs = Employee.objects.select_related('department', 'subdivision').filter(is_active=True).order_by('last_name')
+    qs = Employee.objects.select_related('department', 'subdivision').order_by('last_name')
     is_admin_user = is_admin(request.user)
 
     search = request.GET.get('search', '').strip()
@@ -49,7 +49,7 @@ def employee_list(request):
 
 @login_required
 def employee_detail(request, pk):
-    employee = get_object_or_404(Employee, pk=pk, is_active=True)
+    employee = get_object_or_404(Employee, pk=pk)
     is_fav = Favorite.objects.filter(user=request.user, employee=employee).exists()
     
     return render(request, 'contactbook/employee_detail.html', {
@@ -60,7 +60,7 @@ def employee_detail(request, pk):
 
 @login_required
 def toggle_favorite(request, pk):
-    employee = get_object_or_404(Employee, pk=pk, is_active=True)
+    employee = get_object_or_404(Employee, pk=pk)
     fav, created = Favorite.objects.get_or_create(user=request.user, employee=employee)
 
     if not created:
@@ -73,7 +73,7 @@ def toggle_favorite(request, pk):
 
 @login_required
 def favorite_list(request):
-    qs = Employee.objects.filter(favorited_by__user=request.user, is_active=True) \
+    qs = Employee.objects.filter(favorited_by__user=request.user) \
                          .select_related('department', 'subdivision') \
                          .order_by('last_name')
 
@@ -211,11 +211,14 @@ def change_password(request):
 
 @login_required
 def generate_report(request):
+    """Генерация отчёта в Excel/PDF по фильтрам (только для админов)."""
+    # Проверка роли администратора
     if not is_admin(request.user):
         return redirect('contactbook:employee_list')
 
     if request.method == 'POST':
-        report_name = request.POST.get('report_name', 'Справочник сотрудников').strip()
+        # Сбор параметров из формы
+        report_name = request.POST.get('report_name', 'Справочник_сотрудников').strip()
         dept_id = request.POST.get('department')
         sub_id = request.POST.get('subdivision')
         position = request.POST.get('position', '').strip()
@@ -223,26 +226,39 @@ def generate_report(request):
         floor = request.POST.get('floor', '').strip()
         fmt = request.POST.get('format', 'excel')
 
-        qs = Employee.objects.filter(is_active=True)
-        if dept_id: qs = qs.filter(department_id=dept_id)
-        if sub_id: qs = qs.filter(subdivision_id=sub_id)
-        if position: qs = qs.filter(position__icontains=position)
-        if cabinet: qs = qs.filter(cabinet__icontains=cabinet)
-        if floor: qs = qs.filter(floor__icontains=floor)
+        # ✅ ИСПРАВЛЕНО: убран is_active=True (нет такого поля в модели)
+        qs = Employee.objects.select_related('department', 'subdivision').all()
+        
+        # Применение фильтров (только если переданы)
+        if dept_id:
+            qs = qs.filter(department_id=dept_id)
+        if sub_id:
+            qs = qs.filter(subdivision_id=sub_id)
+        if position:
+            qs = qs.filter(position__icontains=position)
+        if cabinet:
+            qs = qs.filter(cabinet__icontains=cabinet)
+        if floor:
+            qs = qs.filter(floor__icontains=floor)
 
-        data = list(qs.values('last_name', 'first_name', 'middle_name', 'position',
-                              'department__name', 'subdivision__name',
-                              'phone', 'floor', 'cabinet'))
+        # Получение данных для экспорта
+        data = list(qs.values(
+            'last_name', 'first_name', 'middle_name', 'position',
+            'department__name', 'subdivision__name',
+            'phone', 'floor', 'cabinet'
+        ))
 
         if not data:
-            messages.warning(request, "Нет данных для экспорта по выбранным фильтрам")
+            messages.warning(request, "⚠️ Нет данных для экспорта по выбранным фильтрам")
             return redirect('contactbook:generate_report')
 
+        # Генерация файла в выбранном формате
         if fmt == 'excel':
             return _export_excel(report_name, data)
         elif fmt == 'pdf':
             return _export_pdf(report_name, data)
 
+    # GET: отрисовка формы с фильтрами
     return render(request, 'contactbook/generate_report.html', {
         'departments': Department.objects.all(),
         'subdivisions': Subdivision.objects.all()
@@ -530,7 +546,7 @@ def delete_subdivision(request, pk):
     sub = get_object_or_404(Subdivision, pk=pk)
     
     if request.method == 'POST':
-        employees_in_sub = Employee.objects.filter(subdivision=sub, is_active=True)
+        employees_in_sub = Employee.objects.filter(subdivision=sub)
         emp_count = employees_in_sub.count()
         
         if emp_count > 0:
@@ -550,3 +566,63 @@ def delete_subdivision(request, pk):
         'subdivision': sub,
         'employee_count': emp_count
     })
+
+def register(request):
+    if request.method == 'POST':
+        email = request.POST.get('email', '').strip().lower()
+        password = request.POST.get('password', '').strip()
+        confirm = request.POST.get('confirm_password', '').strip()
+        last_name = request.POST.get('last_name', '').strip()
+        first_name = request.POST.get('first_name', '').strip()
+        middle_name = request.POST.get('middle_name', '').strip() or None
+        phone = request.POST.get('phone', '').strip()
+        department = request.POST.get('department', '').strip()
+        subdivision = request.POST.get('subdivision', '').strip() or None
+        position = request.POST.get('position', '').strip()
+        floor = request.POST.get('floor', '').strip() 
+        cabinet = request.POST.get('cabinet', '').strip() or None
+
+
+        # Валидация
+        if not email or not password or not last_name or not first_name or not phone or not department or not floor:
+            messages.error(request, "Все поля, отмеченные *, обязательны")
+            return redirect('contactbook:register')
+        
+        if password != confirm:
+            messages.error(request, "Пароли не совпадают")
+            return redirect('contactbook:register')
+        
+        if len(password) < 6:
+            messages.error(request, "Пароль должен содержать минимум 6 символов")
+            return redirect('contactbook:register')
+        
+        # Проверка уникальности email
+        if User.objects.filter(email=email).exists():
+            messages.error(request, "Этот email уже зарегистрирован")
+            return redirect('contactbook:register')
+
+        try:
+            user = User.objects.create_user(
+                username=email,
+                email=email,
+                password=password
+            )
+            Employee.objects.create(
+                user_account=user,
+                last_name=last_name,
+                first_name=first_name,
+                middle_name=middle_name or '',
+                phone=phone,
+                department=department,
+                subdivision=subdivision or '',
+                position=position,
+                floor=floor,
+                cabinet=cabinet or ''
+            )
+            messages.success(request, "Регистрация успешна! Пожалуйста войдите в систему.")
+            return redirect('contactbook:login')
+        except Exception as e:
+            messages.error(request, f"Ошибка регистрации: {str(e)}")
+            return redirect('contactbook:register')
+
+    return render(request, 'contactbook/register.html')

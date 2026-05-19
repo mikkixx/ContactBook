@@ -6,6 +6,7 @@ app_name = 'contactbook'
 
 urlpatterns = [
     path('login/', auth_views.LoginView.as_view(template_name='contactbook/login.html'), name='login'),
+    path('register/', views.register, name='register'),
     path('logout/', auth_views.LogoutView.as_view(next_page='contactbook:employee_list'), name='logout'),
     
     path('', views.employee_list, name='employee_list'),

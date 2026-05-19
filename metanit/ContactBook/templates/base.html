@@ -32,9 +32,9 @@
                 {% endif %}
             </div>
         </nav>
-    </header>
+    </header> 
 
-    <div class="container">
+    <main>
         {% if messages %}
             {% for message in messages %}
                 <div class="alert alert-{{ message.tags }}">{{ message }}</div>
@@ -42,6 +42,6 @@
         {% endif %}
 
         {% block content %}{% endblock %}
-    </div>
+    </main>
 </body>
 </html>
