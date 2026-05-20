@@ -27,4 +27,5 @@ urlpatterns = [
     path('subdivision/<int:pk>/delete/', views.delete_subdivision, name='delete_subdivision'),
     path('employee/<int:pk>/edit/', views.edit_employee, name='edit_employee'),
     path('employee/<int:pk>/delete/', views.delete_employee, name='delete_employee'),
+    path('api/subdivisions/', views.get_subdivisions_by_dept, name='get_subdivisions'),
 ]

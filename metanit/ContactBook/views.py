@@ -13,6 +13,7 @@ from reportlab.lib.pagesizes import letter
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
 from reportlab.lib import colors
 from reportlab.lib.units import inch
+from django.http import JsonResponse
 
 def is_admin(user):
     return user.is_authenticated and hasattr(user, 'employee_profile') and user.employee_profile.role == 'admin'
@@ -627,3 +628,10 @@ def register(request):
             return redirect('contactbook:register')
 
     return render(request, 'contactbook/register.html')
+
+def get_subdivisions_by_dept(request):
+    dept_id = request.GET.get('dept_id')
+    subdivisions = []
+    if dept_id and dept_id.isdigit():
+        subdivisions = list(Subdivision.objects.filter(department_id=dept_id).values('id', 'name'))
+    return JsonResponse({'subdivisions': subdivisions})
