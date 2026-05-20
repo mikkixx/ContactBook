@@ -569,6 +569,7 @@ def delete_subdivision(request, pk):
 
 def register(request):
     if request.method == 'POST':
+        username = request.POST.get('username', '')
         email = request.POST.get('email', '').strip().lower()
         password = request.POST.get('password', '').strip()
         confirm = request.POST.get('confirm_password', '').strip()
@@ -603,7 +604,7 @@ def register(request):
 
         try:
             user = User.objects.create_user(
-                username=email,
+                username=username,
                 email=email,
                 password=password
             )
