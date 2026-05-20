@@ -2,5 +2,21 @@
 {% block title %}Список сотрудников{% endblock %}
 
 {% block content %}
-
+<div class="filter">
+    <input type="text" name="poisk" placeholder="Поиск по ФИО">
+    <select name="department" id="department">
+        <option value=""></option>
+    </select>
+    <select name="subdivision" id="subdivision">
+        <option value=""></option>
+    </select>
+    <select name="position" id="position">
+        <option value=""></option>
+    </select>
+</div>
+<div class="list">
+    <table border="1">
+        <thead></thead>
+    </table>
+</div>
 {% endblock %}
