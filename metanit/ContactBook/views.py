@@ -627,7 +627,9 @@ def register(request):
             messages.error(request, f"Ошибка регистрации: {str(e)}")
             return redirect('contactbook:register')
 
-    return render(request, 'contactbook/register.html')
+    return render(request, 'contactbook/register.html', {
+        'departments': Department.objects.all()
+    })
 
 def get_subdivisions_by_dept(request):
     dept_id = request.GET.get('dept_id')

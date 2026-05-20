@@ -22,6 +22,7 @@ header{
     display: flex;
     justify-content: right;
     align-items: center;
+    gap: 50px;
 }
 .header > ul{
     display: flex;
@@ -47,6 +48,33 @@ header{
 #logo{
     width: 10%;
     height: auto;
+}
+.leave{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.leave > form > button{
+    width: 100%;
+    height: 45px;
+    background-color: #ffffff;
+    color: rgb(0, 0, 0);
+    font-size: 18px;
+    padding: 5px 15px;
+    border-radius: 20px;  
+    transition: all 0.2s ease;
+    border: 1px solid #0a1220;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.leave > form > button:hover{
+    background-color: transparent;
+    border: 1px solid #ffffff;
+    color: white;
+    transform: scale(1.05);
+    cursor: pointer;
 }
 
 main{
@@ -126,6 +154,7 @@ form{
     background-color: #213659;
     color: white;
     transform: scale(1.05);
+    cursor: pointer;
 }
 
 .link{
@@ -143,7 +172,165 @@ form{
 
 .filter{
     width: 100%;
-    height: 100%;
+    height: 10%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
+
+.zagolovok{
+    width: 10%;
+    height: 100%;
+    display: flex;
+    justify-content: left;
+    align-items: center;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.elements{
+    width: 85%;
+    height: 100%;
+    display: flex;
+    justify-content: right;
+    align-items: center;
+    gap: 5px;
+}
+
+.elements > input{
+    width: 12%;
+    height: 40%;
+    border: solid 1px rgb(163, 163, 163);
+    background-color: white;
+    border-radius: 20px;
+    font-size: 18px;
+    padding: 5px 10px;
+}
+.elements > input:focus{
+    box-shadow: 0 0 5px rgba(9, 23, 75, 0.494);
+    border: solid 1px transparent;
+    outline: none;
+}
+
+#search{
+    width: 35%;
+    height: 40%;
+}
+
+.elements > select{
+    width: 13%;
+    height: 58%;
+    border: solid 1px rgb(163, 163, 163);
+    background-color: white;
+    border-radius: 20px;
+    font-size: 18px;
+    padding: 5px 10px;
+}
+
+.elements > select:focus{
+    outline: none;
+}
+
+#dept-select{
+    width: 10%;
+    height: 58%;
+    border: solid 1px rgb(163, 163, 163);
+    background-color: white;
+    border-radius: 20px;
+    font-size: 18px;
+    padding: 5px 10px;
+}
+
+.elements > button{
+    width: 9%;
+    height: 58%;
+    background-color: #0a1220;
+    color: white;
+    font-size: 18px;
+    border-radius: 20px;  
+    transition: all 0.1s ease;
+    border: solid 1px #0a1220;
+}
+
+.elements > button:hover{
+    background-color: transparent;
+    color: black;
+    cursor: pointer;
+}
+
+.elements > a{
+    width: 9%;
+    height: 58%;
+    background-color: #0a1220;
+    color: white;
+    font-size: 18px;
+    border-radius: 20px;  
+    transition: all 0.1s ease;
+    border: solid 1px #0a1220;
+    text-decoration: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0;
+}
+
+.elements > a:hover{
+    background-color: transparent;
+    color: black;
+    cursor: pointer;
+}
+
+.list{
+    width: 95%;
+    height: 80%;
+    display: flex;
+    justify-content: center;
+}
+
+.list > table{
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    border: 1px solid rgb(163, 163, 163);
+    border-radius: 20px;
+    border-collapse: collapse;
+}
+
+.list > table > thead{
+    width: 100%;
+    height: 5%;
+    display: flex;
+    justify-content: center;
+}
+
+.list > table > thead > tr{
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.list > table > thead > tr > th{
+    width: 15%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-top: none;
+    border-bottom: 1px solid rgb(163, 163, 163);
+    border-right: 1px solid rgb(163, 163, 163);
+    padding: 0;
+    font-size: 18px;
+}
+
+#tel{
+    border-right: none;
+}
+
+
+
 
 
