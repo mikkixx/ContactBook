@@ -1,13 +1,55 @@
 {% extends "base.html" %}
-{% block title %}Регистрация{% endblock %}
+{% block title %}Мой профиль{% endblock %}
 
 {% block content %}
-<div class="auth-card">
-    <form method="post" action="{% url 'contactbook:profile' %}">
-        {% csrf_token %}
+<div class="profile-container">
+    
+    <!-- Заголовок -->
+    <div class="profile-header">
+        <h1>Мой профиль</h1>
+        <a href="{% url 'contactbook:employee_list' %}" class="btn back-link"><--Назад к списку</a>
+    </div>
 
+    <!-- Основная информация -->
+    <div class="profile-card">
+        <div class="profile-info">
+            <h2>{{ employee.last_name }} {{ employee.first_name }} {{ employee.middle_name|default:"" }}</h2>
+            <p class="profile-position">{{ employee.position }}</p>
+            
+            <div class="profile-details">
+                <div class="detail-item">
+                    <label class="detail-label">Отдел:</label>
+                    <span class="detail-value">{{ employee.department.name }}</span>
+                </div>
+                <div class="detail-item">
+                    <label class="detail-label">Подразделение:</label>
+                    <span class="detail-value">{{ employee.subdivision.name|default:"Не указано" }}</span>
+                </div>
+                <div class="detail-item">
+                    <label class="detail-label">Телефон:</label>
+                    <a href="#" onclick="navigator.clipboard.writeText(this.innerText); alert('Скопировано'); return false;" class="copy-data">{{ employee.phone }}</a>
+                </div>
+                <div class="detail-item">
+                    <label class="detail-label">Email:</label>
+                    <a href="#" onclick="navigator.clipboard.writeText(this.innerText); alert('Скопировано'); return false;" class="copy-data">{{ user_email }}</a>
+                </div>
+                <div class="detail-item">
+                    <label class="detail-label">Место:</label>
+                    <span class="detail-value">Этаж {{ employee.floor }}{% if employee.cabinet %}, каб. {{ employee.cabinet }}{% endif %}</span>
+                </div>
+                <div class="detail-item">
+                    <label class="detail-label">Роль:</label>
+                    <span class="detail-value">{{ employee.get_role_display }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
 
-    </form>
-
-
+    <!-- Кнопки действий -->
+    <div class="prof-btn">
+        <br>
+        <a href="{% url 'contactbook:edit_profile' %}" class="btn btn-primary">Редактировать профиль</a>
+        <a href="{% url 'contactbook:change_password' %}" class="btn btn-secondary">Сменить пароль</a>
+    </div>
+</div>
 {% endblock %}
