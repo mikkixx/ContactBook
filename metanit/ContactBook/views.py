@@ -74,7 +74,7 @@ def toggle_favorite(request, pk):
 
 @login_required
 def favorite_list(request):
-    qs = Employee.objects.filter(favorited_by__user=request.user) \
+    qs = Employee.objects.filter(favorites_by__user=request.user) \
                          .select_related('department', 'subdivision') \
                          .order_by('last_name')
 
