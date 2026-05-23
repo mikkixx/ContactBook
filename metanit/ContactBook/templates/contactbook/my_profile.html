@@ -49,7 +49,9 @@
     <div class="prof-btn">
         <br>
         <a href="{% url 'contactbook:edit_profile' %}" class="btn btn-primary">Редактировать профиль</a>
+        {% if employee.user_account == request.user %}
         <a href="{% url 'contactbook:change_password' %}" class="btn btn-secondary">Сменить пароль</a>
+        {% endif %}
     </div>
 </div>
 {% endblock %}

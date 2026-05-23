@@ -1,48 +1,44 @@
 {% extends "base.html" %}
-{% block title %}Мой профиль{% endblock %}
+{% block title %}Профиль сотрудника{% endblock %}
 
 {% block content %}
 <div class="profile-container">
     
     <!-- Заголовок -->
     <div class="profile-header">
-        <h1>Мой профиль</h1>
-        <a href="{% url 'contactbook:employee_list' %}" class="back-link">← Назад к списку</a>
+        <h1>Профиль сотрудника</h1>
+        <a href="{% url 'contactbook:employee_list' %}" class="btn back-link"><--Назад к списку</a>
     </div>
 
     <!-- Основная информация -->
     <div class="profile-card">
-        <div class="profile-avatar">
-            <span>{{ employee.first_name|first }}{{ employee.last_name|first }}</span>
-        </div>
-        
         <div class="profile-info">
             <h2>{{ employee.last_name }} {{ employee.first_name }} {{ employee.middle_name|default:"" }}</h2>
             <p class="profile-position">{{ employee.position }}</p>
             
             <div class="profile-details">
                 <div class="detail-item">
-                    <span class="detail-label">Отдел:</span>
+                    <label class="detail-label">Отдел:</label>
                     <span class="detail-value">{{ employee.department.name }}</span>
                 </div>
                 <div class="detail-item">
-                    <span class="detail-label">Подразделение:</span>
+                    <label class="detail-label">Подразделение:</label>
                     <span class="detail-value">{{ employee.subdivision.name|default:"Не указано" }}</span>
                 </div>
                 <div class="detail-item">
-                    <span class="detail-label">Телефон:</span>
-                    <span class="detail-value">{{ employee.phone }}</span>
+                    <label class="detail-label">Телефон:</label>
+                    <a href="#" onclick="navigator.clipboard.writeText(this.innerText); alert('Скопировано'); return false;" class="copy-data">{{ employee.phone }}</a>
                 </div>
                 <div class="detail-item">
-                    <span class="detail-label">Email:</span>
-                    <span class="detail-value">{{ user_email }}</span>
+                    <label class="detail-label">Email:</label>
+                    <a href="#" onclick="navigator.clipboard.writeText(this.innerText); alert('Скопировано'); return false;" class="copy-data">{{ user_email }}</a>
                 </div>
                 <div class="detail-item">
-                    <span class="detail-label">Место:</span>
+                    <label class="detail-label">Место:</label>
                     <span class="detail-value">Этаж {{ employee.floor }}{% if employee.cabinet %}, каб. {{ employee.cabinet }}{% endif %}</span>
                 </div>
                 <div class="detail-item">
-                    <span class="detail-label">Роль:</span>
+                    <label class="detail-label">Роль:</label>
                     <span class="detail-value">{{ employee.get_role_display }}</span>
                 </div>
             </div>
@@ -50,37 +46,15 @@
     </div>
 
     <!-- Кнопки действий -->
-    <div class="profile-actions">
-        <button href="{% url 'contactbook:toggle_favorite' %}" class="btn btn-primary">⭐</button>
-    </div>
-
-    <!-- Блок "Избранное" -->
-    <div class="favorites-section">
-        <h3>⭐ Моё избранное</h3>
-        
-        {% if favorites %}
-        <div class="favorites-list">
-            {% for fav in favorites %}
-            <div class="favorite-card">
-                <div class="favorite-info">
-                    <strong>{{ fav.employee.last_name }} {{ fav.employee.first_name }}</strong>
-                    <span class="favorite-position">{{ fav.employee.position }}</span>
-                    <span class="favorite-dept">{{ fav.employee.department.name }}</span>
-                </div>
-                <div class="favorite-actions">
-                    <a href="{% url 'contactbook:employee_detail' fav.employee.pk %}" class="btn btn-small">Просмотр</a>
-                    <form method="post" action="{% url 'contactbook:remove_from_favorite' fav.employee.pk %}" style="display:inline;">
-                        {% csrf_token %}
-                        <button type="submit" class="btn btn-small btn-danger" onclick="return confirm('Удалить из избранного?')">✕</button>
-                    </form>
-                </div>
-            </div>
-            {% endfor %}
-        </div>
-        {% else %}
-        <p class="no-favorites">У вас пока нет избранных контактов. Добавляйте сотрудников через кнопку "⭐ В избранное" в их профиле.</p>
+    <div class="prof-btn">
+        <br>
+        <a href="{% url 'contactbook:toggle_favorite' employee.pk %}" class="btn btn-primary">
+            {% if is_favorite %}★ Убрать из избранного{% else %}☆ Добавить в избранное{% endif %}
+        </a>
+        {% if request.user.is_authenticated and request.user.employee_profile.role == 'admin' %}
+        <a href="{% url 'contactbook:edit_employee' employee.pk %}" class="btn btn-secondary">Редактировать сотрудника</a>
+        <a href="{% url 'contactbook:delete_employee' employee.pk %}" class="btn btn-danger">Удалить сотрудника</a>
         {% endif %}
     </div>
-
 </div>
 {% endblock %}

@@ -615,8 +615,8 @@ def register(request):
                 first_name=first_name,
                 middle_name=middle_name or '',
                 phone=phone,
-                department=department,
-                subdivision=subdivision or '',
+                department_id=department,
+                subdivision_id=subdivision or '',
                 position=position,
                 floor=floor,
                 cabinet=cabinet or ''
