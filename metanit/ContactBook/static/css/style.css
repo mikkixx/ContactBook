@@ -295,6 +295,7 @@ form{
     border: 1px solid rgb(163, 163, 163);
     border-radius: 20px;
     border-collapse: collapse;
+    box-shadow: 0 4px 12px rgba(10, 18, 32, 0.08);
 }
 
 .list > table > thead{
@@ -672,3 +673,35 @@ form{
     color:#b4b4b4;
     margin-top: 40px;
 }
+
+.org-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+.org-table th, .org-table td { border: 1px solid #ddd; padding: 12px; vertical-align: top; }
+.org-table th p { margin: 0; font-weight: 600; }
+
+.dept-row td { background: #f4f6f9; }
+.dept-name { font-weight: bold; margin: 0; display: inline-block; }
+.arrow { cursor: pointer; display: inline-block; width: 24px; margin: 0 8px 0 0; transition: transform 0.2s; }
+.arrow.open { transform: rotate(90deg); }
+.dept-actions, .sub-actions { display: flex; gap: 8px; margin: 0; }
+.dept-actions button, .sub-actions button, .btn-add {
+    background: none; border: none; cursor: pointer; padding: 0;
+}
+.dept-actions button p, .sub-actions button p, .btn-add p {
+    margin: 0; padding: 4px 8px; background: #e9ecef; border-radius: 4px;
+}
+.btn-add { background: #0d6efd; color: #fff; border: none; padding: 10px 16px; border-radius: 6px; cursor: pointer; margin-bottom: 15px; }
+
+.sub-row td { background: #ffffff; padding-left: 48px; border-top: 1px dashed #ccc; }
+.sub-name { margin: 0; padding: 6px 0; color: #495057; font-style: italic; }
+.empty-msg { color: #adb5bd; margin: 0; padding: 8px 0; }
+
+.inline-form { background: #f8f9fa; padding: 10px; margin-top: 10px; border-radius: 6px; border: 1px solid #dee2e6; }
+.inline-form input { padding: 6px; width: 250px; border: 1px solid #ced4da; border-radius: 4px; }
+.inline-form button { background: none; border: none; cursor: pointer; margin-left: 5px; }
+.inline-form button p { margin: 0; padding: 4px 8px; background: #28a745; color: #fff; border-radius: 4px; }
+.inline-form button:last-child p { background: #6c757d; }
+
+.hidden { display: none !important; }
+.pagination { margin-top: 20px; display: flex; gap: 12px; align-items: center; }
+.pagination a { text-decoration: none; }
+.pagination a p { margin: 0; padding: 6px 10px; background: #0d6efd; color: #fff; border-radius: 4px; }
