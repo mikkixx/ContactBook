@@ -17,7 +17,8 @@
     <label class="form-label">Отчество</label>
     <input type="text" name="middle_name" class="form-control" value="{{ employee.middle_name|default:'' }}">
   </div>
-  
+
+  {% if request.user.is_authenticated and request.user.employee_profile.role == 'admin' %}
   <div class="col-md-6">
     <label class="form-label">Должность *</label>
     <input type="text" name="position" class="form-control" value="{{ employee.position }}" required>
@@ -45,6 +46,7 @@
       {% endfor %}
     </select>
   </div>
+  {% endif %}
   
   <div class="col-md-6">
     <label class="form-label">Телефон *</label>
@@ -65,17 +67,9 @@
     <input type="email" name="email" class="form-control" value="{{ user_email }}" required>
   </div>
   
-  <div class="col-12">
-    <label class="form-label">Роль</label>
-    <select name="role" class="form-select">
-      <option value="user" {% if employee.role == 'user' %}selected{% endif %}>Пользователь</option>
-      <option value="admin" {% if employee.role == 'admin' %}selected{% endif %}>Администратор</option>
-    </select>
-  </div>
-  
   <div class="col-12 mt-4">
-    <button type="submit" class="btn btn-success">💾 Сохранить изменения</button>
-    <a href="{% url 'contactbook:employee_detail' employee.pk %}" class="btn btn-secondary">↩️ Отмена</a>
+    <button type="submit" class="btn btn-success">Сохранить изменения</button>
+    <a href="{% url 'contactbook:my_profile' %}" class="btn btn-secondary">Отмена</a>
   </div>
 </form>
 {% endblock %}
