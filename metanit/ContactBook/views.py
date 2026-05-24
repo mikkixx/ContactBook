@@ -28,6 +28,7 @@ def employee_list(request):
     sub_id = request.GET.get('subdivision')
     position = request.GET.get('position', '').strip()
 
+    # === ФИЛЬТРАЦИЯ ===
     if search:
         qs = qs.filter(Q(last_name__istartswith=search) | Q(first_name__istartswith=search))
     if dept_id:

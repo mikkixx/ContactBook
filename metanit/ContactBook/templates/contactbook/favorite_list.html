@@ -6,7 +6,7 @@
 <div class="filter">
     <div class="zagolovok"><p>Фильтрация</p></div>
     <form method="get" class="elements">
-        <input type="text" id="search" name="search" value="{{ search }}" placeholder="Поиск по ФИО">
+        <input type="text" id="search" name="search" value="{{ search }}" placeholder="Поиск по имени и фамилии">
         <input type="text" id="position" name="position" value="{{ position }}" placeholder="Поиск по должности">
         
         <select name="department" id="dept-select">
@@ -54,7 +54,7 @@
                 <td id="column2"><a href="{% url 'contactbook:employee_detail' emp.pk %}">Перейти</a></td>
             </tr>
             {% empty %}
-            <tr><td colspan="7" style="text-align:center;">Сотрудники не найдены</td></tr>
+            <tr class="none"><td colspan="7" id="employee-none">Сотрудники не найдены</td></tr>
             {% endfor %}
         </tbody>
     </table>
