@@ -590,9 +590,8 @@ def register(request):
         department = request.POST.get('department', '').strip()
         subdivision = request.POST.get('subdivision', '').strip() or None
         position = request.POST.get('position', '').strip()
-        floor = request.POST.get('floor', '').strip() 
+        floor = request.POST.get('floor', '').strip()
         cabinet = request.POST.get('cabinet', '').strip() or None
-
 
         # Валидация
         if not email or not password or not last_name or not first_name or not phone or not department or not floor:
@@ -607,17 +606,22 @@ def register(request):
             messages.error(request, "Пароль должен содержать минимум 6 символов")
             return redirect('contactbook:register')
         
-        # Проверка уникальности email
+        # ✅ ПРОВЕРКА уникальности username
+        if User.objects.filter(username=username).exists():
+            messages.error(request, "Этот логин уже занят. Выберите другой.")
+            return redirect('contactbook:register')
+        
         if User.objects.filter(email=email).exists():
             messages.error(request, "Этот email уже зарегистрирован")
             return redirect('contactbook:register')
 
         try:
+            # Создаём пользователя НЕактивным
             user = User.objects.create_user(
                 username=username,
                 email=email,
                 password=password,
-                is_active=False
+                is_active=False  # ⚡ Пользователь не может войти до подтверждения
             )
             Employee.objects.create(
                 user_account=user,
@@ -626,18 +630,19 @@ def register(request):
                 middle_name=middle_name or '',
                 phone=phone,
                 department_id=department,
-                subdivision_id=subdivision or '',
+                subdivision_id=subdivision if subdivision else None,
                 position=position,
                 floor=floor,
                 cabinet=cabinet or ''
             )
 
+            # 📧 Отправляем письмо с подтверждением
             token = default_token_generator.make_token(user)
             uid = urlsafe_base64_encode(force_bytes(user.pk))
-            activation_link = request.build_absolute_uri(
-                reverse('contactbook:activate', kwargs = {'iudb64':uid, 'token': token})
-            )
-
+            
+            # Для локального тестирования используем http://127.0.0.1:8000
+            activation_link = f"http://127.0.0.1:8000/activate/{uid}/{token}/"
+            
             send_mail(
                 subject='Подтвердите регистрацию в ContactBook',
                 message=f'Привет, {username}!\n\n'
@@ -649,8 +654,9 @@ def register(request):
                 fail_silently=False,
             )
 
-            messages.success(request, "Регистрация успешна! Пожалуйста войдите в систему.")
+            messages.success(request, "✅ Регистрация успешна! Проверьте почту для подтверждения email.")
             return redirect('contactbook:login')
+            
         except Exception as e:
             messages.error(request, f"Ошибка регистрации: {str(e)}")
             return redirect('contactbook:register')
