@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% block title %}Список сотрудников{% endblock %}
+
+{% block content %}
+<h1>Внешние контакты
+<div class="filter">
+    <div class="zagolovok"><p>Фильтрация</p></div>
+    <form method="get" class="elements">
+        <input type="text" name="search" value="{{ search }}" placeholder="Поиск по имени/фамилии">
+        <input type="text" name="position" value="{{ position }}" placeholder="Поиск по должности">
+        <input type="text" name="organization" value="{{ organization }}" placeholder="Поиск по организации">
+        
+        <select name="category">
+            <option value="">Все категории</option>
+            {% for cat in categories %}
+                <option value="{{ cat.0 }}" {% if category == cat.0 %}selected{% endif %}>
+                    {{ cat.1 }}
+                </option>
+            {% endfor %}
+        </select>
+        
+        <label class="mine-toggle">
+            <input type="checkbox" name="mine_only" {% if mine_only %}checked{% endif %}>
+            <p>Только мои контакты</p>
+        </label>
+        
+        <button type="submit"><p>Применить</p></button>
+        <a href="{% url 'contactbook:contact_list' %}" class="btn-reset"><p>Сбросить</p></a>
+    </form>
+</div>
+
+<div class="list">
+    <table>
+        <thead>
+            <tr>
+                <th>Фамилия</th>
+                <th>Имя</th>
+                <th>Отчество</th>
+                <th>Должность</th>
+                <th>Организация</th>
+                <th>Категория</th>
+                <th>Телефон</th>
+                <th id="column1">Профиль</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for contact in page_obj %}
+            <tr>
+                <td>{{ contact.last_name }}</td>
+                <td>{{ contact.first_name }}</td>
+                <td>{{ contact.middle_name|default:"Нет" }}</td>
+                <td>{{ contact.position|default:"Нет" }}</td>
+                <td>{{ contact.organization|default:"Нет" }}</td>
+                <td>{{ contact.category|default:"Нет" }}</td>
+                <td>{{ contact.phone }}</td>
+                <td><a href="{% url 'contactbook:contact_detail' contact.pk %}">Перейти</a></td>
+            </tr>
+            {% empty %}
+            <tr class="none"><td colspan="8" id="contact-none">Контакты не найдены</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div class="pagination">
+    {% if page_obj.has_previous %}
+        <a href="?page={{ page_obj.previous_page_number }}&search={{ search }}&organization={{ organization }}&category={{ category }}&mine_only={{ mine_only }}">←</a>
+    {% endif %}
+    
+    <span>Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}</span>
+    
+    {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}&search={{ search }}&organization={{ organization }}&category={{ category }}&mine_only={{ mine_only }}">→</a>
+    {% endif %}
+</div>
+{% endblock %}

@@ -687,30 +687,40 @@ def get_subdivisions_by_dept(request):
 
 @login_required
 def contact_list(request):
-    qs = Contact.objects.all().order_by('last_name')
+    is_admin_user = is_admin(request.user)
+    qs = Contact.objects.all()
     
+    mine_only = request.GET.get('mine_only') == 'on'
+    if mine_only and not is_admin_user:
+        qs = qs.filter(owner=request.user)
+        
     search = request.GET.get('search', '').strip()
-    category = request.GET.get('category')
+    position = request.GET.get('position', '').strip()
     org = request.GET.get('organization', '').strip()
+    category = request.GET.get('category')
     
     if search:
-        qs = qs.filter(Q(last_name__istartswith=search) | 
-                       Q(first_name__istartswith=search) | 
-                       Q(phone__icontains=search))
-    if category:
-        qs = qs.filter(category=category)
+        qs = qs.filter(Q(last_name__istartswith=search) | Q(first_name__istartswith=search))
+    if position:
+        qs = qs.filter(position__icontains=position)
     if org:
         qs = qs.filter(organization__icontains=org)
+    if category:
+        qs = qs.filter(category=category)
         
+    qs = qs.order_by('last_name')
     paginator = Paginator(qs, 10)
     page_obj = paginator.get_page(request.GET.get('page'))
     
     return render(request, 'contactbook/contact_list.html', {
         'page_obj': page_obj,
         'search': search,
-        'category': category,
+        'position': position,
         'organization': org,
-        'categories': [('client', 'Клиент'), ('partner', 'Партнёр'), ('supplier', 'Поставщик'), ('other', 'Другое')]
+        'category': category,
+        'mine_only': mine_only,  
+        'categories': [('client', 'Клиент'), ('partner', 'Партнёр'), ('supplier', 'Поставщик'), ('other', 'Другое')],
+        'is_admin': is_admin_user
     })
 
 @login_required

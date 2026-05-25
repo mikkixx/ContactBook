@@ -10,7 +10,7 @@ html,body{
 header{
     width: 100%;
     height: 7%;
-    background-color: #0a1220;
+    background-color: #2b5192;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -33,16 +33,16 @@ header{
     list-style-type: none;
 }
 .header > ul > li > a{
-    color: #ffffff92;
+    color: #ffffffbd;
     text-decoration: none;
     transition: all 0.3s ease;
-    font-size: 20px;
+    font-size: 18px;
     font-weight: 400;
     text-align: center;
 }
 .header > ul > li > a:hover{
     color: #ffffff;
-    font-size: 22px;
+    font-size: 20px;
 }
 
 #logo{
@@ -59,12 +59,12 @@ header{
     width: 100%;
     height: 35px;
     background-color: #ffffff;
-    color: rgb(0, 0, 0);
+    color: rgb(28, 28, 28);
     font-size: 18px;
     padding: 5px 15px;
     border-radius: 20px;  
     transition: all 0.2s ease;
-    border: 1px solid #0a1220;
+    border: 1px solid #2b5192;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -84,6 +84,10 @@ main{
     justify-content: center;
     align-items: center;
     flex-direction: column;
+}
+main > h1{
+    font-size: 30px;
+    color: rgb(28, 28, 28);
 }
 
 .auth-card{
@@ -106,7 +110,8 @@ main{
 }
 
 .form > h1{
-    font-size: 48px;
+    font-size: 40px;
+    color: rgb(28, 28, 28);
 }
 
 form{
@@ -127,31 +132,31 @@ form{
     border: solid 1px rgb(163, 163, 163);
     background-color: white;
     border-radius: 20px;
-    font-size: 20px;
+    font-size: 16px;
     padding: 5px 10px;
 }
 .row > input:focus{
-    box-shadow: 0 0 10px rgba(9, 23, 75, 0.494);
-    border: solid 1px transparent;
+    box-shadow: 0 0 10px rgba(41, 48, 73, 0.22);
     outline: none;
 }
 .row > label{
-    font-size: 26px;
+    font-size: 20px;
+    color: rgb(28, 28, 28);
 }
 
 .form > button{
     width: 70%;
     height: 50px;
-    background-color: #0a1220;
+    background-color: #2b5192;
     color: white;
-    font-size: 26px;
-    border-radius: 20px;  
+    font-size: 24px;
+    border-radius: 25px;  
     margin-top: 10px;
     transition: all 0.2s ease;
     border: none;
 }
 .form > button:hover{
-    background-color: #213659;
+    background-color: #587dbd;
     color: white;
     transform: scale(1.05);
     cursor: pointer;
@@ -163,7 +168,7 @@ form{
     align-items: center;
     justify-content: center;
     gap: 10px;
-    font-size: 20px;
+    font-size: 18px;
 }
 .link > a{
     text-decoration: none;
@@ -184,8 +189,9 @@ form{
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: 20px;
+    font-size: 18px;
     font-weight: bold;
+    color: rgb(28, 28, 28);
 }
 
 .elements{
@@ -203,11 +209,11 @@ form{
     border: solid 1px rgb(163, 163, 163);
     background-color: white;
     border-radius: 20px;
-    font-size: 18px;
+    font-size: 16px;
     padding: 5px 10px;
 }
 .elements > input:focus{
-    box-shadow: 0 0 5px rgba(9, 23, 75, 0.494);
+    box-shadow: 0 0 10px rgba(41, 48, 73, 0.22);
     outline: none;
 }
 
@@ -222,8 +228,9 @@ form{
     border: solid 1px rgb(163, 163, 163);
     background-color: white;
     border-radius: 20px;
-    font-size: 18px;
+    font-size: 16px;
     padding: 5px 10px;
+    color: rgb(107, 107, 107);
 }
 
 .elements > select:focus{
@@ -236,36 +243,38 @@ form{
     border: solid 1px rgb(163, 163, 163);
     background-color: white;
     border-radius: 20px;
-    font-size: 18px;
+    font-size: 16px;
     padding: 5px 10px;
+    color: rgb(107, 107, 107);
 }
 
 .elements > button{
     width: 9%;
     height: 58%;
-    background-color: #0a1220;
+    background-color: #2b5192;
     color: white;
-    font-size: 18px;
+    font-size: 16px;
     border-radius: 20px;  
     transition: all 0.1s ease;
-    border: solid 1px #0a1220;
+    border: solid 2px #2b5192;
 }
 
 .elements > button:hover{
     background-color: transparent;
-    color: black;
+    border: solid 2px rgb(28, 28, 28);
+    color: rgb(28, 28, 28);
     cursor: pointer;
 }
 
 .elements > a{
     width: 9%;
     height: 58%;
-    background-color: #0a1220;
+    background-color: #2b5192;
     color: white;
-    font-size: 18px;
+    font-size: 16px;
     border-radius: 20px;  
     transition: all 0.1s ease;
-    border: solid 1px #0a1220;
+    border: solid 2px #2b5192;
     text-decoration: none;
     display: flex;
     justify-content: center;
@@ -275,7 +284,8 @@ form{
 
 .elements > a:hover{
     background-color: transparent;
-    color: black;
+    border: solid 2px rgb(28, 28, 28);
+    color: rgb(28, 28, 28);
     cursor: pointer;
 }
 
@@ -292,10 +302,10 @@ form{
     display: flex;
     align-items: center;
     flex-direction: column;
-    border: 1px solid rgb(163, 163, 163);
+    border: 1px solid rgb(214, 214, 214);
     border-radius: 20px;
     border-collapse: collapse;
-    box-shadow: 0 4px 12px rgba(10, 18, 32, 0.08);
+    box-shadow: 0 0 10px rgba(41, 48, 73, 0.22);
 }
 
 .list > table > thead{
@@ -303,7 +313,7 @@ form{
     height: 10%;
     display: flex;
     justify-content: center;
-    background-color: #577fc527;
+    background-color: rgba(87, 127, 197, 0.644);
     border-top-left-radius: 20px;
     border-top-right-radius: 20px;
 }
@@ -323,10 +333,11 @@ form{
     align-items: center;
     justify-content: center;
     border-top: none;
-    border-bottom: 1px solid rgb(163, 163, 163);
-    border-right: 1px solid rgb(163, 163, 163);
+    border-bottom: 1px solid rgb(28, 28, 28);
+    border-right: 1px solid rgb(28, 28, 28);
     padding: 0;
-    font-size: 18px;
+    font-size: 16px;
+    color: rgb(28, 28, 28);
 }
 
 #column1{
@@ -358,21 +369,22 @@ form{
     align-items: center;
     justify-content: center;
     border-top: none;
-    border-bottom: 1px solid rgb(163, 163, 163);
-    border-right: 1px solid rgb(163, 163, 163);
+    border-bottom: 1px solid rgb(28, 28, 28);
+    border-right: 1px solid rgb(28, 28, 28);
     padding: 0;
-    font-size: 18px;
+    font-size: 16px;
+    color: rgb(28, 28, 28);
 }
 
 .list > table > tbody > tr > td > a{
     width: 60%;
     height: 58%;
     background-color: transparent;
-    color: rgb(0, 0, 0);
+    color: rgb(28, 28, 28);
     font-size: 18px;
     border-radius: 20px;  
     transition: all 0.1s ease;
-    border: solid 1px #0a1220;
+    border: solid 1px rgb(28, 28, 28);
     text-decoration: none;
     display: flex;
     justify-content: center;
@@ -381,7 +393,11 @@ form{
 }
 
 .list > table > tbody > tr > td > a:hover{
-    background-color: #4b6eab2a;
+    background-color: #2656aa36;
+}
+
+.pagination{
+    color: rgb(28, 28, 28);
 }
 
 .registration{
@@ -405,6 +421,7 @@ form{
 }
 .reg > h1{
     padding: 0;
+    color: rgb(28, 28, 28);
 }
 
 .pole-vvoda{
@@ -424,6 +441,7 @@ form{
 
 .label > label{
     font-size: 16px;
+    color: rgb(28, 28, 28);
 }
 
 .input{
@@ -445,11 +463,6 @@ form{
     justify-content: center;
 }
 
-.input > input:focus{
-    box-shadow: 0 0 5px rgba(9, 23, 75, 0.269);
-    border: solid 1px transparent;
-    outline: none;
-}
 #dept{
     width: 105%;
     height: 29px;
@@ -458,6 +471,7 @@ form{
     border-radius: 20px;
     font-size: 14px;
     padding: 5px 10px;
+    color: rgb(107, 107, 107);
 }
 #sub{
     width: 105%;
@@ -467,11 +481,11 @@ form{
     border-radius: 20px;
     font-size: 14px;
     padding: 5px 10px;
+    color: rgb(107, 107, 107);
 }
 
 .input > input:focus{
-    box-shadow: 0 0 5px rgba(9, 23, 75, 0.269);
-    border: solid 1px transparent;
+    box-shadow: 0 0 10px rgba(41, 48, 73, 0.22);
     outline: none;
 }
 
@@ -485,18 +499,18 @@ form{
     gap: 15px;
 }
 .niz > button{
-    width: 30%;
-    background-color: #0a1220;
+    width: 40%;
+    height: 50px;
+    background-color: #2b5192;
     color: white;
-    font-size: 18px;
-    border-radius: 20px;  
-    padding: 10px 0;
-    margin-top: 20px;
+    font-size: 20px;
+    border-radius: 25px;  
+    margin-top: 10px;
     transition: all 0.2s ease;
     border: none;
 }
 .niz > button:hover{
-    background-color: #213659;
+    background-color: #587dbd;
     color: white;
     transform: scale(1.05);
     cursor: pointer;
