@@ -20,7 +20,7 @@
                 <li><a href="{% url 'contactbook:favorite_list' %}">Избранное</a></li>
                 <li><a href="{% url 'contactbook:my_profile' %}">Профиль</a></li>
                 {% if request.user.is_authenticated and request.user.employee_profile.role == 'admin' %}
-                    <li><a href="{% url 'contactbook:structure' %}">Структура</a></li>
+                    <li><a href="{% url 'contactbook:organization_structure' %}">Структура</a></li>
                 {% endif %}
             </ul>
             
