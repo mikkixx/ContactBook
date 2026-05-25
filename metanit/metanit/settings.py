@@ -102,3 +102,12 @@ LOGIN_URL = 'contactbook:login'
 LOGIN_REDIRECT_URL = 'contactbook:employee_list'
 # Куда перенаправлять после выхода
 LOGOUT_REDIRECT_URL = 'contactbook:employee_list'
+
+#подтверждение почты (письма в консоли временно)
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'rockstar.setry@gmail.com'  # Ваш Gmail
+EMAIL_HOST_PASSWORD = 'wwvo rlma kmrs mfzn'  # App Password (не обычный пароль!)
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
