@@ -59,3 +59,22 @@ class Favorite(models.Model):
 
     def __str__(self):
         return f"{self.user.email} -> {self.employee}"
+    
+class Contact(models.Model):
+    last_name = models.CharField(max_length=50, verbose_name='Фамилия')  
+    first_name = models.CharField(max_length=50, verbose_name='Имя')  
+    middle_name = models.CharField(max_length=50, blank=True, null=True, verbose_name='Отчество') 
+    phone = models.CharField(max_length=20, unique=True, verbose_name='Телефон')
+    email = models.CharField(max_length=150, unique=True, blank=True, null=True, verbose_name='Почта')
+    organization = models.CharField(max_length=100, blank=True, null=True, verbose_name='Организация')
+    position = models.CharField(max_length=100, blank=True, null=True, verbose_name='Должность')
+    category = models.CharField(max_length=20, choices=[('client', 'Клиент'), ('partner', 'Партнёр'), ('supplier', 'Поставщик'), ('other', 'Другое')], default='client', verbose_name='Категория')
+    owner = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, verbose_name='Ответственный')
+
+    class Meta:
+        verbose_name = 'Внешний контакт'
+        verbose_name_plural = 'Внешние контакты'
+        ordering = ['last_name', 'first_name'] 
+
+    def __str__(self):
+        return f"{self.last_name} {self.first_name} ({self.organization or 'Без организации'})"
