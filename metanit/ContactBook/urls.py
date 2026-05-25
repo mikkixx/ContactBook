@@ -28,4 +28,9 @@ urlpatterns = [
     path('employee/<int:pk>/edit/', views.edit_employee, name='edit_employee'),
     path('employee/<int:pk>/delete/', views.delete_employee, name='delete_employee'),
     path('api/subdivisions/', views.get_subdivisions_by_dept, name='get_subdivisions'),
+    path('contacts/', views.contact_list, name='contact_list'),
+    path('contacts/add/', views.contact_create, name='contact_create'),
+    path('contacts/<int:pk>/', views.contact_detail, name='contact_detail'),
+    path('contacts/<int:pk>/edit/', views.contact_edit, name='contact_edit'),
+    path('contacts/<int:pk>/delete/', views.contact_delete, name='contact_delete'),
 ]
