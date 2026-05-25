@@ -14,6 +14,13 @@ from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, 
 from reportlab.lib import colors
 from reportlab.lib.units import inch
 from django.http import JsonResponse
+from django.core.mail import send_mail
+from django.urls import reverse
+from django.utils.http import urlsafe_base64_encode
+from django.utils.encoding import force_bytes
+from django.contrib.auth.tokens import default_token_generator
+from django.utils.http import urlsafe_base64_decode
+from django.utils.encoding import force_str
 
 def is_admin(user):
     return user.is_authenticated and hasattr(user, 'employee_profile') and user.employee_profile.role == 'admin'
@@ -608,7 +615,8 @@ def register(request):
             user = User.objects.create_user(
                 username=username,
                 email=email,
-                password=password
+                password=password,
+                is_active=False
             )
             Employee.objects.create(
                 user_account=user,
@@ -622,6 +630,24 @@ def register(request):
                 floor=floor,
                 cabinet=cabinet or ''
             )
+
+            token = default_token_generator.make_token(user)
+            uid = urlsafe_base64_encode(force_bytes(user.pk))
+            activation_link = request.build_absolute_uri(
+                reverse('contactbook:activate', kwargs = {'iudb64':uid, 'token': token})
+            )
+
+            send_mail(
+                subject='Подтвердите регистрацию в ContactBook',
+                message=f'Привет, {username}!\n\n'
+                        f'Для завершения регистрации перейдите по ссылке:\n'
+                        f'{activation_link}\n\n'
+                        f'Если вы не регистрировались, просто проигнорируйте это письмо.',
+                from_email='your_email@gmail.com',  # Замените на вашу почту
+                recipient_list=[email],
+                fail_silently=False,
+            )
+
             messages.success(request, "Регистрация успешна! Пожалуйста войдите в систему.")
             return redirect('contactbook:login')
         except Exception as e:
@@ -631,6 +657,25 @@ def register(request):
     return render(request, 'contactbook/register.html', {
         'departments': Department.objects.all()
     })
+
+def activate(request, uidb64, token):
+    """Подтверждение email через ссылку из письма"""
+    try:
+        uid = force_str(urlsafe_base64_decode(uidb64))
+        user = User.objects.get(pk=uid)
+    except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+        user = None
+
+    if user is not None and default_token_generator.check_token(user, token):
+        # ✅ Активируем пользователя
+        user.is_active = True
+        user.save()
+        
+        messages.success(request, "✅ Email подтверждён! Теперь вы можете войти в систему.")
+        return redirect('contactbook:login')
+    else:
+        messages.error(request, "❌ Ссылка подтверждения недействительна или устарела.")
+        return redirect('contactbook:register')
 
 def get_subdivisions_by_dept(request):
     dept_id = request.GET.get('dept_id')
