@@ -3,7 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.core.paginator import Paginator
 from django.db.models import Q
-from .models import Employee, Department, Subdivision, Favorite
+from .models import Employee, Department, Subdivision, Favorite, Contact
 from django.contrib.auth.models import User
 from django.contrib.auth import update_session_auth_hash
 import io
@@ -21,6 +21,7 @@ from django.utils.encoding import force_bytes
 from django.contrib.auth.tokens import default_token_generator
 from django.utils.http import urlsafe_base64_decode
 from django.utils.encoding import force_str
+from django.db import IntegrityError
 
 def is_admin(user):
     return user.is_authenticated and hasattr(user, 'employee_profile') and user.employee_profile.role == 'admin'
@@ -683,3 +684,122 @@ def get_subdivisions_by_dept(request):
     if dept_id and dept_id.isdigit():
         subdivisions = list(Subdivision.objects.filter(department_id=dept_id).values('id', 'name'))
     return JsonResponse({'subdivisions': subdivisions})
+
+@login_required
+def contact_list(request):
+    qs = Contact.objects.all().order_by('last_name')
+    
+    search = request.GET.get('search', '').strip()
+    category = request.GET.get('category')
+    org = request.GET.get('organization', '').strip()
+    
+    if search:
+        qs = qs.filter(Q(last_name__istartswith=search) | 
+                       Q(first_name__istartswith=search) | 
+                       Q(phone__icontains=search))
+    if category:
+        qs = qs.filter(category=category)
+    if org:
+        qs = qs.filter(organization__icontains=org)
+        
+    paginator = Paginator(qs, 10)
+    page_obj = paginator.get_page(request.GET.get('page'))
+    
+    return render(request, 'contactbook/contact_list.html', {
+        'page_obj': page_obj,
+        'search': search,
+        'category': category,
+        'organization': org,
+        'categories': [('client', 'Клиент'), ('partner', 'Партнёр'), ('supplier', 'Поставщик'), ('other', 'Другое')]
+    })
+
+@login_required
+def contact_detail(request, pk):
+    contact = get_object_or_404(Contact, pk=pk)
+    
+    is_owner = (contact.owner == request.user)
+    is_admin_user = is_admin(request.user)
+    
+    return render(request, 'contactbook/contact_detail.html', {
+        'contact': contact,
+        'is_owner': is_owner,
+        'is_admin': is_admin_user
+    })
+
+@login_required
+def contact_create(request):
+    if request.method == 'POST':
+        last_name = request.POST.get('last_name', '').strip()
+        first_name = request.POST.get('first_name', '').strip()
+        middle_name = request.POST.get('middle_name', '').strip() or None
+        phone = request.POST.get('phone', '').strip()
+        email = request.POST.get('email', '').strip() or None
+        organization = request.POST.get('organization', '').strip() or None
+        position = request.POST.get('position', '').strip() or None
+        category = request.POST.get('category', 'client')
+        
+        if not last_name or not first_name or not phone:
+            messages.error(request, 'Фамилия, имя и телефон обязательны')
+            return redirect('contactbook:contact_create')
+            
+        try:
+            Contact.objects.create(
+                last_name=last_name, first_name=first_name, middle_name=middle_name,
+                phone=phone, email=email, organization=organization,
+                position=position, category=category, notes=notes,
+                owner=request.user 
+            )
+            messages.success(request, 'Контакт успешно добавлен')
+            return redirect('contactbook:contact_list')
+        except IntegrityError:
+            messages.error(request, 'Контакт с таким телефоном или email уже существует')
+            return redirect('contactbook:contact_create')
+            
+    return render(request, 'contactbook/contact_form.html', {'is_create': True})
+
+@login_required
+def contact_edit(request, pk):
+    contact = get_object_or_404(Contact, pk=pk)
+    
+    if not is_admin(request.user) and contact.owner != request.user:
+        messages.error(request, "У вас нет прав для редактирования этого контакта.")
+        return redirect('contactbook:contact_detail', pk=pk)
+    
+    if request.method == 'POST':
+        contact.last_name = request.POST.get('last_name', '').strip()
+        contact.first_name = request.POST.get('first_name', '').strip()
+        contact.middle_name = request.POST.get('middle_name', '').strip() or None
+        contact.phone = request.POST.get('phone', '').strip()
+        contact.email = request.POST.get('email', '').strip() or None
+        contact.organization = request.POST.get('organization', '').strip() or None
+        contact.position = request.POST.get('position', '').strip() or None
+        contact.category = request.POST.get('category', 'client')
+        
+        if not contact.last_name or not contact.first_name or not contact.phone:
+            messages.error(request, 'Фамилия, имя и телефон обязательны')
+            return redirect('contactbook:contact_edit', pk=pk)
+            
+        try:
+            contact.save()
+            messages.success(request, 'Данные контакта обновлены')
+            return redirect('contactbook:contact_detail', pk=pk)
+        except IntegrityError:
+            messages.error(request, 'Контакт с таким телефоном или email уже существует')
+            return redirect('contactbook:contact_edit', pk=pk)
+            
+    return render(request, 'contactbook/contact_form.html', {'contact': contact, 'is_create': False})
+
+@login_required
+def contact_delete(request, pk):
+    contact = get_object_or_404(Contact, pk=pk)
+    
+    if not is_admin(request.user) and contact.owner != request.user:
+        messages.error(request, "У вас нет прав для удаления этого контакта.")
+        return redirect('contactbook:contact_detail', pk=pk)
+    
+    if request.method == 'POST':
+        contact.delete()
+        messages.success(request, 'Контакт удалён')
+        return redirect('contactbook:contact_list')
+        
+    return render(request, 'contactbook/contact_confirm_delete.html', {'contact': contact})
