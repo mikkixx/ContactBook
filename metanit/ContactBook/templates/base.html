@@ -16,7 +16,7 @@
         <nav class="header">
             <ul>
                 <li><a href="{% url 'contactbook:employee_list' %}">Контакты сотрудников</a></li>
-                <li><a href="{% url 'contactbook:contacts' %}">Внешние контакты</a></li>
+                <li><a href="{% url 'contactbook:contact_list' %}">Внешние контакты</a></li>
                 <li><a href="{% url 'contactbook:favorite_list' %}">Избранное</a></li>
                 <li><a href="{% url 'contactbook:my_profile' %}">Профиль</a></li>
                 {% if request.user.is_authenticated and request.user.employee_profile.role == 'admin' %}
