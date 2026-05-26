@@ -39,9 +39,9 @@ def employee_list(request):
     # === ФИЛЬТРАЦИЯ ===
     if search:
         qs = qs.filter(Q(last_name__istartswith=search) | Q(first_name__istartswith=search))
-    if dept_id:
+    if dept_id and dept_id != 'None':
         qs = qs.filter(department_id=dept_id)
-    if sub_id:
+    if sub_id and sub_id != 'None':
         qs = qs.filter(subdivision_id=sub_id)
     if position:
         qs = qs.filter(position__icontains=position)
