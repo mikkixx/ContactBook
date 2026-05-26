@@ -4,7 +4,7 @@
 {% block content %}
 <h1>Структура организации</h1>
 <div class="adddept">
-    <button onclick="document.getElementById('add-dept-form').classList.toggle('hidden')" class="btn-add">Добавить отдел</button>
+    <button type="submit" onclick="toggleForm('add-dept-form')">Добавить отдел</button>
 </div>
 <div>
     <table class="structure">
@@ -18,7 +18,7 @@
             {% for dept in page_obj %}
             <tr class="dept-row" data-dept-id="{{ dept.id }}">
                 <td>
-                    <p class="arrow" onclick="toggleSubs({{ dept.id }})">▶</p>
+                    <p class="arrow" onclick="toggleSubs('{{ dept.id }}')">▶</p>
                     <p class="dept-name">{{ dept.name }}</p>
                 </td>
                 <td>

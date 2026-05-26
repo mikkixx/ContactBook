@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}Удаление подразделения{% endblock %}
+
+{% block content %}
+<div class="reg">
+    <h1>Подтверждение удаления подразделения</h1>
+
+    <p style="font-size: 20px; margin: 20px 0; text-align: center;">
+        Вы действительно хотите удалить подразделение:<br>
+        <strong>"{{ subdivision.name }}"</strong>
+    </p>
+
+    {% if employee_count > 0 %}
+    <div class="alert-box" style="background: #fff3cd; color: #856404; padding: 15px; border-radius: 10px; margin-bottom: 20px; text-align: center;">
+        <strong>Внимание!</strong> В этом подразделении числиться <strong>{{ employee_count }}</strong> сотрудник(ов).<br>
+        При удалении они будут автоматически перенесены в отдел "{{ subdivision.department.name }}" без подразделения.
+    </div>
+    {% endif %}
+
+    <form method="post">
+        {% csrf_token %}
+
+        <div class="form-buttons">
+            <button type="submit" class="btn btn-delete">Да, удалить</button>
+            <a href="{% url 'contactbook:organization_structure' %}" class="btn btn-secondary">Отмена</a>
+        </div>
+    </form>
+</div>
+{% endblock %}
