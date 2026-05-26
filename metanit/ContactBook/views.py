@@ -607,7 +607,7 @@ def delete_subdivision(request, pk):
     sub = get_object_or_404(Subdivision, pk=pk)
     
     if request.method == 'POST':
-        employees_in_sub = Employee.objects.filter(subdivision=sub)
+        employees_in_sub = Employee.objects.filter(subdivision=sub, is_deleted=False)
         emp_count = employees_in_sub.count()
         
         if emp_count > 0:
@@ -622,7 +622,7 @@ def delete_subdivision(request, pk):
             messages.error(request, f"Ошибка при удалении: {str(e)}")
         return redirect('contactbook:organization_structure')
         
-    emp_count = Employee.objects.filter(subdivision=sub, is_active=True).count()
+    emp_count = Employee.objects.filter(subdivision=sub, is_deleted=False).count()
     return render(request, 'contactbook/confirm_delete_subdivision.html', {
         'subdivision': sub,
         'employee_count': emp_count
