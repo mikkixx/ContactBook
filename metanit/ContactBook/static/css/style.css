@@ -719,3 +719,61 @@ form{
 .pagination { margin-top: 20px; display: flex; gap: 12px; align-items: center; }
 .pagination a { text-decoration: none; }
 .pagination a p { margin: 0; padding: 6px 10px; background: #0d6efd; color: #fff; border-radius: 4px; }
+
+/* Выделение неподтверждённых сотрудников */
+.unconfirmed {
+    background-color: #ffcdd2 !important; /* Светло-красный фон */
+    color: #c62828;                      /* Тёмно-красный текст */
+}
+
+/* Чтобы границы ячеек тоже подстраивались под цвет */
+.unconfirmed td {
+    border-bottom: 1px solid #ffcdd2 !important;
+}
+
+/* Эффект при наведении чуть темнее */
+.unconfirmed:hover {
+    background-color: #ff7a87 !important;
+}
+
+/* кнопки удаления */
+.button-container {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 30px;
+}
+
+.button-container .btn {
+    padding: 12px 30px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s ease;
+}
+
+.btn-delete {
+    background-color: #ff4444;
+    color: white;
+}
+
+.btn-delete:hover {
+    background-color: #cc0000;
+    transform: scale(1.05);
+}
+
+.btn-secondary {
+    background-color: #1478fa;
+    color: #ffffff;
+    border: 2px solid #0a1220;
+}
+
+.btn-secondary:hover {
+    background-color: #1478fa;
+    transform: scale(1.05);
+}

@@ -28,7 +28,7 @@ def is_admin(user):
 
 @login_required
 def employee_list(request):
-    qs = Employee.objects.select_related('department', 'subdivision').order_by('last_name')
+    qs = Employee.objects.select_related('department', 'subdivision', 'user_account').order_by('last_name')
     is_admin_user = is_admin(request.user)
 
     search = request.GET.get('search', '').strip()
@@ -394,22 +394,73 @@ def delete_employee(request, pk):
     if not is_admin(request.user):
         messages.error(request, "Только администратор может удалять сотрудников")
         return redirect('contactbook:employee_list')
-
-    employee = get_object_or_404(Employee, pk=pk)
+    
+    # ✅ ИСПОЛЬЗУЙ all_objects чтобы найти даже "удалённого"
+    employee = get_object_or_404(Employee.all_objects, pk=pk)
 
     if request.method == 'POST':
         try:
             employee_name = f"{employee.last_name} {employee.first_name}"
-            Favorite.objects.filter(employee=employee).delete()
+            
+            #МЯГКОЕ УДАЛЕНИЕ вместо employee.delete()
+            employee.soft_delete()
+            
+            # Опционально: деактивируем учётную запись
             if employee.user_account:
-                employee.user_account.delete()
-            employee.delete()
-            messages.success(request, f"Аккаунт и карточка «{employee_name}» успешно удалены")
+                employee.user_account.is_active = False
+                employee.user_account.save()
+            
+            messages.success(request, f"Карточка «{employee_name}» перемещена в корзину")
         except Exception as e:
             messages.error(request, f"Ошибка при удалении: {str(e)}")
         return redirect('contactbook:employee_list')
 
     return render(request, 'contactbook/confirm_delete_employee.html', {'employee': employee})
+
+@login_required
+def restore_employee(request, pk):
+    """Восстановление удалённого сотрудника (только для админов)"""
+    if not is_admin(request.user):
+        messages.error(request, "Доступ запрещён")
+        return redirect('contactbook:employee_list')
+    
+    # ✅ Ищем среди удалённых
+    employee = get_object_or_404(Employee.all_objects, pk=pk, is_deleted=True)
+    
+    if request.method == 'POST':
+        try:
+            employee.restore()
+            
+            # Активируем учётную запись
+            if employee.user_account:
+                employee.user_account.is_active = True
+                employee.user_account.save()
+            
+            messages.success(request, f"Сотрудник {employee} восстановлен")
+        except Exception as e:
+            messages.error(request, f"Ошибка при восстановлении: {str(e)}")
+    
+    return redirect('contactbook:deleted_employees')  # Или куда хочешь
+
+@login_required
+def deleted_employees(request):
+    """Список удалённых сотрудников (только для админов)"""
+    if not is_admin(request.user):
+        messages.error(request, "Доступ запрещён")
+        return redirect('contactbook:employee_list')
+    
+    # ✅ Получаем только удалённых
+    qs = Employee.all_objects.filter(
+        is_deleted=True
+    ).select_related('department', 'subdivision').order_by('-deleted_at')
+    
+    paginator = Paginator(qs, 10)
+    page_obj = paginator.get_page(request.GET.get('page'))
+    
+    return render(request, 'contactbook/deleted_employees.html', {
+        'page_obj': page_obj,
+        'is_admin': True
+    })
 
 @login_required
 def organization_structure(request):

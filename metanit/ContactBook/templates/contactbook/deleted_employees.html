@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}Удалённые сотрудники{% endblock %}
+
+{% block content %}
+<h1>Удалённые сотрудники</h1>
+
+<table>
+    <thead>
+        <tr>
+            <th>ФИО</th>
+            <th>Должность</th>
+            <th>Отдел</th>
+            <th>Дата удаления</th>
+            <th>Действия</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for emp in page_obj %}
+        <tr>
+            <td>{{ emp.last_name }} {{ emp.first_name }}</td>
+            <td>{{ emp.position }}</td>
+            <td>{{ emp.department.name }}</td>
+            <td>{{ emp.deleted_at|date:"d.m.Y H:i" }}</td>
+            <td>
+                <form method="post" action="{% url 'contactbook:restore_employee' emp.pk %}" style="display:inline;">
+                    {% csrf_token %}
+                    <button type="submit">↩️ Восстановить</button>
+                </form>
+            </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="5">Удалённых сотрудников нет</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

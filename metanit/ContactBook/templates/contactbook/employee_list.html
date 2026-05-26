@@ -43,7 +43,7 @@
         </thead>
         <tbody>
             {% for emp in page_obj %}
-            <tr>
+            <tr class="{% if not emp.user_account.is_active %}unconfirmed{% endif %}">
                 <td>{{ emp.last_name }}</td>
                 <td>{{ emp.first_name }}</td>
                 <td>{{ emp.middle_name|default:"Нет" }}</td>

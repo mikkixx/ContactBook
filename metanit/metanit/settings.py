@@ -103,11 +103,15 @@ LOGIN_REDIRECT_URL = 'contactbook:employee_list'
 # Куда перенаправлять после выхода
 LOGOUT_REDIRECT_URL = 'contactbook:employee_list'
 
-#подтверждение почты (письма в консоли временно)
+#подтверждение почты
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'rockstar.setry@gmail.com'  # Ваш Gmail
-EMAIL_HOST_PASSWORD = 'wwvo rlma kmrs mfzn'  # App Password (не обычный пароль!)
+EMAIL_HOST_USER = 'rockstar.setry@gmail.com'
+EMAIL_HOST_PASSWORD = 'wwvo rlma kmrs mfzn'
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+
+#установка мск времени в тайм зон
+TIME_ZONE = 'Europe/Moscow'
+USE_TZ = True

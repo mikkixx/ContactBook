@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.utils import timezone
 
 class Department(models.Model):
     name = models.CharField(max_length=100, unique=True, verbose_name='Название отдела')
@@ -20,6 +21,10 @@ class Subdivision(models.Model):
         verbose_name_plural = 'Подразделения'
     def __str__(self):
         return self.name
+
+class EmployeeManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(is_deleted=False)
 
 class Employee(models.Model):
     last_name = models.CharField(max_length=50, verbose_name='Фамилия')  
@@ -42,11 +47,32 @@ class Employee(models.Model):
     )
     user_account = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True, related_name='employee_profile', verbose_name='Аккаунт входа')
     
+    is_deleted = models.BooleanField(default=False, verbose_name='Удалён')
+    deleted_at = models.DateTimeField(null=True, blank=True, verbose_name='Дата удаления')
+
+    objects = EmployeeManager()  # По умолчанию показывает только активные
+    all_objects = models.Manager()  # Показывает всех, включая удалённых
+
     class Meta:
         verbose_name_plural = 'Сотрудники'
+
     def __str__(self):
         return f"{self.last_name} {self.first_name}"
     
+    def soft_delete(self):
+        """Мягкое удаление"""
+        self.is_deleted = True
+        self.deleted_at = timezone.now()
+        self.save()
+    
+    def restore(self):
+        """Восстановление"""
+        self.is_deleted = False
+        self.deleted_at = None
+        self.save()
+
+
+
 class Favorite(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='favorites', verbose_name='Пользователь')
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='favorites_by', verbose_name='Сотрудник')
