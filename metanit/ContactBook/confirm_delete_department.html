@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}Удаление отдела{% endblock %}
+
+{% block content %}
+<div class="reg">
+    <h1>Подтверждение удаления отдела</h1>
+
+    <p style="font-size: 20px; margin: 20px 0; text-align: center;">
+        Вы действительно хотите удалить отдел навсегда?
+        <strong>"{{ department.name }}"</strong>
+    </p>
+
+    <div class="warning-text" style="color: #ff4444; margin-bottom: 20px; font-size: 16px">
+        Это действие нельзя будет отменить. Все подразделения внутри этого отдела также будут удалены.
+    </div>
+
+    <form method="post">
+        {% csrf_token %}
+
+        <div class="form-buttons">
+            <button type="submit" class="btn btn-delete">Да, удалить</button>
+            <a href="{% url 'contactbook:organization_structure' %}" class="btn btn-secondary">Отмена</a>
+        </div>
+    </form>
+</div>
+
+{% endblock %}

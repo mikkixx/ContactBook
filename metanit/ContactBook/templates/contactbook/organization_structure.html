@@ -4,7 +4,7 @@
 {% block content %}
 <h1>Структура организации</h1>
 <div class="adddept">
-    <button type="submit" onclick="toggleForm('add-dept-form')">Добавить отдел</button>
+    <button onclick="document.getElementById('add-dept-form').classList.toggle('hidden')" class="btn-add">Добавить отдел</button>
 </div>
 <div>
     <table class="structure">
