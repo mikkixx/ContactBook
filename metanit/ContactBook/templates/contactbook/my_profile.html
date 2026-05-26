@@ -6,11 +6,12 @@
     
     <!-- Заголовок -->
     <div class="profile-header">
+        <div class="nazad">
+            <a href="{% url 'contactbook:employee_list' %}" class="btn back-link"><--Назад к списку</a>
+        </div>
         <h1>Мой профиль</h1>
-        <a href="{% url 'contactbook:employee_list' %}" class="btn back-link"><--Назад к списку</a>
     </div>
 
-    <!-- Основная информация -->
     <div class="profile-card">
         <div class="profile-info">
             <h2>{{ employee.last_name }} {{ employee.first_name }} {{ employee.middle_name|default:"" }}</h2>
@@ -45,7 +46,6 @@
         </div>
     </div>
 
-    <!-- Кнопки действий -->
     <div class="prof-btn">
         <br>
         <a href="{% url 'contactbook:edit_profile' %}" class="btn btn-primary">Редактировать профиль</a>

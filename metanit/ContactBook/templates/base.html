@@ -29,7 +29,7 @@
                 {% if request.user.is_authenticated %}
                     <form method="post" action="{% url 'contactbook:logout' %}">
                         {% csrf_token %}
-                        <button type="submit">Выйти</button>
+                        <button type="submit" class="btn">Выйти</button>
                     </form>
                 {% endif %}
             </div>
