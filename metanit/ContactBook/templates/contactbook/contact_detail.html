@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% block title %}Профиль контакта{% endblock %}
+
+{% block content %}
+<a href="{% url 'contactbook:contact_list' %}" class="back-link">← Назад к списку</a>
+
+<div class="profile-card">
+    <div class="profile-info">
+        <h2>{{ contact.last_name }} {{ contact.first_name }} {{ contact.middle_name|default:"" }}</h2>
+        {% if contact.position %}
+            <p class="profile-position">{{ contact.position }}</p>
+        {% endif %}
+    </div>
+
+    <div class="profile-details">
+        <div class="detail-item">
+            <span class="detail-label">Телефон</span>
+            <span class="detail-value">
+                <a href="#" onclick="navigator.clipboard.writeText(this.innerText); alert('Скопировано'); return false;" class="copy-data">{{ contact.phone }}</a>
+            </span>
+        </div>
+
+        <div class="detail-item">
+            <span class="detail-label">Email</span>
+            <span class="detail-value">
+                {% if contact.email %}
+                    <a href="#" onclick="navigator.clipboard.writeText(this.innerText); alert('Скопировано'); return false;" class="copy-data">{{ contact.email }}</a>
+                {% else %}
+                    <span class="none">Не указан</span>
+                {% endif %}
+            </span>
+        </div>
+
+        <div class="detail-item">
+            <span class="detail-label">Организация</span>
+            <span class="detail-value">{{ contact.organization|default:"Не указана" }}</span>
+        </div>
+
+        <div class="detail-item">
+            <span class="detail-label">Категория</span>
+            <span class="detail-value">
+                {% if contact.category == 'client' %}
+                    Клиент
+                {% elif contact.category == 'partner' %}
+                    Партнёр
+                {% elif contact.category == 'supplier' %}
+                    Поставщик
+                {% else %}
+                    Другое
+                {% endif %}
+            </span>
+        </div>
+
+        {% if contact.owner %}
+        <div class="detail-item">
+            <span class="detail-label">Ответственный</span>
+            <span class="detail-value">{{ contact.owner.get_full_name|default:contact.owner.username }}</span>
+        </div>
+        {% endif %}
+    </div>
+
+    {% if is_admin %}
+    <div class="profile-actions">
+        <a href="{% url 'contactbook:contact_edit' contact.pk %}" class="btn btn-primary">Редактировать</a>
+        <a href="{% url 'contactbook:contact_delete' contact.pk %}" class="btn btn-delete">Удалить</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
