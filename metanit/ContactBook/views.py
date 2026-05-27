@@ -567,8 +567,8 @@ def delete_department(request, pk):
     dept = get_object_or_404(Department, pk=pk)
     
     if request.method == 'POST':
-        if dept.employee_set.filter(is_active=True).exists():
-            count = dept.employee_set.filter(is_active=True).count()
+        if dept.employee_set.filter(is_deleted=True).exists():
+            count = dept.employee_set.filter(is_deleted=True).count()
             messages.warning(request, f"Нельзя удалить отдел: в нём числится {count} сотрудник(ов). Сначала переведите их в другой отдел.")
             return redirect('contactbook:organization_structure')
         try:
