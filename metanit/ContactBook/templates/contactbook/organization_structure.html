@@ -1,94 +1,127 @@
 {% extends "base.html" %}
-{% block title %}Избранное{% endblock %}
+{% block title %}Структура организации{% endblock %}
 
 {% block content %}
-<div class="structure-container">
-    <div class="structure-header">
-        <div class="add-dept">
-            <button type="submit" onclick="toggleForm('add-dept-form')" class="btn back-link">Добавить отдел</button>
-        </div>
-        <h1>Структура организации</h1>
+<div class="structure-header">
+    <div class="add-dept">
+        <button type="button" onclick="toggleForm('add-dept-form')" class="btn back-link"> + Добавить отдел</button>
+        
+        <form id="add-dept-form" class="hidden inline-form" method="post" action="{% url 'contactbook:add_department' %}">
+            {% csrf_token %}
+            <input type="text" name="name" placeholder="Название нового отдела" required>
+            <button type="submit">Сохранить</button>
+            <button type="button" onclick="toggleForm('add-dept-form')">Отмена</button>
+        </form>
     </div>
+    <h1>Структура организации</h1>
+</div>
 
-    <div class="structure-list">
-        <table>
-            <thead>
-                <tr>
-                    <th>Отдел</th>
-                    <th id="column1">Действия</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for dept in page_obj %}
-                <tr class="dept-row" data-dept-id="{{ dept.id }}">
-                    <td>
-                        <p class="arrow" onclick="toggleSubs('{{ dept.id }}')">▶</p>
-                        <p class="dept-name">{{ dept.name }}</p>
-                    </td>
-                    <td>
-                        <p class="dept-actions">
-                            <button onclick="toggleForm('add-sub-{{ dept.id }}')"><p>➕ Подразделение</p></button>
-                            <button onclick="toggleForm('edit-dept-{{ dept.id }}')"><p>✏️</p></button>
-                            <a href="{% url 'contactbook:delete_department' dept.pk %}"><p>🗑️</p></a>
+<div class="structure-list">
+    <table>
+        <thead>
+            <tr>
+                <th>Отдел</th>
+                <th class="movements">Действия</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for dept in page_obj %}
+            <tr class="dept-row {% if forloop.last %}last-dept{% endif %}" data-dept-id="{{ dept.id }}">
+                <td class="dept-stroka">
+                    <p class="dept-name">{{ dept.name }}</p>
+                    <p class="arrow" onclick="toggleSubs('{{ dept.id }}')">▶</p>
+                </td>
+                <td class="movements">
+                    <div class="dept-actions">
+                        <button onclick="toggleForm('add-sub-{{ dept.id }}')" class="btn btn-actions">+ Подразделение</button>
+                        <button onclick="toggleForm('edit-dept-{{ dept.id }}')" class="btn btn-actions">✍🏻</button>
+                        <button onclick="toggleForm('delete-dept-{{ dept.id }}')" class="btn btn-actions">🗑️</button>
+                    </div>
+
+                    <form id="edit-dept-{{ dept.id }}" class="hidden inline-form" method="post" action="{% url 'contactbook:edit_department' dept.pk %}">
+                        {% csrf_token %}
+                        <p><input type="text" name="name" value="{{ dept.name }}" required></p>
+                        <p>
+                            <button type="submit"><p>💾</p></button>
+                            <button type="button" onclick="toggleForm('edit-dept-{{ dept.id }}')"><p>✖</p></button>
                         </p>
-                        <form id="edit-dept-{{ dept.id }}" class="hidden inline-form" method="post" action="{% url 'contactbook:edit_department' dept.pk %}">
-                            {% csrf_token %}
-                            <p><input type="text" name="name" value="{{ dept.name }}" required></p>
-                            <p>
-                                <button type="submit"><p>💾</p></button>
-                                <button type="button" onclick="toggleForm('edit-dept-{{ dept.id }}')"><p>✖</p></button>
-                            </p>
-                        </form>
-                        <form id="add-sub-{{ dept.id }}" class="hidden inline-form" method="post" action="{% url 'contactbook:add_subdivision' dept.pk %}">
-                            {% csrf_token %}
-                            <p><input type="text" name="name" placeholder="Название подразделения" required></p>
-                            <p>
-                                <button type="submit"><p>Добавить</p></button>
-                                <button type="button" onclick="toggleForm('add-sub-{{ dept.id }}')"><p>Отмена</p></button>
-                            </p>
-                        </form>
-                    </td>
-                </tr>
-                {% for sub in dept.subdivisions.all %}
-                <tr class="sub-row hidden" data-parent-dept="{{ dept.id }}">
-                    <td>
-                        <p class="sub-name">{{ sub.name }}</p>
-                    </td>
-                    <td>
-                        <p class="sub-actions">
-                            <button onclick="toggleForm('edit-sub-{{ sub.id }}')"><p>✏️</p></button>
-                            <a href="{% url 'contactbook:delete_subdivision' sub.pk %}"><p>🗑️</p></a>
+                    </form>
+
+                    <form id="add-sub-{{ dept.id }}" class="hidden inline-form" method="post" action="{% url 'contactbook:add_subdivision' dept.pk %}">
+                        {% csrf_token %}
+                        <p><input type="text" name="name" placeholder="Название подразделения" required></p>
+                        <p>
+                            <button type="submit"><p>Добавить</p></button>
+                            <button type="button" onclick="toggleForm('add-sub-{{ dept.id }}')"><p>Отмена</p></button>
                         </p>
-                        <form id="edit-sub-{{ sub.id }}" class="hidden inline-form" method="post" action="{% url 'contactbook:edit_subdivision' sub.pk %}">
-                            {% csrf_token %}
-                            <p><input type="text" name="name" value="{{ sub.name }}" required></p>
-                            <p>
-                                <button type="submit"><p>💾</p></button>
-                                <button type="button" onclick="toggleForm('edit-sub-{{ sub.id }}')"><p>✖</p></button>
-                            </p>
-                        </form>
-                    </td>
-                </tr>
-                {% empty %}
-                <tr class="sub-row hidden" data-parent-dept="{{ dept.id }}">
-                    <td colspan="2"><p class="empty-msg">Нет подразделений</p></td>
-                </tr>
-                {% endfor %}
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-    <div class="pagination">
-        {% if page_obj.has_previous %}
-            <a href="?page={{ page_obj.previous_page_number }}&search={{ search }}&department={{ dept_id }}&subdivision={{ sub_id }}&position={{ position }}">←</a>
-        {% endif %}
-        
-        <p>Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}</p>
-        
-        {% if page_obj.has_next %}
-            <a href="?page={{ page_obj.next_page_number }}&search={{ search }}&department={{ dept_id }}&subdivision={{ sub_id }}&position={{ position }}">→</a>
-        {% endif %}
-    </div>
+                    </form>
+
+                    <form id="delete-dept-{{ dept.id }}" class="hidden inline-form" method="post" action="{% url 'contactbook:delete_department' dept.pk %}">
+                        {% csrf_token %}
+                        <p style="color: #dc3545; font-weight: 600; margin-bottom: 8px;">
+                            ⚠️ Удалить отдел «{{ dept.name }}» и все связанные подразделения?
+                        </p>
+                        <p class="delete-actions">
+                            <button type="submit" class="btn-danger"><p>Да, удалить</p></button>
+                            <button type="button" onclick="toggleForm('delete-dept-{{ dept.id }}')"><p>Отмена</p></button>
+                        </p>
+                    </form>
+                </td>
+            </tr>
+            {% for sub in dept.subdivisions.all %}
+            <tr class="sub-row {% if loop.last %}last-sub-row{% endif %} hidden" data-parent-dept="{{ dept.id }}">
+                <td class="sub-stroka">
+                    <p class="sub-name">{{ sub.name }}</p>
+                </td>
+                <td class="movements">
+                    <div class="sub-actions">
+                        <button onclick="toggleForm('edit-sub-{{ sub.id }}')" class="btn btn-actions">✍🏻</button>
+                        <button onclick="toggleForm('delete-sub-{{ sub.id }}')" class="btn btn-actions">🗑️</button>
+                    </div>
+
+                    <form id="edit-sub-{{ sub.id }}" class="hidden inline-form" method="post" action="{% url 'contactbook:edit_subdivision' sub.pk %}">
+                        {% csrf_token %}
+                        <p><input type="text" name="name" value="{{ sub.name }}" required></p>
+                        <p>
+                            <button type="submit"><p>💾</p></button>
+                            <button type="button" onclick="toggleForm('edit-sub-{{ sub.id }}')"><p>✖</p></button>
+                        </p>
+                    </form>
+
+                    <form id="delete-sub-{{ sub.id }}" class="hidden inline-form" method="post" action="{% url 'contactbook:delete_subdivision' sub.pk %}">
+                        {% csrf_token %}
+                        <p style="color: #dc3545; font-weight: 600; margin-bottom: 6px;">
+                            ⚠️ Удалить подразделение «{{ sub.name }}»?
+                        </p>
+                        <p style="font-size: 13px; color: #666; margin-bottom: 10px;">
+                            Все сотрудники будут автоматически перенесены в отдел «{{ sub.department.name }}».
+                        </p>
+                        <p class="delete-actions">
+                            <button type="submit" class="btn-danger"><p>Да, удалить</p></button>
+                            <button type="button" onclick="toggleForm('delete-sub-{{ sub.id }}')"><p>Отмена</p></button>
+                        </p>
+                    </form>
+                </td>
+            </tr>
+            {% empty %}
+            <tr class="sub-row hidden" data-parent-dept="{{ dept.id }}">
+                <td colspan="2" id="sub-none"><p class="empty-msg">Нет подразделений</p></td>
+            </tr>
+            {% endfor %}
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+<div class="pagination">
+    {% if page_obj.has_previous %}
+        <a href="?page={{ page_obj.previous_page_number }}&search={{ search }}&department={{ dept_id }}&subdivision={{ sub_id }}&position={{ position }}">←</a>
+    {% endif %}
+    
+    <p>Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}</p>
+    
+    {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}&search={{ search }}&department={{ dept_id }}&subdivision={{ sub_id }}&position={{ position }}">→</a>
+    {% endif %}
 </div>
 
 <script>

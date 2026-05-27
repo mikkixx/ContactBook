@@ -549,7 +549,6 @@ def delete_department(request, pk):
 
 @login_required
 def add_subdivision(request, dept_pk):
-    """Добавление подразделения в отдел (только для админов)."""
     if not is_admin(request.user):
         messages.error(request, "Доступ запрещён")
         return redirect('contactbook:organization_structure')

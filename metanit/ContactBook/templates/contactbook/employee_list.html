@@ -38,7 +38,7 @@
                 <th>Отдел</th>
                 <th>Подразделение</th>
                 <th>Телефон</th>
-                <th id="column1">Профиль</th>
+                <th class="last-column">Профиль</th>
             </tr>
         </thead>
         <tbody>
@@ -51,7 +51,7 @@
                 <td>{{ emp.department.name }}</td>
                 <td>{{ emp.subdivision.name|default:"Нет" }}</td>
                 <td>{{ emp.phone }}</td>
-                <td id="column2"><a href="{% url 'contactbook:employee_detail' emp.pk %}">Перейти</a></td>
+                <td class="last-column"><a href="{% url 'contactbook:employee_detail' emp.pk %}">Перейти</a></td>
             </tr>
             {% empty %}
             <tr class="none"><td colspan="7" id="employee-none">Сотрудники не найдены</td></tr>
