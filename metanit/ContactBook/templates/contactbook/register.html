@@ -8,126 +8,72 @@
         <div class="reg">
             <h1>Регистрация</h1>
             <div class="pole-vvoda">
-                <div class="label">
-                    <label for="login">Логин: </label>
-                </div>
-                <div class="input">
-                    <input type="text" placeholder="Введите логин" id="login" name="username" required>
-                </div>
+                <label for="login">Логин: </label>
+                <input type="text" placeholder="Введите логин" id="login" name="username" required>
             </div>
             <div class="pole-vvoda">
-                <div class="label">
-                    <label for="email">Почта: </label>
-                </div>
-                <div class="input">
-                    <input type="email" placeholder="Введите почту" id="email" name="email" required>
-                </div>
+                <label for="email">Почта: </label>
+                <input type="email" placeholder="Введите почту" id="email" name="email" required>
             </div>
             <div class="pole-vvoda">
-                <div class="label">
-                    <label for="pass">Пароль:</label>
-                </div>
-                <div class="input">
-                    <input type="password" placeholder="Введите пароль (не менее 6 символов)" id="pass" name="password" minlength="6" required>
-                </div>
+                <label for="pass">Пароль:</label>
+                <input type="password" placeholder="Введите пароль (не менее 6 символов)" id="pass" name="password" minlength="6" required>
             </div>
             <div class="pole-vvoda">
-                <div class="label">
-                    <label for="confrm_pass">Подтверждение:</label>
-                </div>
-                <div class="input">
-                    <input type="password" placeholder="Повторите пароль" id="confrm_pass" name="confirm_password" required>
-                </div>
+                <label for="confrm_pass">Подтверждение:</label>
+                <input type="password" placeholder="Повторите пароль" id="confrm_pass" name="confirm_password" required>
             </div>
             <div class="pole-vvoda">
-                <div class="label">
-                    <label for="last_name">Фамилия:</label>
-                </div>
-                <div class="input">
-                    <input type="text" placeholder="Введите фамилию" id="last_name" name="last_name" required>
-                </div>
+                <label for="last_name">Фамилия:</label>
+                <input type="text" placeholder="Введите фамилию" id="last_name" name="last_name" required>
             </div>
             <div class="pole-vvoda">
-                <div class="label">
-                    <label for="first_name">Имя:</label>
-                </div>
-                <div class="input">
-                    <input type="text" placeholder="Введите имя" id="first_name" name="first_name" required>
-                </div>
+                <label for="first_name">Имя:</label>
+                <input type="text" placeholder="Введите имя" id="first_name" name="first_name" required>
             </div>
             <div class="pole-vvoda">
-                <div class="label">
-                    <label for="middle_name">Отчество:</label>
-                </div>
-                <div class="input">
-                    <input type="text" placeholder="Введите отчество" id="middle_name" name="middle_name" required>
-                </div>
+                <label for="middle_name">Отчество:</label>
+                <input type="text" placeholder="Введите отчество" id="middle_name" name="middle_name" required>
             </div>
             <div class="pole-vvoda">
-                <div class="label">
-                    <label for="dept-select">Выберите отдел:</label>
-                </div>
-                <div class="input">
-                    <select name="department" id="dept">
-                        <option value="">Все отделы</option>
-                        {% for dept in departments %}
-                            <option value="{{ dept.id }}" {% if dept_id == dept.id|stringformat:"s" %}selected{% endif %}>
-                                {{ dept.name }}
-                            </option>
-                        {% endfor %}
-                    </select>
-                </div>
+                <label for="dept-select">Отдел:</label>
+                <select name="department" id="select">
+                    <option value="">Все отделы</option>
+                    {% for dept in departments %}
+                        <option value="{{ dept.id }}" {% if dept_id == dept.id|stringformat:"s" %}selected{% endif %}>
+                            {{ dept.name }}
+                        </option>
+                    {% endfor %}
+                </select>
             </div>
             <div class="pole-vvoda">
-                <div class="label">
-                    <label for="sub">Выберите подразделение:</label>
-                </div>
-                <div class="input">
-                    <select name="subdivision" id="sub">
-                        <option value="">Нет</option>
-                    </select>
-                </div>
+                <label for="sub">Подразделение:</label>
+                <select name="subdivision" id="select">
+                    <option value="">Нет</option>
+                </select>
             </div>
             <div class="pole-vvoda">
-                <div class="label">
-                    <label for="position">Должность:</label>
-                </div>
-                <div class="input">
-                    <input type="text" placeholder="Введите должность" id="position" name="position" required>
-                </div>
+                <label for="position">Должность:</label>
+                <input type="text" placeholder="Введите должность" id="position" name="position" required>
             </div>
             <div class="pole-vvoda">
-                <div class="label">
-                    <label for="phone">Номер телефона:</label>
-                </div>
-                <div class="input">
-                    <input type="tel" placeholder="Введите номер телефона" id="phone" name="phone" required>
-                </div>
+                <label for="phone">Номер телефона:</label>
+                <input type="tel" placeholder="Введите номер телефона" id="phone" name="phone" required>
             </div>
             <div class="pole-vvoda">
-                <div class="label">
-                    <label for="floor">Этаж:</label>
-                </div>
-                <div class="input">
-                    <input type="text" placeholder="Введите этаж" id="floor" name="floor" required>
-                </div>
+                <label for="floor">Этаж:</label>
+                <input type="text" placeholder="Введите этаж" id="floor" name="floor" required>
             </div>
             <div class="pole-vvoda">
-                <div class="label">
-                    <label for="cab">Кабинет:</label>
-                </div>
-                <div class="input">
-                    <input type="text" placeholder="Введите кабинет" id="cab" name="cabinet" required>
-                </div>
+                <label for="cab">Кабинет:</label>
+                <input type="text" placeholder="Введите кабинет" id="cab" name="cabinet" required>
             </div>
             {% if form.non_field_errors %}
                 <div class="error-box">
                     {{ form.non_field_errors }}
                 </div>
             {% endif %}
-        </div>
-        <div class="niz">
-            <button type="submit" href="{% url 'contactbook:login' %}">Зарегистрироваться</button>
+            <button type="submit" href="{% url 'contactbook:login' %}" class="btn">Зарегистрироваться</button>
             <div class="link-reg">
                 <p>Есть аккаунт?</p>
                 <a href="{% url 'contactbook:login' %}">Войти</a>
