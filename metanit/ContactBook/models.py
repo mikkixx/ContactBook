@@ -107,7 +107,7 @@ class Contact(models.Model):
     organization = models.CharField(max_length=100, blank=True, null=True, verbose_name='Организация')
     position = models.CharField(max_length=100, blank=True, null=True, verbose_name='Должность')
     category = models.CharField(max_length=20, choices=[('client', 'Клиент'), ('partner', 'Партнёр'), ('supplier', 'Поставщик'), ('other', 'Другое')], default='client', verbose_name='Категория')
-    owner = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, verbose_name='Ответственный')
+    owner = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Ответственный')
 
     class Meta:
         verbose_name = 'Внешний контакт'

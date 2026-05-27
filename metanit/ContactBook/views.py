@@ -778,17 +778,17 @@ def get_subdivisions_by_dept(request):
 
 @login_required
 def contact_list(request):
-    is_admin_user = is_admin(request.user)
+    is_admin_user = is_admin(request.user)  
     qs = Contact.objects.all()
     
     mine_only = request.GET.get('mine_only') == 'on'
-    if mine_only and not is_admin_user:
+    if mine_only:
         qs = qs.filter(owner=request.user)
         
     search = request.GET.get('search', '').strip()
     position = request.GET.get('position', '').strip()
     org = request.GET.get('organization', '').strip()
-    category = request.GET.get('category')
+    category = request.GET.get('category', '').strip()
     
     if search:
         search_escaped = re.escape(search)
@@ -814,7 +814,7 @@ def contact_list(request):
         'position': position,
         'organization': org,
         'category': category,
-        'mine_only': mine_only,  
+        'mine_only': mine_only, 
         'categories': [('client', 'Клиент'), ('partner', 'Партнёр'), ('supplier', 'Поставщик'), ('other', 'Другое')],
         'is_admin': is_admin_user
     })

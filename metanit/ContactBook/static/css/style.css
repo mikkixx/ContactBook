@@ -278,6 +278,92 @@ form{
     color: #2b5192;
     cursor: pointer;
 }
+.elements-contact{
+    width: 85%;
+    height: 100%;
+    display: flex;
+    justify-content: right;
+    align-items: center;
+    gap: 5px;
+}
+
+.elements-contact > input{
+    width: 13%;
+    height: 42px;
+    border: solid 1px rgb(163, 163, 163);
+    background-color: white;
+    border-radius: 12px;
+    font-size: 16px;
+    padding: 5px 10px;
+}
+.elements-contact > input:focus{
+    box-shadow: 0 0 10px rgba(41, 48, 73, 0.22);
+    outline: none;
+}
+
+#search{
+    width: 30%;
+    height: 42px;
+}
+
+.elements-contact > select{
+    width: 13%;
+    height: 52px;
+    border: solid 1px rgb(163, 163, 163);
+    background-color: white;
+    border-radius: 12px;
+    font-size: 16px;
+    padding: 5px 10px;
+    color: rgb(107, 107, 107);
+}
+
+.elements-contact > select:focus{
+    box-shadow: 0 0 10px rgba(41, 48, 73, 0.22);
+    outline: none;
+}
+
+.elements-contact > button{
+    background-color: #0a1220;
+    border: solid 2px transparent;
+    color: white;
+    box-shadow: 0 0px 6px rgba(10, 18, 32, 0.2);
+    transition: all 0.2s ease;
+}
+
+.elements-contact > button:hover{
+    background-color: transparent;
+    border: solid 2px #0a1220;
+    cursor: pointer;
+    color: #0a1220;
+}
+
+.elements-contact > a{
+    background-color: #2b5192;
+    border: 2px solid transparent;
+    color: #ffffff;
+    transition: all 0.2s ease;
+    box-shadow: 0 0px 6px rgba(10, 18, 32, 0.2);
+}
+
+.elements-contact > a:hover{
+    background-color: transparent;
+    border: solid 2px #2b5192;
+    color: #2b5192;
+    cursor: pointer;
+}
+
+.mine-toggle{
+    display: flex;
+    align-items: center;
+    width: 12%;
+    height: 42px;
+    border: solid 1px rgb(163, 163, 163);
+    background-color: white;
+    border-radius: 12px;
+    font-size: 16px;
+    padding: 5px 10px;
+    color: rgb(107, 107, 107);
+}
 
 .list{
     width: 95%;
@@ -929,12 +1015,33 @@ form{
     align-items: center;
 }
 
+.btn-dept-actions{
+    border: 2px solid #1046a43c;
+    background: #ffffff;
+    margin: 0;
+    font-size: 14px;
+    transition: all 0.2s ease;
+}
+
+.btn-dept-actions:hover{
+    border: 2px solid #1a1a1a;
+    transform: scale(1.05);
+    cursor: pointer;
+}
+
 .btn-actions{
     height: 25px;
     border: 2px solid #1046a43c;
     background: #ffffff;
     margin: 0;
     font-size: 14px;
+    transition: all 0.2s ease;
+}
+
+.btn-actions:hover{
+    border: 2px solid #1a1a1a;
+    transform: scale(1.05);
+    cursor: pointer;
 }
 
 .sub-row{
@@ -952,7 +1059,7 @@ form{
     padding: 0;
     color: #495057; 
     font-style: italic; 
-    font-size: 12px;
+    font-size: 14px;
 }
 
 .empty-msg { color: #adb5bd; margin: 0; padding: 8px 0; }
@@ -1050,4 +1157,25 @@ form{
     font-family: "Inter", sans-serif;
     font-weight: 600;
     margin-left: 60px;
+}
+
+.contact-header{
+    width: 95%;
+    height: 10%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.contact-header > h1{
+    width: 60%;
+    font-size: 30px;
+    margin:0;
+}
+
+.create-contact{
+    width: 40%;
+    display: flex;
+    justify-content: left;
+    align-items: start;
 }

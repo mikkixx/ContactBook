@@ -2,10 +2,29 @@
 {% block title %}Внешние контакты{% endblock %}
 
 {% block content %}
-<h1>Внешние контакты</h1>
+<div class="contact-header">
+    <div class="create-contact">
+        <button type="button" onclick="toggleForm('create-contact-form')" class="btn back-link"> + Создать контакт</button>
+        
+        <form id="create-contact-form" class="hidden inline-form" method="post" action="{% url 'contactbook:contact_create' %}">
+            {% csrf_token %}
+            <input type="text" name="last_name" placeholder="Фамилия" required>
+            <input type="text" name="first_name" placeholder="Имя">
+            <input type="text" name="organization" placeholder="Организация">
+            <input type="text" name="position" placeholder="Должность">
+            <input type="tel" name="phone" placeholder="Телефон">
+            <input type="email" name="email" placeholder="Email">
+            
+            <button type="submit">Сохранить</button>
+            <button type="button" onclick="toggleForm('create-contact-form')">Отмена</button>
+        </form>
+    </div>
+    <h1>Внешние контакты</h1>
+</div>
+
 <div class="filter">
     <div class="zagolovok"><p>Фильтрация</p></div>
-    <form method="get" class="elements">
+    <form method="get" class="elements-contact">
         <input type="text" name="search" value="{{ search }}" placeholder="Поиск по имени/фамилии">
         <input type="text" name="position" value="{{ position }}" placeholder="Поиск по должности">
         <input type="text" name="organization" value="{{ organization }}" placeholder="Поиск по организации">
@@ -19,13 +38,13 @@
             {% endfor %}
         </select>
         
-        <label class="mine-toggle">
-            <input type="checkbox" name="mine_only" {% if mine_only %}checked{% endif %}>
+        <label for="mine_only" class="mine-toggle">
+            <input type="checkbox" name="mine_only" value="on" {% if mine_only %}checked{% endif %}>
             <p>Только мои контакты</p>
         </label>
         
-        <button type="submit"><p>Применить</p></button>
-        <a href="{% url 'contactbook:contact_list' %}" class="btn-reset"><p>Сбросить</p></a>
+        <button type="submit" class="btn btn-primary">Применить</button>
+        <a href="{% url 'contactbook:contact_list' %}" class="btn btn-secondary">Сбросить</a>
     </form>
 </div>
 
@@ -40,7 +59,7 @@
                 <th>Организация</th>
                 <th>Категория</th>
                 <th>Телефон</th>
-                <th id="column1">Профиль</th>
+                <th class="last-column">Профиль</th>
             </tr>
         </thead>
         <tbody>
@@ -53,7 +72,7 @@
                 <td>{{ contact.organization|default:"Нет" }}</td>
                 <td>{{ contact.category|default:"Нет" }}</td>
                 <td>{{ contact.phone }}</td>
-                <td><a href="{% url 'contactbook:contact_detail' contact.pk %}">Перейти</a></td>
+                <td class="last-column"><a href="{% url 'contactbook:contact_detail' contact.pk %}">Перейти</a></td>
             </tr>
             {% empty %}
             <tr class="none"><td colspan="8" id="contact-none">Контакты не найдены</td></tr>
@@ -64,13 +83,14 @@
 
 <div class="pagination">
     {% if page_obj.has_previous %}
-        <a href="?page={{ page_obj.previous_page_number }}&search={{ search }}&organization={{ organization }}&category={{ category }}&mine_only={{ mine_only }}">←</a>
+        <a href="?page={{ page_obj.previous_page_number }}&search={{ search|urlencode }}&position={{ position|urlencode }}&organization={{ organization|urlencode }}&category={{ category }}&mine_only={% if mine_only %}on{% endif %}">←</a>
     {% endif %}
     
-    <span>Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}</span>
+    <p>Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}</p>
     
     {% if page_obj.has_next %}
-        <a href="?page={{ page_obj.next_page_number }}&search={{ search }}&organization={{ organization }}&category={{ category }}&mine_only={{ mine_only }}">→</a>
+        <a href="?page={{ page_obj.next_page_number }}&search={{ search|urlencode }}&position={{ position|urlencode }}&organization={{ organization|urlencode }}&category={{ category }}&mine_only={% if mine_only %}on{% endif %}">→</a>
     {% endif %}
 </div>
+
 {% endblock %}

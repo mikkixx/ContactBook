@@ -33,9 +33,9 @@
                 </td>
                 <td class="movements">
                     <div class="dept-actions">
-                        <button onclick="toggleForm('add-sub-{{ dept.id }}')" class="btn btn-actions">+ Подразделение</button>
-                        <button onclick="toggleForm('edit-dept-{{ dept.id }}')" class="btn btn-actions">✍🏻</button>
-                        <button onclick="toggleForm('delete-dept-{{ dept.id }}')" class="btn btn-actions">🗑️</button>
+                        <button onclick="toggleForm('add-sub-{{ dept.id }}')" class="btn btn-dept-actions">+ Подразделение</button>
+                        <button onclick="toggleForm('edit-dept-{{ dept.id }}')" class="btn btn-dept-actions">✍🏻</button>
+                        <button onclick="toggleForm('delete-dept-{{ dept.id }}')" class="btn btn-dept-actions">🗑️</button>
                     </div>
 
                     <form id="edit-dept-{{ dept.id }}" class="hidden inline-form" method="post" action="{% url 'contactbook:edit_department' dept.pk %}">
