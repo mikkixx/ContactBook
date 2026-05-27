@@ -23,6 +23,7 @@ from django.utils.http import urlsafe_base64_decode
 from django.utils.encoding import force_str
 from django.db import IntegrityError
 from .utils import normalize_phone
+import re
 
 def is_admin(user):
     return user.is_authenticated and hasattr(user, 'employee_profile') and user.employee_profile.role == 'admin'
@@ -39,7 +40,12 @@ def employee_list(request):
 
     # === ФИЛЬТРАЦИЯ ===
     if search:
-        qs = qs.filter(Q(last_name__istartswith=search) | Q(first_name__istartswith=search))
+        search_escaped = re.escape(search)
+        pattern = f'^{search_escaped}'
+        qs = qs.filter(
+            Q(last_name__iregex=pattern) | 
+            Q(first_name__iregex=pattern)
+        )
     if dept_id and dept_id != 'None':
         qs = qs.filter(department_id=dept_id)
     if sub_id and sub_id != 'None':
@@ -94,7 +100,12 @@ def favorite_list(request):
     position = request.GET.get('position', '').strip()
 
     if search:
-        qs = qs.filter(Q(last_name__istartswith=search) | Q(first_name__istartswith=search))
+        search_escaped = re.escape(search)
+        pattern = f'^{search_escaped}'
+        qs = qs.filter(
+            Q(last_name__iregex=pattern) | 
+            Q(first_name__iregex=pattern)
+        )
     if dept_id:
         qs = qs.filter(department_id=dept_id)
     if sub_id:
@@ -450,17 +461,40 @@ def deleted_employees(request):
         messages.error(request, "Доступ запрещён")
         return redirect('contactbook:employee_list')
     
-    # ✅ Получаем только удалённых
-    qs = Employee.all_objects.filter(
-        is_deleted=True
-    ).select_related('department', 'subdivision').order_by('-deleted_at')
+    search = request.GET.get('search', '').strip()
+    position = request.GET.get('position', '').strip()
+    sort_order = request.GET.get('sort', 'desc')
+
+
+    qs = Employee.all_objects.filter(is_deleted=True).select_related('department')
     
+    if search:
+        search_escaped = re.escape(search)
+        pattern = f'^{search_escaped}'
+        
+        qs = qs.filter(
+            Q(last_name__iregex=pattern) |
+            Q(first_name__iregex=pattern) |
+            Q(middle_name__iregex=pattern)
+        )
+
+    if position:
+        qs = qs.filter(position__icontains=position)
+    
+    if sort_order == 'asc':
+        qs = qs.order_by('deleted_at')
+    else:
+        qs = qs.order_by('-deleted_at')
+
     paginator = Paginator(qs, 10)
     page_obj = paginator.get_page(request.GET.get('page'))
     
     return render(request, 'contactbook/deleted_employees.html', {
         'page_obj': page_obj,
-        'is_admin': True
+        'is_admin': True,
+        'search': search,
+        'position': position,
+        'sort_order': sort_order
     })
 
 @login_required
@@ -757,7 +791,12 @@ def contact_list(request):
     category = request.GET.get('category')
     
     if search:
-        qs = qs.filter(Q(last_name__istartswith=search) | Q(first_name__istartswith=search))
+        search_escaped = re.escape(search)
+        pattern = f'^{search_escaped}'
+        qs = qs.filter(
+            Q(last_name__iregex=pattern) | 
+            Q(first_name__iregex=pattern)
+        )
     if position:
         qs = qs.filter(position__icontains=position)
     if org:
