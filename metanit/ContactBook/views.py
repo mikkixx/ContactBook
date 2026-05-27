@@ -22,6 +22,7 @@ from django.contrib.auth.tokens import default_token_generator
 from django.utils.http import urlsafe_base64_decode
 from django.utils.encoding import force_str
 from django.db import IntegrityError
+from .utils import normalize_phone
 
 def is_admin(user):
     return user.is_authenticated and hasattr(user, 'employee_profile') and user.employee_profile.role == 'admin'

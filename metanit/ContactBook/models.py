@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
+from .utils import normalize_phone, format_phone_display
 
 class Department(models.Model):
     name = models.CharField(max_length=100, unique=True, verbose_name='Название отдела')
@@ -56,6 +57,17 @@ class Employee(models.Model):
     class Meta:
         verbose_name_plural = 'Сотрудники'
 
+    def save(self, *args, **kwargs):
+        # Нормализуем телефон перед сохранением
+        if self.phone:
+            self.phone = normalize_phone(self.phone)
+        super().save(*args, **kwargs)
+    
+    @property
+    def phone_formatted(self):
+        """Возвращает номер в формате +7 (900) 123-45-67"""
+        return format_phone_display(self.phone)
+    
     def __str__(self):
         return f"{self.last_name} {self.first_name}"
     
