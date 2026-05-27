@@ -5,9 +5,11 @@
 <div class="profile-container">
     
     <!-- Заголовок -->
-    <div class="profile-header">
+    <div class="employee-header">
+        <div class="nazad">
+            <a href="{% url 'contactbook:employee_list' %}" class="btn back-link"><--Назад к списку</a>
+        </div>
         <h1>Профиль сотрудника</h1>
-        <a href="{% url 'contactbook:employee_list' %}" class="btn back-link"><--Назад к списку</a>
     </div>
 
     <!-- Основная информация -->

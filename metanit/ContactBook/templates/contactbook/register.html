@@ -36,8 +36,8 @@
                 <input type="text" placeholder="Введите отчество" id="middle_name" name="middle_name" required>
             </div>
             <div class="pole-vvoda">
-                <label for="dept-select">Отдел: <b class="obyaz" title="Обязательное поле">*</b></label>
-                <select name="department" id="select">
+                <label for="dept">Отдел: <b class="obyaz" title="Обязательное поле">*</b></label>
+                <select name="department" id="dept" class="select">
                     <option value="">Все отделы</option>
                     {% for dept in departments %}
                         <option value="{{ dept.id }}" {% if dept_id == dept.id|stringformat:"s" %}selected{% endif %}>
@@ -48,8 +48,8 @@
             </div>
             <div class="pole-vvoda">
                 <label for="sub">Подразделение:</label>
-                <select name="subdivision" id="select">
-                    <option value="">Нет</option>
+                <select name="subdivision" id="sub" class="select">
+                    <option value="">Сначала выберите отдел</option>
                 </select>
             </div>
             <div class="pole-vvoda">
@@ -88,8 +88,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const subSelect = document.getElementById('sub');
     
     function loadSubdivisions(deptId) {
-        // Очищаем и добавляем "нет"
-        subSelect.innerHTML = '<option value="">нет</option>';
+        subSelect.innerHTML = '<option value="">Нет</option>';
         
         if (!deptId) {
             subSelect.disabled = true;
@@ -113,7 +112,6 @@ document.addEventListener('DOMContentLoaded', () => {
             .catch(err => console.error('Ошибка загрузки подразделений:', err));
     }
 
-    // Слушаем изменения в первом списке
     deptSelect.addEventListener('change', () => loadSubdivisions(deptSelect.value));
 });
 </script>

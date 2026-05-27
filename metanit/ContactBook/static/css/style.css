@@ -387,6 +387,15 @@ form{
 
 .pagination{
     color: rgb(28, 28, 28);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 18px;
+}
+.pagination > a{
+    color: rgb(28, 28, 28);
+    text-decoration: none;
 }
 
 .registration{
@@ -435,23 +444,37 @@ form{
     font-size: 16px;
     padding: 5px 10px;
 }
-.pole-vvoda > select{
+
+.pole-vvoda > input:focus{
+    box-shadow: 0 0 10px rgba(41, 48, 73, 0.22);
+    outline: none;
+}
+
+.pole-vvoda > select:focus{
+    box-shadow: 0 0 10px rgba(41, 48, 73, 0.22);
+    outline: none;
+}
+
+#dept{
     width: 753px;
-    height: 28px;
+    height: 40px;
     border: solid 1px rgb(163, 163, 163);
     background-color: white;
     border-radius: 12px;
     font-size: 16px;
     padding: 5px 10px;
 }
-.pole-vvoda > input:focus{
-    box-shadow: 0 0 10px rgba(41, 48, 73, 0.22);
-    outline: none;
+
+#sub{
+    width: 753px;
+    height: 40px;
+    border: solid 1px rgb(163, 163, 163);
+    background-color: white;
+    border-radius: 12px;
+    font-size: 16px;
+    padding: 5px 10px;
 }
 
-#select{
-    height: 40px;
-}
 
 .reg > button{
     width: 930px;
@@ -501,11 +524,24 @@ form{
     justify-content: center;
     align-items: end;
 }
+.employee-header{
+    width: 100%;
+    max-width: 970px;
+    display: flex;
+    justify-content: center;
+    align-items: end;
+}
+
 .profile-header > h1{
     width: 70%;
     font-size: 40px;
     margin:0;
     margin-left: 100px;
+}
+.employee-header > h1{
+    width: 70%;
+    font-size: 40px;
+    margin:0;
 }
 .nazad{
     width: 30%;
@@ -805,9 +841,6 @@ form{
 .inline-form button:last-child p { background: #6c757d; }
 
 .hidden { display: none !important; }
-.pagination { margin-top: 20px; display: flex; gap: 12px; align-items: center; }
-.pagination a { text-decoration: none; }
-.pagination a p { margin: 0; padding: 6px 10px; background: #0d6efd; color: #fff; border-radius: 4px; }
 
 
 /* Выделение неподтверждённых сотрудников */
