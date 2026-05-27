@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block title %}Редактирование контакта{% endblock %}
+
+{% block content %}
+<a href="{% url 'contactbook:contact_detail' contact.pk %}" class="back-link">← Назад</a>
+
+<div class="reg">
+    <h1>Редактирование контакта</h1>
+    
+    <form method="post" class="form">
+        {% csrf_token %}
+        
+        <div class="pole-vvoda">
+            <label>Фамилия: <span class="required">*</span></label>
+            <input type="text" name="last_name" value="{{ contact.last_name }}" required>
+        </div>
+        
+        <div class="pole-vvoda">
+            <label>Имя: <span class="required">*</span></label>
+            <input type="text" name="first_name" value="{{ contact.first_name }}" required>
+        </div>
+        
+        <div class="pole-vvoda">
+            <label>Отчество:</label>
+            <input type="text" name="middle_name" value="{{ contact.middle_name|default:'' }}">
+        </div>
+        
+        <div class="pole-vvoda">
+            <label>Телефон: <span class="required">*</span></label>
+            <input type="tel" name="phone" value="{{ contact.phone }}" required>
+        </div>
+        
+        <div class="pole-vvoda">
+            <label>Email:</label>
+            <input type="email" name="email" value="{{ contact.email|default:'' }}">
+        </div>
+        
+        <div class="pole-vvoda">
+            <label>Организация:</label>
+            <input type="text" name="organization" value="{{ contact.organization|default:'' }}">
+        </div>
+        
+        <div class="pole-vvoda">
+            <label>Должность:</label>
+            <input type="text" name="position" value="{{ contact.position|default:'' }}">
+        </div>
+        
+        <div class="pole-vvoda">
+            <label>Категория:</label>
+            <select name="category">
+                {% for cat_value, cat_label in categories %}
+                    <option value="{{ cat_value }}" {% if contact.category == cat_value %}selected{% endif %}>
+                        {{ cat_label }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+        
+        <div class="niz">
+            <button type="submit" class="btn btn-primary">💾 Сохранить</button>
+            <a href="{% url 'contactbook:contact_detail' contact.pk %}" class="btn btn-secondary">✖ Отмена</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

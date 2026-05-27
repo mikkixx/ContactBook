@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}Удаление контакта{% endblock %}
+
+{% block content %}
+<div class="reg">
+    <h1>Подтверждение удаления</h1>
+    
+    <p style="font-size: 20px; margin: 20px 0; text-align: center;">
+        Вы действительно хотите удалить контакт:<br>
+        <strong>"{{ contact.last_name }} {{ contact.first_name }} {{ contact.middle_name|default:'' }}"</strong>?
+    </p>
+    
+    <p style="color: #ff4444; font-weight: 500; text-align: center;">
+        ⚠️ Это действие нельзя будет отменить.
+    </p>
+
+    <form method="post">
+        {% csrf_token %}
+        
+        <div class="form-buttons">
+            <button type="submit" class="btn btn-delete">🗑️ Да, удалить</button>
+            <a href="{% url 'contactbook:contact_detail' contact.pk %}" class="btn btn-secondary">↩️ Отмена</a>
+        </div>
+    </form>
+</div>
+{% endblock %}
