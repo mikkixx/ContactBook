@@ -762,14 +762,13 @@ form{
     width: 100%;
     margin: 0; 
     padding: 0;
-    color: #495057; 
-    font-style: italic; 
-    font-size: 14px;
     border-right: none;
 }
 
-tr.sub-row:last-child > td {
-    border-top: 1px solid rgb(28, 28, 28);
+#sub-none > p{
+    color: #495057;
+    font-style: italic; 
+    font-size: 14px;
 }
 
 .structure-header{
@@ -887,6 +886,15 @@ tr.sub-row:last-child > td {
     border-bottom: none;
 }
 
+.structure-list > table > tbody > tr.sub-row:last-child {
+    border-bottom: none;
+}
+
+.structure-list > table > tbody > tr.sub-row:last-child > td {
+    border-top: 1px solid rgb(28, 28, 28);
+    border-bottom: none; 
+}
+
 .dept-stroka{
     width: 70% !important;
     display: flex;
@@ -914,17 +922,23 @@ tr.sub-row:last-child > td {
 
 .sub-actions { 
     width: 100%;
-    height: 30px;
+    height: 100%;
     display: flex; 
     gap: 10px; 
     justify-content: center;
+    align-items: center;
 }
 
 .btn-actions{
-    border: 2px solid #1e59be3c;
-    background: transparent;
+    height: 25px;
+    border: 2px solid #1046a43c;
+    background: #ffffff;
     margin: 0;
     font-size: 14px;
+}
+
+.sub-row{
+    background-color: #1e59be17;
 }
 
 .sub-stroka{
