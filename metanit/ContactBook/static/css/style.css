@@ -856,3 +856,8 @@ form{
     background-color: #cc0000;
     transform: scale(1.05);
 }
+
+.obyaz{
+    color: #ff4444;
+    margin-left: 2px;
+}

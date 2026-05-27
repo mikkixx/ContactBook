@@ -8,27 +8,27 @@
         <div class="reg">
             <h1>Регистрация</h1>
             <div class="pole-vvoda">
-                <label for="login">Логин: </label>
+                <label for="login">Логин: <b class="obyaz" title="Обязательное поле">*</b></label>
                 <input type="text" placeholder="Введите логин" id="login" name="username" required>
             </div>
             <div class="pole-vvoda">
-                <label for="email">Почта: </label>
+                <label for="email">Почта: <b class="obyaz" title="Обязательное поле">*</b></label>
                 <input type="email" placeholder="Введите почту" id="email" name="email" required>
             </div>
             <div class="pole-vvoda">
-                <label for="pass">Пароль:</label>
+                <label for="pass">Пароль: <b class="obyaz" title="Обязательное поле">*</b></label>
                 <input type="password" placeholder="Введите пароль (не менее 6 символов)" id="pass" name="password" minlength="6" required>
             </div>
             <div class="pole-vvoda">
-                <label for="confrm_pass">Подтверждение:</label>
+                <label for="confrm_pass">Подтверждение: <b class="obyaz" title="Обязательное поле">*</b></label>
                 <input type="password" placeholder="Повторите пароль" id="confrm_pass" name="confirm_password" required>
             </div>
             <div class="pole-vvoda">
-                <label for="last_name">Фамилия:</label>
+                <label for="last_name">Фамилия: <b class="obyaz" title="Обязательное поле">*</b></label>
                 <input type="text" placeholder="Введите фамилию" id="last_name" name="last_name" required>
             </div>
             <div class="pole-vvoda">
-                <label for="first_name">Имя:</label>
+                <label for="first_name">Имя: <b class="obyaz" title="Обязательное поле">*</b></label>
                 <input type="text" placeholder="Введите имя" id="first_name" name="first_name" required>
             </div>
             <div class="pole-vvoda">
@@ -36,7 +36,7 @@
                 <input type="text" placeholder="Введите отчество" id="middle_name" name="middle_name" required>
             </div>
             <div class="pole-vvoda">
-                <label for="dept-select">Отдел:</label>
+                <label for="dept-select">Отдел: <b class="obyaz" title="Обязательное поле">*</b></label>
                 <select name="department" id="select">
                     <option value="">Все отделы</option>
                     {% for dept in departments %}
@@ -53,15 +53,15 @@
                 </select>
             </div>
             <div class="pole-vvoda">
-                <label for="position">Должность:</label>
+                <label for="position">Должность: <b class="obyaz" title="Обязательное поле">*</b></label>
                 <input type="text" placeholder="Введите должность" id="position" name="position" required>
             </div>
             <div class="pole-vvoda">
-                <label for="phone">Номер телефона:</label>
+                <label for="phone">Номер телефона: <b class="obyaz" title="Обязательное поле">*</b></label>
                 <input type="tel" placeholder="Введите номер телефона" id="phone" name="phone" required>
             </div>
             <div class="pole-vvoda">
-                <label for="floor">Этаж:</label>
+                <label for="floor">Этаж: <b class="obyaz" title="Обязательное поле">*</b></label>
                 <input type="text" placeholder="Введите этаж" id="floor" name="floor" required>
             </div>
             <div class="pole-vvoda">
