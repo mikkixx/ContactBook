@@ -6,23 +6,6 @@
 <div class="structure-header">
     <div class="add-dept">
         <button type="button" class="btn back-link" id="add-dept"> + Добавить отдел</button>
-        
-        <div class="overflow no_active"></div>
-
-        <div id="modal">
-            <h2>Добавление отдела</h2>
-            <form id="add-dept-form" method="post" action="{% url 'contactbook:add_department' %}">
-                {% csrf_token %}
-                <input type="text" id="dept-name" name="name" placeholder="Название нового отдела" required>
-                <div class="btn-add-dept">
-                    <button type="submit" id="save-dept" class="btn btn-secondary">Сохранить</button>
-                    <button type="button" id="cancel-dept" class="btn btn-danger">Отмена</button>
-                </div>
-            </form>
-            <div id="modal-message" class="hidden">
-                <p id="result-text"></p>
-            </div>
-        </div>
     </div>
     <h1>Структура организации</h1>
 </div>
@@ -46,19 +29,8 @@
                     <div class="dept-actions">
                         <button type="button" class="btn btn-dept-actions open-sub-modal" data-dept-id="{{ dept.id }}" data-dept-name="{{ dept.name }}" data-url="{% url 'contactbook:add_subdivision' dept.id %}">+ Подразделение</button>
                         <button type="button" class="btn btn-dept-actions open-edit-dept-modal" data-dept-id="{{ dept.id }}" data-dept-name="{{ dept.name }}" data-url="{% url 'contactbook:edit_department' dept.pk %}">✍🏻</button>
-                        <button onclick="toggleForm('delete-dept-{{ dept.id }}')" class="btn btn-dept-actions">🗑️</button>
+                        <button type="button" class="btn btn-dept-actions open-del-dept-modal" data-dept-id="{{ dept.id }}" data-dept-name="{{ dept.name }}" data-url="{% url 'contactbook:delete_department' dept.pk %}">🗑️</button>
                     </div>
-
-                    <form id="delete-dept-{{ dept.id }}" class="hidden inline-form" method="post" action="{% url 'contactbook:delete_department' dept.pk %}">
-                        {% csrf_token %}
-                        <p style="color: #dc3545; font-weight: 600; margin-bottom: 8px;">
-                            ⚠️ Удалить отдел «{{ dept.name }}» и все связанные подразделения?
-                        </p>
-                        <p class="delete-actions">
-                            <button type="submit" class="btn-danger"><p>Да, удалить</p></button>
-                            <button type="button" onclick="toggleForm('delete-dept-{{ dept.id }}')"><p>Отмена</p></button>
-                        </p>
-                    </form>
                 </td>
             </tr>
             {% for sub in dept.subdivisions.all %}
@@ -68,32 +40,9 @@
                 </td>
                 <td class="movements">
                     <div class="sub-actions">
-                        <button onclick="toggleForm('edit-sub-{{ sub.id }}')" class="btn btn-actions">✍🏻</button>
-                        <button onclick="toggleForm('delete-sub-{{ sub.id }}')" class="btn btn-actions">🗑️</button>
+                        <button type="button" class="btn btn-actions open-edit-sub-modal" data-sub-id="{{ sub.id }}" data-sub-name="{{ sub.name }}" data-url="{% url 'contactbook:edit_subdivision' sub.pk %}">✍🏻</button>
+                        <button type="button" class="btn btn-actions open-del-sub-modal" data-sub-id="{{ sub.id }}" data-sub-name="{{ sub.name }}" data-dept-name="{{ sub.department.name }}" data-url="{% url 'contactbook:delete_subdivision' sub.pk %}">🗑️</button>
                     </div>
-
-                    <form id="edit-sub-{{ sub.id }}" class="hidden inline-form" method="post" action="{% url 'contactbook:edit_subdivision' sub.pk %}">
-                        {% csrf_token %}
-                        <p><input type="text" name="name" value="{{ sub.name }}" required></p>
-                        <p>
-                            <button type="submit"><p>💾</p></button>
-                            <button type="button" onclick="toggleForm('edit-sub-{{ sub.id }}')"><p>✖</p></button>
-                        </p>
-                    </form>
-
-                    <form id="delete-sub-{{ sub.id }}" class="hidden inline-form" method="post" action="{% url 'contactbook:delete_subdivision' sub.pk %}">
-                        {% csrf_token %}
-                        <p style="color: #dc3545; font-weight: 600; margin-bottom: 6px;">
-                            ⚠️ Удалить подразделение «{{ sub.name }}»?
-                        </p>
-                        <p style="font-size: 13px; color: #666; margin-bottom: 10px;">
-                            Все сотрудники будут автоматически перенесены в отдел «{{ sub.department.name }}».
-                        </p>
-                        <p class="delete-actions">
-                            <button type="submit" class="btn-danger"><p>Да, удалить</p></button>
-                            <button type="button" onclick="toggleForm('delete-sub-{{ sub.id }}')"><p>Отмена</p></button>
-                        </p>
-                    </form>
                 </td>
             </tr>
             {% empty %}
@@ -105,7 +54,24 @@
         </tbody>
     </table>
 
-    <div id="modal-sub">
+    <div class="overflow no_active"></div>
+
+    <div id="modal" class="modal">
+        <h2>Добавление отдела</h2>
+        <form id="add-dept-form" method="post" action="{% url 'contactbook:add_department' %}">
+            {% csrf_token %}
+            <input type="text" id="dept-name" name="name" placeholder="Название нового отдела" required>
+            <div class="btn-add-dept">
+                <button type="submit" id="save-dept" class="btn btn-secondary">Сохранить</button>
+                <button type="button" id="cancel-dept" class="btn btn-danger">Отмена</button>
+            </div>
+        </form>
+        <div id="modal-message" class="hidden">
+            <p id="result-text"></p>
+        </div>
+    </div>
+
+    <div id="modal-sub" class="modal">
         <h2>Добавление подразделения</h2>
         <form id="add-sub-form" method="post">
             {% csrf_token %}
@@ -121,7 +87,7 @@
         </div>
     </div>
 
-    <div id="modal-edit-dept">
+    <div id="modal-edit-dept" class="modal">
         <h2>Редактирование отдела</h2>
         <form id="edit-dept-form" method="post">
             {% csrf_token %}
@@ -136,18 +102,48 @@
         </div>
     </div>
 
-    <div id="modal-edit-sub">
+    <div id="modal-edit-sub" class="modal">
         <h2>Редактирование подразделения</h2>
         <form id="edit-sub-form" method="post">
             {% csrf_token %}
-            <input type="text" id="edit-sub-name" name="name" placeholder="Введите новое название подразделения" required>
+            <input type="text" id="edit-sub-name-input" name="name" required>
             <div class="btn-add-sub">
                 <button type="submit" id="save-edit-sub" class="btn btn-secondary">Сохранить</button>
                 <button type="button" id="cancel-edit-sub" class="btn btn-danger">Отмена</button>
             </div>
         </form>
-        <div id="modal-message-edit" class="hidden">
-            <p id="result-text-edit"></p>
+        <div id="modal-message-edit-sub" class="hidden">
+            <p id="result-text-edit-sub"></p>
+        </div>
+    </div>
+
+    <div id="modal-del-dept" class="modal">
+        <h2>Удаление отдела</h2>
+        <form id="del-dept-form" method="post">
+            {% csrf_token %}
+            <p id="del-dept-warning">Удалить отдел и все связанные подразделения?</p>
+            <div class="btn-add-sub">
+                <button type="submit" id="confirm-del-dept" class="btn btn-danger">Удалить</button>
+                <button type="button" id="cancel-del-dept" class="btn btn-secondary">Отмена</button>
+            </div>
+        </form>
+        <div id="modal-message-del-dept" class="hidden">
+            <p id="result-text-del-dept"></p>
+        </div>
+    </div>
+
+    <div id="modal-sub-dept" class="modal">
+        <h2>Удаление подразделения</h2>
+        <form id="del-sub-form" method="post">
+            {% csrf_token %}
+            <p id="del-sub-warning">Удалить подразделение из отдела?</p>
+            <div class="btn-add-sub">
+                <button type="submit" id="confirm-del-sub" class="btn btn-danger">Удалить</button>
+                <button type="button" id="cancel-del-sub" class="btn btn-secondary">Отмена</button>
+            </div>
+        </form>
+        <div id="modal-message-del-sub" class="hidden">
+            <p id="result-text-del-sub"></p>
         </div>
     </div>
 </div>
@@ -357,6 +353,192 @@
                 msgTextEdit.style.color = '#a63a3a'
                 msgBoxEdit.classList.remove('hidden')
                 formEdit.classList.remove('hidden')
+            }
+        }
+    })
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const modalEditSub = document.getElementById('modal-edit-sub')
+        const formEditSub = document.getElementById('edit-sub-form')
+        const inputEditSub = document.getElementById('edit-sub-name-input')
+        const msgBoxEditSub = document.getElementById('modal-message-edit-sub')
+        const msgTextEditSub = document.getElementById('result-text-edit-sub')
+        const cancelEditSub = document.getElementById('cancel-edit-sub')
+        const overflow = document.querySelector('.overflow')
+
+        const toggleEditSub = show => {
+            overflow.classList.toggle('no_active', !show)
+            modalEditSub.style.display = show ? 'flex' : 'none'
+            if (show) {
+                formEditSub.classList.remove('hidden')
+                msgBoxEditSub.classList.add('hidden')
+            } else {
+                formEditSub.classList.add('hidden')
+            }
+        }
+
+        document.querySelectorAll('.open-edit-sub-modal').forEach(btn => {
+            btn.onclick = () => {
+                formEditSub.action = btn.dataset.url
+                inputEditSub.value = btn.dataset.subName
+                toggleEditSub(true)
+            }
+        })
+
+        cancelEditSub.onclick = () => toggleEditSub(false)
+        overflow.addEventListener('click', (e) => {
+            if (e.target === overflow && modalEditSub.style.display === 'flex') toggleEditSub(false)
+        })
+
+        formEditSub.onsubmit = async e => {
+            e.preventDefault()
+            const fd = new FormData(formEditSub)
+            fd.append('csrfmiddlewaretoken', document.querySelector('[name=csrfmiddlewaretoken]').value)
+
+            try {
+                const res = await fetch(formEditSub.action, { method: 'POST', body: fd })
+                const data = await res.json()
+
+                msgTextEditSub.textContent = data.message
+                msgTextEditSub.style.color = data.success ? '#20623b' : '#a63a3a'
+                msgBoxEditSub.classList.remove('hidden')
+
+                if (data.success) {
+                    setTimeout(() => window.location.reload(), 1000)
+                } else {
+                    formEditSub.classList.remove('hidden')
+                }
+            } catch {
+                msgTextEditSub.textContent = 'Ошибка сети'
+                msgTextEditSub.style.color = '#a63a3a'
+                msgBoxEditSub.classList.remove('hidden')
+                formEditSub.classList.remove('hidden')
+            }
+        }
+    })
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const modalDel = document.getElementById('modal-del-dept')
+        const formDel = document.getElementById('del-dept-form')
+        const warningText = document.getElementById('del-dept-warning')
+        const msgBoxDel = document.getElementById('modal-message-del-dept')
+        const msgTextDel = document.getElementById('result-text-del-dept')
+        const cancelDel = document.getElementById('cancel-del-dept')
+        const overflow = document.querySelector('.overflow')
+
+        const toggleDel = show => {
+            overflow.classList.toggle('no_active', !show)
+            modalDel.style.display = show ? 'flex' : 'none'
+            if (show) {
+                formDel.classList.remove('hidden')
+                msgBoxDel.classList.add('hidden')
+            } else {
+                formDel.classList.add('hidden')
+            }
+        }
+
+        document.querySelectorAll('.open-del-dept-modal').forEach(btn => {
+            btn.onclick = () => {
+                formDel.action = btn.dataset.url
+                warningText.textContent = `Удалить отдел «${btn.dataset.deptName}» и все связанные подразделения?`
+                toggleDel(true)
+            }
+        })
+
+        cancelDel.onclick = () => toggleDel(false)
+        overflow.addEventListener('click', (e) => {
+            if (e.target === overflow && modalDel.style.display === 'flex') toggleDel(false)
+        })
+
+        formDel.onsubmit = async e => {
+            e.preventDefault()
+            const fd = new FormData(formDel)
+            fd.append('csrfmiddlewaretoken', document.querySelector('[name=csrfmiddlewaretoken]').value)
+
+            try {
+                const res = await fetch(formDel.action, { method: 'POST', body: fd })
+                const data = await res.json()
+
+                msgTextDel.textContent = data.message
+                msgTextDel.style.color = data.success ? '#20623b' : '#a63a3a'
+                msgBoxDel.classList.remove('hidden')
+
+                if (data.success) {
+                    setTimeout(() => window.location.reload(), 1000)
+                } else {
+                    formDel.classList.remove('hidden')
+                }
+            } catch {
+                msgTextDel.textContent = 'Ошибка сети'
+                msgTextDel.style.color = '#a63a3a'
+                msgBoxDel.classList.remove('hidden')
+                formDel.classList.remove('hidden')
+            }
+        }
+    })
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const modalDelSub = document.getElementById('modal-sub-dept')
+        const formDelSub = document.getElementById('del-sub-form')
+        const warningText = document.getElementById('del-sub-warning')
+        const msgBoxDelSub = document.getElementById('modal-message-del-sub')
+        const msgTextDelSub = document.getElementById('result-text-del-sub')
+        const cancelDelSub = document.getElementById('cancel-del-sub')
+        const overflow = document.querySelector('.overflow')
+
+        const toggleDelSub = show => {
+            overflow.classList.toggle('no_active', !show)
+            modalDelSub.style.display = show ? 'flex' : 'none'
+            if (show) {
+                formDelSub.classList.remove('hidden')
+                msgBoxDelSub.classList.add('hidden')
+            } else {
+                formDelSub.classList.add('hidden')
+            }
+        }
+
+        document.querySelectorAll('.open-del-sub-modal').forEach(btn => {
+            btn.onclick = () => {
+                formDelSub.action = btn.dataset.url
+                warningText.innerHTML = `Удалить подразделение «${btn.dataset.subName}»?<br><small style="color:#666">Сотрудники будут перенесены в отдел «${btn.dataset.deptName}».</small>`
+                toggleDelSub(true)
+            }
+        })
+
+        cancelDelSub.onclick = () => toggleDelSub(false)
+        overflow.addEventListener('click', (e) => {
+            if (e.target === overflow && modalDelSub.style.display === 'flex') toggleDelSub(false)
+        })
+
+        formDelSub.onsubmit = async e => {
+            e.preventDefault()
+            const fd = new FormData(formDelSub)
+            fd.append('csrfmiddlewaretoken', document.querySelector('[name=csrfmiddlewaretoken]').value)
+
+            try {
+                const res = await fetch(formDelSub.action, { method: 'POST', body: fd })
+                const data = await res.json()
+
+                msgTextDelSub.textContent = data.message
+                msgTextDelSub.style.color = data.success ? '#20623b' : '#a63a3a'
+                msgBoxDelSub.classList.remove('hidden')
+
+                if (data.success) {
+                    setTimeout(() => window.location.reload(), 1000)
+                } else {
+                    formDelSub.classList.remove('hidden')
+                }
+            } catch {
+                msgTextDelSub.textContent = 'Ошибка сети'
+                msgTextDelSub.style.color = '#a63a3a'
+                msgBoxDelSub.classList.remove('hidden')
+                formDelSub.classList.remove('hidden')
             }
         }
     })

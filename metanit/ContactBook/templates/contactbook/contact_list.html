@@ -62,21 +62,39 @@
     </table>
 </div>
 
+<div class="overflow no_active"></div>
+
 <div class="create-contact">
-    <button type="button" onclick="toggleForm('create-contact-form')" class="btn back-link"> + Создать контакт</button>
-    
-    <form id="create-contact-form" class="hidden inline-form" method="post" action="{% url 'contactbook:contact_create' %}">
+    <button type="button" id="add-contact-btn" class="btn back-link">+ Создать контакт</button>
+</div>
+
+<div id="modal-create-contact" class="modal">
+    <h2>Создание внешнего контакта</h2>
+    <form id="create-contact-form" method="post" action="{% url 'contactbook:contact_create' %}">
         {% csrf_token %}
-        <input type="text" name="last_name" placeholder="Фамилия" required>
-        <input type="text" name="first_name" placeholder="Имя">
+        <input type="text" name="last_name" placeholder="Фамилия *" required>
+        <input type="text" name="first_name" placeholder="Имя *" required>
+        <input type="text" name="middle_name" placeholder="Отчество">
+        <input type="tel" name="phone" placeholder="Телефон *" required>
+        <input type="email" name="email" placeholder="Email">
         <input type="text" name="organization" placeholder="Организация">
         <input type="text" name="position" placeholder="Должность">
-        <input type="tel" name="phone" placeholder="Телефон">
-        <input type="email" name="email" placeholder="Email">
+        <select name="category">
+            <option value="client">Клиент</option>
+            <option value="partner">Партнёр</option>
+            <option value="supplier">Поставщик</option>
+            <option value="other">Другое</option>
+        </select>
         
-        <button type="submit">Сохранить</button>
-        <button type="button" onclick="toggleForm('create-contact-form')">Отмена</button>
+        <div class="btn-add-contact">
+            <button type="submit" class="btn btn-secondary">Сохранить</button>
+            <button type="button" id="cancel-create-contact" class="btn btn-danger">Отмена</button>
+        </div>
     </form>
+    
+    <div id="modal-message-create" class="hidden">
+        <p id="result-text-create"></p>
+    </div>
 </div>
 
 <div class="pagination">
@@ -91,4 +109,60 @@
     {% endif %}
 </div>
 
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const modalCreate = document.getElementById('modal-create-contact')
+        const formCreate = document.getElementById('create-contact-form')
+        const openBtn = document.getElementById('add-contact-btn')
+        const cancelBtn = document.getElementById('cancel-create-contact')
+        const overflow = document.querySelector('.overflow')
+        const msgBox = document.getElementById('modal-message-create')
+        const msgText = document.getElementById('result-text-create')
+
+        const toggleCreate = show => {
+            overflow.classList.toggle('no_active', !show)
+            modalCreate.style.display = show ? 'flex' : 'none'
+            if (show) {
+                formCreate.classList.remove('hidden')
+                msgBox.classList.add('hidden')
+                formCreate.reset()
+            } else {
+                formCreate.classList.add('hidden')
+            }
+        }
+
+        openBtn.onclick = () => toggleCreate(true)
+        cancelBtn.onclick = () => toggleCreate(false)
+        overflow.addEventListener('click', (e) => {
+            if (e.target === overflow && modalCreate.style.display === 'flex') toggleCreate(false)
+        })
+
+        formCreate.onsubmit = async e => {
+            e.preventDefault()
+            const fd = new FormData(formCreate)
+            fd.append('csrfmiddlewaretoken', document.querySelector('[name=csrfmiddlewaretoken]').value)
+
+            try {
+                const res = await fetch(formCreate.action, { method: 'POST', body: fd })
+                const data = await res.json()
+
+                msgText.textContent = data.message
+                msgText.style.color = data.success ? '#20623b' : '#a63a3a'
+                msgBox.classList.remove('hidden')
+
+                if (data.success) {
+                    setTimeout(() => window.location.reload(), 1000)
+                } else {
+                    formCreate.classList.remove('hidden')
+                }
+            } catch (err) {
+                msgText.textContent = 'Ошибка сети. Проверьте подключение.'
+                msgText.style.color = '#a63a3a'
+                msgBox.classList.remove('hidden')
+                formCreate.classList.remove('hidden')
+                console.error('Fetch error:', err)
+            }
+        }
+    })
+</script>
 {% endblock %}
