@@ -3,9 +3,7 @@
 
 {% block content %}
 <div class="profile-container">
-    
-    <!-- Заголовок -->
-    <div class="profile-header">
+    <div class="employee-header">
         <div class="nazad">
             <a href="{% url 'contactbook:employee_list' %}" class="btn back-link"><--Назад к списку</a>
         </div>
@@ -16,42 +14,170 @@
         <div class="profile-info">
             <h2>{{ employee.last_name }} {{ employee.first_name }} {{ employee.middle_name|default:"" }}</h2>
             <p class="profile-position">{{ employee.position }}</p>
+        </div>
+
+        <div class="profile-details">
+            <div class="detail-item">
+                <span class="detail-label">ОТДЕЛ:</span>
+                <span class="detail-value">{{ employee.department.name }}</span>
+            </div>
             
-            <div class="profile-details">
-                <div class="detail-item">
-                    <label class="detail-label">Отдел:</label>
-                    <span class="detail-value">{{ employee.department.name }}</span>
-                </div>
-                <div class="detail-item">
-                    <label class="detail-label">Подразделение:</label>
-                    <span class="detail-value">{{ employee.subdivision.name|default:"Не указано" }}</span>
-                </div>
-                <div class="detail-item">
-                    <label class="detail-label">Телефон:</label>
+            <div class="detail-item">
+                <span class="detail-label">ПОДРАЗДЕЛЕНИЕ:</span>
+                <span class="detail-value">{{ employee.subdivision.name|default:"Не указано" }}</span>
+            </div>
+            
+            <div class="detail-item">
+                <span class="detail-label">ТЕЛЕФОН:</span>
+                <span class="detail-value">
                     <a href="#" onclick="navigator.clipboard.writeText(this.innerText); alert('Скопировано'); return false;" class="copy-data">{{ employee.phone }}</a>
-                </div>
-                <div class="detail-item">
-                    <label class="detail-label">Email:</label>
+                </span>
+            </div>
+            
+            <div class="detail-item">
+                <span class="detail-label">EMAIL:</span>
+                <span class="detail-value">
                     <a href="#" onclick="navigator.clipboard.writeText(this.innerText); alert('Скопировано'); return false;" class="copy-data">{{ user_email }}</a>
-                </div>
-                <div class="detail-item">
-                    <label class="detail-label">Место:</label>
-                    <span class="detail-value">Этаж {{ employee.floor }}{% if employee.cabinet %}, каб. {{ employee.cabinet }}{% endif %}</span>
-                </div>
-                <div class="detail-item">
-                    <label class="detail-label">Роль:</label>
-                    <span class="detail-value">{{ employee.get_role_display }}</span>
-                </div>
+                </span>
+            </div>
+            
+            <div class="detail-item">
+                <span class="detail-label">МЕСТО:</span>
+                <span class="detail-value">
+                    Этаж {{ employee.floor }}{% if employee.cabinet %}, каб. {{ employee.cabinet }}{% endif %}
+                </span>
+            </div>
+            
+            <div class="detail-item">
+                <span class="detail-label">РОЛЬ:</span>
+                <span class="detail-value">{{ employee.get_role_display }}</span>
             </div>
         </div>
     </div>
-
-    <div class="prof-btn">
-        <br>
-        <a href="{% url 'contactbook:edit_profile' %}" class="btn btn-primary">Редактировать профиль</a>
+    <div class="profile-actions">
+        <button type="button" class="btn btn-primary" onclick="openEditModal()">Редактировать профиль</button>
+                
         {% if employee.user_account == request.user %}
-        <a href="{% url 'contactbook:change_password' %}" class="btn btn-secondary">Сменить пароль</a>
+            <button type="button" class="btn btn-secondary" onclick="openPasswordModal()">Сменить пароль</button>
         {% endif %}
     </div>
 </div>
+
+
+<div class="overflow" id="modalOverlay" style="display:none;" onclick="closeModals()"></div>
+
+<div id="modal-edit" class="modal-custom" style="display:none;">
+    <h3>Редактирование профиля</h3>
+    <form method="post" action="{% url 'contactbook:edit_profile' %}" class="modal-form">
+        {% csrf_token %}
+        <div class="modal-grid">
+            <div class="modal-field"><label>Фамилия *</label><input type="text" name="last_name" value="{{ employee.last_name }}" required></div>
+            <div class="modal-field"><label>Имя *</label><input type="text" name="first_name" value="{{ employee.first_name }}" required></div>
+            <div class="modal-field"><label>Отчество</label><input type="text" name="middle_name" value="{{ employee.middle_name|default:'' }}"></div>
+            <div class="modal-field"><label>Телефон *</label><input type="tel" name="phone" value="{{ employee.phone }}" required></div>
+            <div class="modal-field"><label>Email *</label><input type="email" name="email" value="{{ user_email }}" required></div>
+            <div class="modal-field"><label>Этаж *</label><input type="text" name="floor" value="{{ employee.floor }}" required></div>
+            <div class="modal-field"><label>Кабинет</label><input type="text" name="cabinet" value="{{ employee.cabinet|default:'' }}"></div>
+
+            {% if request.user.employee_profile.role == 'admin' %}
+            <div class="modal-field"><label>Должность *</label><input type="text" name="position" value="{{ employee.position }}" required></div>
+            
+            <div class="modal-field">
+                <label>Отдел *</label>
+                <select name="department" required id="departmentSelect" onchange="filterSubdivisions()">
+                    {% for dept in departments %}
+                        <option value="{{ dept.id }}" {% if dept.id == employee.department.id %}selected{% endif %}>
+                            {{ dept.name }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="modal-field">
+                <label>Подразделение</label>
+                <select name="subdivision" id="subdivisionSelect">
+                    <option value="">Не назначено</option>
+                    {% for sub in subdivisions %}
+                        <option value="{{ sub.id }}" data-dept="{{ sub.department_id }}" {% if sub.id == employee.subdivision_id %}selected{% endif %}>
+                            {{ sub.name }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            {% endif %}
+        </div>
+        <div class="modal-btns">
+            <button type="submit" class="btn btn-primary">Сохранить</button>
+            <button type="button" class="btn btn-secondary" onclick="closeModals()">Отмена</button>
+        </div>
+    </form>
+</div>
+
+<div id="modal-password" class="modal-custom" style="display:none;">
+    <h3>Смена пароля</h3>
+    <form method="post" action="{% url 'contactbook:change_password' %}" class="modal-form">
+        {% csrf_token %}
+        <div class="modal-grid single-col">
+            <div class="modal-field"><label>Текущий пароль</label><input type="password" name="current_password" required></div>
+            <div class="modal-field"><label>Новый пароль</label><input type="password" name="new_password" minlength="6" required></div>
+            <div class="modal-field"><label>Подтверждение пароля</label><input type="password" name="confirm_password" minlength="6" required></div>
+        </div>
+        <div class="modal-btns">
+            <button type="submit" class="btn btn-primary">Сменить пароль</button>
+            <button type="button" class="btn btn-secondary" onclick="closeModals()">Отмена</button>
+        </div>
+    </form>
+</div>
+
+<script>
+    function filterSubdivisions() {
+        const deptSelect = document.getElementById('departmentSelect');
+        const subSelect = document.getElementById('subdivisionSelect');
+        
+        if (!subSelect) return;
+
+        const selectedDeptId = deptSelect.value;
+
+        subSelect.querySelectorAll('option').forEach(option => {
+            if (option.value === '') {
+                option.style.display = '';
+                return;
+            }
+
+            if (option.getAttribute('data-dept') === selectedDeptId) {
+                option.style.display = '';
+            } else {
+                option.style.display = 'none';
+            }
+        });
+
+        const currentSubOption = subSelect.options[subSelect.selectedIndex];
+        if (currentSubOption && currentSubOption.style.display === 'none') {
+            subSelect.value = '';
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', filterSubdivisions);
+
+    function openEditModal() {
+        document.getElementById('modalOverlay').style.display = 'block';
+        document.getElementById('modal-edit').style.display = 'flex';
+        filterSubdivisions();
+    }
+
+    function openPasswordModal() {
+        document.getElementById('modalOverlay').style.display = 'block';
+        document.getElementById('modal-password').style.display = 'flex';
+    }
+
+    function closeModals() {
+        document.getElementById('modalOverlay').style.display = 'none';
+        document.getElementById('modal-edit').style.display = 'none';
+        document.getElementById('modal-password').style.display = 'none';
+    }
+
+    document.addEventListener('keydown', e => {
+        if (e.key === 'Escape') closeModals();
+    });
+</script>
 {% endblock %}

@@ -72,7 +72,9 @@ def employee_detail(request, pk):
     return render(request, 'contactbook/employee_detail.html', {
         'employee': employee,
         'is_favorite': is_fav,
-        'is_admin': is_admin(request.user)
+        'is_admin': is_admin(request.user),
+        'departments': Department.objects.all(),
+        'subdivisions': Subdivision.objects.all()
     })
 
 @login_required
@@ -134,10 +136,15 @@ def remove_from_favorite(request, pk):
 @login_required
 def my_profile(request):
     employee = request.user.employee_profile
-    return render(request, 'contactbook/my_profile.html', {
+    context = {
         'employee': employee,
         'user_email': request.user.email
-    })
+    }
+    if employee.role == 'admin':
+        context['departments'] = Department.objects.all()
+        context['subdivisions'] = Subdivision.objects.all()
+        
+    return render(request, 'contactbook/my_profile.html', context)
 
 @login_required
 def edit_profile(request):
@@ -164,7 +171,7 @@ def edit_profile(request):
 
         if not last_name or not first_name or not phone or not floor or not new_email or not position or not dept_id:
             messages.error(request, "Фамилия, имя, телефон, этаж, почта, должность и отдел обязательны для заполнения")
-            return redirect('contactbook:edit_profile')
+            return redirect('contactbook:my_profile')
 
         try:
             employee.last_name = last_name
@@ -181,7 +188,7 @@ def edit_profile(request):
             if new_email and new_email != request.user.email:
                 if User.objects.filter(email=new_email).exclude(id=request.user.id).exists():
                     messages.error(request, "Этот email уже зарегистрирован в системе")
-                    return redirect('contactbook:edit_profile')
+                    return redirect('contactbook:my_profile')
                 User.objects.filter(id=request.user.id).update(email=new_email)
 
             messages.success(request, "Профиль успешно обновлён")
@@ -189,15 +196,7 @@ def edit_profile(request):
 
         except Exception as e:
             messages.error(request, f"Ошибка сохранения: {str(e)}")
-            return redirect('contactbook:edit_profile')
-
-    return render(request, 'contactbook/edit_profile.html', {
-        'employee': employee,
-        'user_email': request.user.email,
-        'is_admin': is_admin_user,
-        'departments': Department.objects.all() if is_admin_user else [],
-        'subdivisions': Subdivision.objects.all() if is_admin_user else []
-    })
+            return redirect('contactbook:my_profile')
 
 @login_required
 def change_password(request):
@@ -208,19 +207,19 @@ def change_password(request):
 
         if not request.user.check_password(current_pw):
             messages.error(request, "Неверный текущий пароль")
-            return redirect('contactbook:change_password')
+            return redirect('contactbook:my_profile')
 
         if not (6 <= len(new_pw) <= 32):
             messages.error(request, "Новый пароль должен содержать от 6 до 32 символов")
-            return redirect('contactbook:change_password')
+            return redirect('contactbook:my_profile')
 
         if new_pw != confirm_pw:
             messages.error(request, "Пароли не совпадают")
-            return redirect('contactbook:change_password')
+            return redirect('contactbook:my_profile')
 
         if request.user.check_password(new_pw):
             messages.error(request, "Новый пароль не должен совпадать с предыдущим")
-            return redirect('contactbook:change_password')
+            return redirect('contactbook:my_profile')
 
         request.user.set_password(new_pw)
         request.user.save()
@@ -229,7 +228,6 @@ def change_password(request):
         messages.success(request, "Пароль успешно изменён")
         return redirect('contactbook:my_profile')
 
-    return render(request, 'contactbook/change_password.html')
 
 @login_required
 def generate_report(request):

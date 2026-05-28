@@ -4,7 +4,6 @@
 {% block content %}
 <div class="profile-container">
     
-    <!-- Заголовок -->
     <div class="employee-header">
         <div class="nazad">
             <a href="{% url 'contactbook:employee_list' %}" class="btn back-link"><--Назад к списку</a>
@@ -12,7 +11,6 @@
         <h1>Профиль сотрудника</h1>
     </div>
 
-    <!-- Основная информация -->
     <div class="profile-card">
         <div class="profile-info">
             <h2>{{ employee.last_name }} {{ employee.first_name }} {{ employee.middle_name|default:"" }}</h2>
@@ -47,15 +45,142 @@
         </div>
     </div>
 
-    <!-- Кнопки действий -->
     <div class="prof-btn">
         <br>
         <a href="{% url 'contactbook:toggle_favorite' employee.pk %}" class="btn btn-primary">
             {% if is_favorite %}★ Убрать из избранного{% else %}☆ Добавить в избранное{% endif %}
         </a>
         {% if request.user.is_authenticated and request.user.employee_profile.role == 'admin' %}
-        <a href="{% url 'contactbook:edit_employee' employee.pk %}" class="btn btn-secondary">Редактировать сотрудника</a>
-        <a href="{% url 'contactbook:delete_employee' employee.pk %}" class="btn btn-danger">Удалить сотрудника</a>
+        <div class="prof-btn">
+            <button type="button" class="btn btn-secondary" onclick="openEditModal()">Редактировать сотрудника</button>
+            <button type="button" class="btn btn-danger" onclick="openDeleteModal()">Удалить сотрудника</button>
+        </div>
+        
+
+        <div class="overflow" id="modalOverlay" onclick="closeModals()" style="display: none;"></div>
+        
+        <div id="editModal" class="modal-container" style="display:none;">
+            <div class="modal-content">
+                <h3>️Редактировать сотрудника</h3>
+                <form method="post" action="{% url 'contactbook:edit_employee' employee.pk %}">
+                    {% csrf_token %}
+                    <div class="modal-grid">
+                        <div class="modal-field"><label>Фамилия</label><input type="text" name="last_name" value="{{ employee.last_name }}" required></div>
+                        <div class="modal-field"><label>Имя</label><input type="text" name="first_name" value="{{ employee.first_name }}" required></div>
+                        <div class="modal-field"><label>Отчество</label><input type="text" name="middle_name" value="{{ employee.middle_name|default:'' }}"></div>
+                        <div class="modal-field"><label>Телефон</label><input type="tel" name="phone" value="{{ employee.phone }}" required></div>
+                        <div class="modal-field"><label>Email</label><input type="email" name="email" value="{{ employee.user_account.email|default:'' }}" required></div>
+                        <div class="modal-field"><label>Должность</label><input type="text" name="position" value="{{ employee.position }}" required></div>
+                        
+                        <div class="modal-field">
+                            <label>Отдел</label>
+                            <select name="department" id="editDept" required onchange="updateSubdivisions()">
+                                {% for dept in departments %}
+                                    <option value="{{ dept.id }}" {% if dept.id == employee.department.id %}selected{% endif %}>{{ dept.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="modal-field">
+                            <label>Подразделение</label>
+                            <select name="subdivision" id="editSub">
+                                <option value="">Не выбрано</option>
+                                {% for sub in subdivisions %}
+                                    <option value="{{ sub.id }}" data-dept="{{ sub.department_id }}" {% if sub.id == employee.subdivision_id %}selected{% endif %}>{{ sub.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="modal-field"><label>Этаж</label><input type="text" name="floor" value="{{ employee.floor }}" required></div>
+                        <div class="modal-field"><label>Кабинет</label><input type="text" name="cabinet" value="{{ employee.cabinet|default:'' }}"></div>
+                        <div class="modal-field">
+                            <label>Роль</label>
+                            <select name="role">
+                                <option value="user" {% if employee.role == 'user' %}selected{% endif %}>Пользователь</option>
+                                <option value="admin" {% if employee.role == 'admin' %}selected{% endif %}>Администратор</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-btns">
+                        <button type="submit" class="btn btn-primary">Сохранить</button>
+                        <button type="button" class="btn btn-secondary" onclick="closeModals()">Отмена</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div id="deleteModal" class="modal-container" style="display:none;">
+        <div class="modal-content">
+                <h3>Подтверждение удаления</h3>
+                <p>Вы действительно хотите удалить <strong>«{{ employee.last_name }} {{ employee.first_name }}»</strong>?</p>
+                <form method="post" action="{% url 'contactbook:delete_employee' employee.pk %}">
+                    {% csrf_token %}
+                    <div class="modal-btns">
+                        <button type="submit" class="btn btn-delete">Да, удалить</button>
+                        <button type="button" class="btn btn-secondary" onclick="closeModals()">Отмена</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <script>
+            function loadSubdivisions(deptId, selectedSubId = '') {
+                const subSelect = document.getElementById('editSub');
+                subSelect.innerHTML = '<option value="">Загрузка...</option>';
+                
+                if (!deptId) {
+                    subSelect.innerHTML = '<option value="">Сначала выберите отдел</option>';
+                    return;
+                }
+
+                fetch(`/api/subdivisions/?dept_id=${deptId}`)
+                    .then(res => res.json())
+                    .then(data => {
+                        subSelect.innerHTML = '<option value="">Не выбрано</option>';
+                        data.subdivisions.forEach(sub => {
+                            const opt = document.createElement('option');
+                            opt.value = sub.id;
+                            opt.textContent = sub.name;
+
+                            if (sub.id == selectedSubId) {
+                                opt.selected = true;
+                            }
+                            subSelect.appendChild(opt);
+                        });
+                    })
+                    .catch(err => {
+                        console.error('Ошибка загрузки:', err);
+                        subSelect.innerHTML = '<option value="">Ошибка</option>';
+                    });
+            }
+
+            function openDeleteModal() {
+                document.getElementById('modalOverlay').style.display = 'block';
+                document.getElementById('deleteModal').style.display = 'flex';
+            }
+            function openEditModal() {
+                document.getElementById('modalOverlay').style.display = 'block';
+                document.getElementById('editModal').style.display = 'flex';
+
+                const currentDeptId = document.getElementById('editDept').value;
+                const currentSubId = '{{ employee.subdivision_id|default:"" }}';
+
+                if (currentDeptId) {
+                    loadSubdivisions(currentDeptId, currentSubId);
+                }
+            }
+
+            function closeModals() {
+                document.getElementById('modalOverlay').style.display = 'none';
+                document.getElementById('editModal').style.display = 'none';
+                document.getElementById('deleteModal').style.display = 'none';
+            }
+
+            document.getElementById('editDept').addEventListener('change', function() {
+                loadSubdivisions(this.value);
+            });
+
+            document.getElementById('modalOverlay').addEventListener('click', closeModal);
+        </script>
         {% endif %}
     </div>
 </div>
