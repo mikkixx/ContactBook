@@ -5,7 +5,7 @@
 <div class="profile-container">
     <div class="employee-header">
         <div class="nazad">
-            <a href="{% url 'contactbook:contact_list' %}" class="btn back-link"><--Назад к списку</a>
+            <a href="{% url 'contactbook:contact_list' %}" class="btn back-link">← Назад к списку</a>
         </div>
         <h1>Профиль контакта</h1>
     </div>
@@ -13,71 +13,35 @@
     <div class="profile-card">
         <div class="profile-info">
             <h2>{{ contact.last_name }} {{ contact.first_name }} {{ contact.middle_name|default:"" }}</h2>
-            {% if contact.position %}
-                <p class="profile-position">{{ contact.position }}</p>
-            {% endif %}
-        
-
+            {% if contact.position %}<p class="profile-position">{{ contact.position }}</p>{% endif %}
+            
             <div class="profile-details">
-                <div class="detail-item">
-                    <span class="detail-label">ТЕЛЕФОН:</span>
-                    <span class="detail-value">
-                        <a href="#" onclick="navigator.clipboard.writeText(this.innerText); alert('Скопировано'); return false;" class="copy-data">{{ contact.phone }}</a>
-                    </span>
-                </div>
-                
-                <div class="detail-item">
-                    <span class="detail-label">EMAIL:</span>
-                    <span class="detail-value">
-                        {% if contact.email %}
-                            <a href="#" onclick="navigator.clipboard.writeText(this.innerText); alert('Скопировано'); return false;" class="copy-data">{{ contact.email }}</a>
-                        {% else %}
-                            <span style="color: #6b7280;">Не указан</span>
-                        {% endif %}
-                    </span>
-                </div>
-                
-                <div class="detail-item">
-                    <span class="detail-label">ОРГАНИЗАЦИЯ:</span>
-                    <span class="detail-value">{{ contact.organization|default:"Не указана" }}</span>
-                </div>
-                
-                <div class="detail-item">
-                    <span class="detail-label">КАТЕГОРИЯ:</span>
-                    <span class="detail-value">
-                        {% if contact.category == 'client' %}Клиент
-                        {% elif contact.category == 'partner' %}Партнёр
-                        {% elif contact.category == 'supplier' %}Поставщик
-                        {% else %}Другое{% endif %}
-                    </span>
-                </div>
-                
-                <div class="detail-item">
-                    <span class="detail-label">ОТВЕТСТВЕННЫЙ:</span>
-                    <span class="detail-value">{{ contact.owner.get_full_name|default:contact.owner.username|default:"Не назначен" }}</span>
-                </div>
+                <div class="detail-item"><span class="detail-label">ТЕЛЕФОН:</span><span class="detail-value"><span class="copy-data" onclick="copyToClipboard(this)">{{ contact.phone }}</span></span></div>
+                <div class="detail-item"><span class="detail-label">EMAIL:</span><span class="detail-value">{% if contact.email %}<span class="copy-data" onclick="copyToClipboard(this)">{{ contact.email }}</span>{% else %}<span style="color: #6b7280;">Не указан</span>{% endif %}</span></div>
+                <div class="detail-item"><span class="detail-label">ОРГАНИЗАЦИЯ:</span><span class="detail-value">{{ contact.organization|default:"Не указана" }}</span></div>
+                <div class="detail-item"><span class="detail-label">КАТЕГОРИЯ:</span><span class="detail-value">{{ contact.get_category_display|default:"Другое" }}</span></div>
+                <div class="detail-item"><span class="detail-label">ОТВЕТСТВЕННЫЙ:</span><span class="detail-value">{{ contact.owner.get_full_name|default:contact.owner.username|default:"Не назначен" }}</span></div>
             </div>
         </div>
     </div>
-    {% if is_admin or contact.owner == request.user %}
+
     <div class="prof-btn">
-        <form method="post" action="{% url 'contactbook:toggle_contact_favorite' contact.pk %}" style="display: inline;">
-            {% csrf_token %}
-            <button type="submit" class="btn btn-secondary">
-                {% if is_contact_favorite %}★ Убрать из избранного{% else %}☆ Добавить в избранное{% endif %}
-            </button>
-        </form>
-        <button type="button" class="btn btn-secondary" onclick="openEditModal()">Редактировать контакт</button>
-        <button type="button" class="btn btn-danger" onclick="openDeleteModal()">Удалить контакт</button>
+        <a href="{% url 'contactbook:toggle_contact_favorite' contact.pk %}" class="btn btn-primary">
+            {% if is_contact_favorite %}★ Удалить из избранного{% else %}☆ Добавить в избранное{% endif %}
+        </a>
+        
+        {% if is_admin or contact.owner == request.user %}
+            <button type="button" id="open-edit-contact-modal" class="btn btn-secondary">Редактировать контакт</button>
+            <button type="button" id="open-delete-contact-modal" class="btn btn-danger">Удалить контакт</button>
+        {% endif %}
     </div>
-    {% endif %}
 </div>
 
-<div class="overflow" id="modalOverlay" style="display:none;" onclick="closeModals()"></div>
+<div class="overflow no_active"></div>
 
-<div id="modal-edit" class="modal-custom" style="display:none;">
-    <h3>Редактирование контакта</h3>
-    <form method="post" action="{% url 'contactbook:contact_edit' contact.pk %}" class="modal-form">
+<div id="modal-edit-contact" class="modal-custom">
+    <h2>Редактирование контакта</h2>
+    <form id="form-edit-contact" method="post" action="{% url 'contactbook:contact_edit' contact.pk %}">
         {% csrf_token %}
         <div class="modal-grid">
             <div class="modal-field"><label>Фамилия *</label><input type="text" name="last_name" value="{{ contact.last_name }}" required></div>
@@ -98,43 +62,105 @@
             </div>
         </div>
         <div class="modal-btns">
-            <button type="submit" class="btn btn-primary">Сохранить</button>
-            <button type="button" class="btn btn-secondary" onclick="closeModals()">Отмена</button>
+            <button type="submit" class="btn btn-secondary">Сохранить</button>
+            <button type="button" id="cancel-edit-contact" class="btn btn-danger">Отмена</button>
         </div>
     </form>
+    <div id="modal-message-edit-contact" class="hidden"><p id="result-text-edit-contact"></p></div>
 </div>
 
-<div id="modal-delete" class="modal-custom" style="display:none;">
-    <h3>Подтверждение удаления</h3>
-    <p class="delete-text">Вы действительно хотите удалить контакт <strong>«{{ contact.last_name }} {{ contact.first_name }}»</strong>?</p>
-    <form method="post" action="{% url 'contactbook:contact_delete' contact.pk %}">
+<div id="modal-delete-contact" class="modal">
+    <h2>Подтверждение удаления</h2>
+    <form id="form-delete-contact" method="post" action="{% url 'contactbook:contact_delete' contact.pk %}">
         {% csrf_token %}
-        <div class="modal-btns">
-            <button type="submit" class="btn btn-delete">Удалить</button>
-            <button type="button" class="btn btn-secondary" onclick="closeModals()">Отмена</button>
+        <p>Вы действительно хотите удалить контакт <strong>«{{ contact.last_name }} {{ contact.first_name }}»</strong>?</p>
+        <div class="btn-add-dept">
+            <button type="submit" class="btn btn-danger">Удалить</button>
+            <button type="button" id="cancel-delete-contact" class="btn btn-secondary">Отмена</button>
         </div>
     </form>
+    <div id="modal-message-delete-contact" class="hidden"><p id="result-text-delete-contact"></p></div>
 </div>
 
 <script>
-    function openEditModal() {
-        document.getElementById('modalOverlay').style.display = 'block';
-        document.getElementById('modal-edit').style.display = 'flex';
-    }
+    document.addEventListener('DOMContentLoaded', () => {
+        const overflow = document.querySelector('.overflow');
+        if (!overflow) return;
 
-    function openDeleteModal() {
-        document.getElementById('modalOverlay').style.display = 'block';
-        document.getElementById('modal-delete').style.display = 'flex';
-    }
+        const modalEdit = document.getElementById('modal-edit-contact');
+        const formEdit = document.getElementById('form-edit-contact');
+        const openEditBtn = document.getElementById('open-edit-contact-modal');
+        const cancelEditBtn = document.getElementById('cancel-edit-contact');
+        const msgBoxEdit = document.getElementById('modal-message-edit-contact');
+        const msgTextEdit = document.getElementById('result-text-edit-contact');
 
-    function closeModals() {
-        document.getElementById('modalOverlay').style.display = 'none';
-        document.getElementById('modal-edit').style.display = 'none';
-        document.getElementById('modal-delete').style.display = 'none';
-    }
+        const modalDelete = document.getElementById('modal-delete-contact');
+        const formDelete = document.getElementById('form-delete-contact');
+        const openDeleteBtn = document.getElementById('open-delete-contact-modal');
+        const cancelDeleteBtn = document.getElementById('cancel-delete-contact');
+        const msgBoxDelete = document.getElementById('modal-message-delete-contact');
+        const msgTextDelete = document.getElementById('result-text-delete-contact');
 
-    document.addEventListener('keydown', e => {
-        if (e.key === 'Escape') closeModals();
+        const toggleModal = (modal, show) => {
+            overflow.classList.toggle('no_active', !show);
+            modal.style.display = show ? 'flex' : 'none';
+        };
+
+        if (openEditBtn) openEditBtn.onclick = () => toggleModal(modalEdit, true);
+        if (cancelEditBtn) cancelEditBtn.onclick = () => toggleModal(modalEdit, false);
+        if (openDeleteBtn) openDeleteBtn.onclick = () => toggleModal(modalDelete, true);
+        if (cancelDeleteBtn) cancelDeleteBtn.onclick = () => toggleModal(modalDelete, false);
+
+        overflow.addEventListener('click', (e) => {
+            if (e.target === overflow) {
+                toggleModal(modalEdit, false);
+                toggleModal(modalDelete, false);
+            }
+        });
+
+        if (formEdit) {
+            formEdit.onsubmit = async e => {
+                e.preventDefault();
+                const fd = new FormData(formEdit);
+                fd.append('csrfmiddlewaretoken', document.querySelector('[name=csrfmiddlewaretoken]').value);
+                try {
+                    const res = await fetch(formEdit.action, { method: 'POST', body: fd });
+                    const data = await res.json();
+                    msgTextEdit.textContent = data.message;
+                    msgTextEdit.style.color = data.success ? '#20623b' : '#a63a3a';
+                    msgBoxEdit.classList.remove('hidden');
+                    if (data.success) setTimeout(() => window.location.reload(), 1000);
+                } catch {
+                    msgTextEdit.textContent = 'Ошибка сети'; msgTextEdit.style.color = '#a63a3a'; msgBoxEdit.classList.remove('hidden');
+                }
+            };
+        }
+
+        if (formDelete) {
+            formDelete.onsubmit = async e => {
+                e.preventDefault();
+                const fd = new FormData(formDelete);
+                fd.append('csrfmiddlewaretoken', document.querySelector('[name=csrfmiddlewaretoken]').value);
+                try {
+                    const res = await fetch(formDelete.action, { method: 'POST', body: fd });
+                    const data = await res.json();
+                    msgTextDelete.textContent = data.message;
+                    msgTextDelete.style.color = data.success ? '#20623b' : '#a63a3a';
+                    msgBoxDelete.classList.remove('hidden');
+                    if (data.success) setTimeout(() => window.location.href = "{% url 'contactbook:contact_list' %}", 1000);
+                } catch {
+                    msgTextDelete.textContent = 'Ошибка сети'; msgTextDelete.style.color = '#a63a3a'; msgBoxDelete.classList.remove('hidden');
+                }
+            };
+        }
     });
+
+    window.copyToClipboard = function(el) {
+        navigator.clipboard.writeText(el.innerText).then(() => {
+            const orig = el.textContent;
+            el.textContent = '✓ Скопировано'; el.style.color = '#20623b';
+            setTimeout(() => { el.textContent = orig; el.style.color = ''; }, 1200);
+        });
+    };
 </script>
 {% endblock %}

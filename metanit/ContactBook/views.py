@@ -86,21 +86,16 @@ def toggle_favorite(request, pk):
 
 @login_required
 def toggle_contact_favorite(request, pk):
-    """Добавление/удаление внешнего контакта из избранного"""
     contact = get_object_or_404(Contact, pk=pk)
     fav, created = ContactFavorite.objects.get_or_create(user=request.user, contact=contact)
     
     if not created:
         fav.delete()
-        messages.success(request, "Контакт удалён из избранного")
-    else:
-        messages.success(request, "Контакт добавлен в избранное")
     
     return redirect('contactbook:contact_detail', pk=pk)
 
 @login_required
 def favorite_list(request):
-    """Список избранного: сотрудники и внешние контакты с раздельной фильтрацией"""
     
     # Определяем активную вкладку (по умолчанию сотрудники)
     active_tab = request.GET.get('tab', 'employees')
@@ -799,7 +794,7 @@ def contact_detail(request, pk):
         'contact': contact,
         'is_owner': is_owner,
         'is_admin': is_admin_user,
-        'is_contact_favorite': is_contact_favorite  # Добавь эту строку
+        'is_contact_favorite': is_contact_favorite 
     })
 
 @login_required
@@ -850,42 +845,40 @@ def contact_create(request):
 @login_required
 def contact_edit(request, pk):
     contact = get_object_or_404(Contact, pk=pk)
-    
     if not is_admin(request.user) and contact.owner != request.user:
-        messages.error(request, "У вас нет прав для редактирования этого контакта.")
-        return redirect('contactbook:contact_detail', pk=pk)
-    
-    if request.method == 'POST':
-        contact.last_name = request.POST.get('last_name', '').strip()
-        contact.first_name = request.POST.get('first_name', '').strip()
-        contact.middle_name = request.POST.get('middle_name', '').strip() or None
-        contact.phone = request.POST.get('phone', '').strip()
-        contact.email = request.POST.get('email', '').strip() or None
-        contact.organization = request.POST.get('organization', '').strip() or None
-        contact.position = request.POST.get('position', '').strip() or None
-        contact.category = request.POST.get('category', 'client')
-        
-        if not contact.last_name or not contact.first_name or not contact.phone:
-            messages.error(request, 'Фамилия, имя и телефон обязательны')
-            return redirect('contactbook:contact_detail', pk=pk)
-            
-        try:
-            contact.save()
-            messages.success(request, 'Данные контакта обновлены')
-            return redirect('contactbook:contact_detail', pk=pk)
-        except IntegrityError:
-            messages.error(request, 'Контакт с таким телефоном или email уже существует')
-            return redirect('contactbook:contact_detail', pk=pk)
+        return JsonResponse({'success': False, 'message': 'Нет прав'}, status=403)
+    if request.method != 'POST':
+        return JsonResponse({'success': False, 'message': 'Метод не поддерживается'}, status=405)
+
+    contact.last_name = request.POST.get('last_name', '').strip()
+    contact.first_name = request.POST.get('first_name', '').strip()
+    contact.middle_name = request.POST.get('middle_name', '').strip() or None
+    contact.phone = request.POST.get('phone', '').strip()
+    contact.email = request.POST.get('email', '').strip() or None
+    contact.organization = request.POST.get('organization', '').strip() or None
+    contact.position = request.POST.get('position', '').strip() or None
+    contact.category = request.POST.get('category', 'client')
+
+    if not contact.last_name or not contact.first_name or not contact.phone:
+        return JsonResponse({'success': False, 'message': 'Фамилия, имя и телефон обязательны'}, status=400)
+
+    try:
+        contact.save()
+        return JsonResponse({'success': True, 'message': 'Данные контакта обновлены'})
+    except IntegrityError:
+        return JsonResponse({'success': False, 'message': 'Контакт с таким телефоном или email уже существует'}, status=400)
 
 @login_required
 def contact_delete(request, pk):
     contact = get_object_or_404(Contact, pk=pk)
-    
     if not is_admin(request.user) and contact.owner != request.user:
-        messages.error(request, "У вас нет прав для удаления этого контакта.")
-        return redirect('contactbook:contact_detail', pk=pk)
-    
-    if request.method == 'POST':
-        contact.delete()
-        messages.success(request, 'Контакт удалён')
-        return redirect('contactbook:contact_list')
+        return JsonResponse({'success': False, 'message': 'Нет прав'}, status=403)
+    if request.method != 'POST':
+        return JsonResponse({'success': False, 'message': 'Метод не поддерживается'}, status=405)
+
+    try:
+        name = f"{contact.last_name} {contact.first_name}"
+        contact.delete() 
+        return JsonResponse({'success': True, 'message': f'Контакт «{name}» удалён'})
+    except Exception as e:
+        return JsonResponse({'success': False, 'message': f'Ошибка удаления: {str(e)}'}, status=500)
