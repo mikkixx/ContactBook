@@ -61,27 +61,20 @@
     </div>
     {% if is_admin or contact.owner == request.user %}
     <div class="prof-btn">
-<<<<<<< HEAD
         <form method="post" action="{% url 'contactbook:toggle_contact_favorite' contact.pk %}" style="display: inline;">
             {% csrf_token %}
             <button type="submit" class="btn btn-secondary">
                 {% if is_contact_favorite %}★ Убрать из избранного{% else %}☆ Добавить в избранное{% endif %}
             </button>
         </form>
-        <button type="button" class="btn btn-primary" onclick="openEditModal()">Редактировать контакт</button>
-        <button type="button" class="btn btn-delete" onclick="openDeleteModal()">Удалить контакт</button>
-=======
         <button type="button" class="btn btn-secondary" onclick="openEditModal()">Редактировать контакт</button>
         <button type="button" class="btn btn-danger" onclick="openDeleteModal()">Удалить контакт</button>
->>>>>>> 225120adbd980888d621f766b59a9cb9c9d2bf21
     </div>
     {% endif %}
 </div>
 
-<!-- Затемнение фона -->
 <div class="overflow" id="modalOverlay" style="display:none;" onclick="closeModals()"></div>
 
-<!-- МОДАЛЬНОЕ ОКНО: Редактирование -->
 <div id="modal-edit" class="modal-custom" style="display:none;">
     <h3>Редактирование контакта</h3>
     <form method="post" action="{% url 'contactbook:contact_edit' contact.pk %}" class="modal-form">
@@ -111,7 +104,6 @@
     </form>
 </div>
 
-<!-- МОДАЛЬНОЕ ОКНО: Удаление -->
 <div id="modal-delete" class="modal-custom" style="display:none;">
     <h3>Подтверждение удаления</h3>
     <p class="delete-text">Вы действительно хотите удалить контакт <strong>«{{ contact.last_name }} {{ contact.first_name }}»</strong>?</p>
@@ -141,7 +133,6 @@
         document.getElementById('modal-delete').style.display = 'none';
     }
 
-    // Закрытие по клавише Escape
     document.addEventListener('keydown', e => {
         if (e.key === 'Escape') closeModals();
     });
