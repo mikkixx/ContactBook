@@ -2,16 +2,27 @@
 {% block title %}Структура организации{% endblock %}
 
 {% block content %}
+
 <div class="structure-header">
     <div class="add-dept">
-        <button type="button" onclick="toggleForm('add-dept-form')" class="btn back-link"> + Добавить отдел</button>
+        <button type="button" class="btn back-link" id="add-dept"> + Добавить отдел</button>
         
-        <form id="add-dept-form" class="hidden inline-form" method="post" action="{% url 'contactbook:add_department' %}">
-            {% csrf_token %}
-            <input type="text" name="name" placeholder="Название нового отдела" required>
-            <button type="submit">Сохранить</button>
-            <button type="button" onclick="toggleForm('add-dept-form')">Отмена</button>
-        </form>
+        <div class="overflow no_active"></div>
+
+        <div id="modal">
+            <h2>Добавление отдела</h2>
+            <form id="add-dept-form" method="post" action="{% url 'contactbook:add_department' %}">
+                {% csrf_token %}
+                <input type="text" id="dept-name" name="name" placeholder="Название нового отдела" required>
+                <div class="btn-add-dept">
+                    <button type="submit" id="save-dept" class="btn btn-secondary">Сохранить</button>
+                    <button type="button" id="cancel-dept" class="btn btn-danger">Отмена</button>
+                </div>
+            </form>
+            <div id="modal-message" class="hidden">
+                <p id="result-text"></p>
+            </div>
+        </div>
     </div>
     <h1>Структура организации</h1>
 </div>
@@ -24,7 +35,7 @@
                 <th class="movements">Действия</th>
             </tr>
         </thead>
-        <tbody>
+        <tbody id="dept-tbody">
             {% for dept in page_obj %}
             <tr class="dept-row {% if forloop.last %}last-dept{% endif %}" data-dept-id="{{ dept.id }}">
                 <td class="dept-stroka">
@@ -105,7 +116,7 @@
             </tr>
             {% empty %}
             <tr class="sub-row hidden" data-parent-dept="{{ dept.id }}">
-                <td colspan="2" id="sub-none"><p class="empty-msg">Нет подразделений</p></td>
+                <td colspan="2" id="sub-none"><p>Нет подразделений</p></td>
             </tr>
             {% endfor %}
             {% endfor %}
@@ -137,5 +148,60 @@
     function toggleForm(id) {
         document.getElementById(id).classList.toggle('hidden');
     }
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const openBtn = document.getElementById('add-dept')
+        const modal = document.getElementById('modal')
+        const overflow = document.querySelector('.overflow')
+        const closeBtn = document.getElementById('cancel-dept')
+        const form = document.getElementById('add-dept-form')
+        const msgBox = document.getElementById('modal-message')
+        const msgText = document.getElementById('result-text')
+
+        const toggle = show => {
+            overflow.classList.toggle('no_active', !show)
+            modal.style.display = show ? 'flex' : 'none'
+            if (show) {
+                form.classList.remove('hidden')
+                msgBox.classList.add('hidden')
+                form.reset()
+            } else {
+                form.classList.add('hidden')
+            }
+        }
+
+        openBtn.onclick = () => toggle(true)
+        closeBtn.onclick = () => toggle(false)
+        overflow.onclick = () => toggle(false)
+
+        form.onsubmit = async e => {
+            e.preventDefault()
+            
+            const fd = new FormData(form)
+            fd.append('csrfmiddlewaretoken', document.querySelector('[name=csrfmiddlewaretoken]').value)
+
+            try {
+                const res = await fetch(form.action, { method: 'POST', body: fd })
+                const data = await res.json()
+
+                msgText.textContent = data.message
+                msgText.style.color = data.success ? '#20623b' : '#a63a3a'
+                msgBox.classList.remove('hidden')
+
+                if (data.success) {
+                    setTimeout(() => window.location.reload(), 1000)
+                } else {
+                    form.classList.remove('hidden')
+                }
+            } catch {
+                msgText.textContent = 'Ошибка сети'
+                msgText.style.color = '#a63a3a'
+                msgBox.classList.remove('hidden')
+                form.classList.remove('hidden')
+            }
+        }
+    })
 </script>
 {% endblock %}

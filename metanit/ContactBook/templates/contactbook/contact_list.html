@@ -2,26 +2,7 @@
 {% block title %}Внешние контакты{% endblock %}
 
 {% block content %}
-<div class="contact-header">
-    <div class="create-contact">
-        <button type="button" onclick="toggleForm('create-contact-form')" class="btn back-link"> + Создать контакт</button>
-        
-        <form id="create-contact-form" class="hidden inline-form" method="post" action="{% url 'contactbook:contact_create' %}">
-            {% csrf_token %}
-            <input type="text" name="last_name" placeholder="Фамилия" required>
-            <input type="text" name="first_name" placeholder="Имя">
-            <input type="text" name="organization" placeholder="Организация">
-            <input type="text" name="position" placeholder="Должность">
-            <input type="tel" name="phone" placeholder="Телефон">
-            <input type="email" name="email" placeholder="Email">
-            
-            <button type="submit">Сохранить</button>
-            <button type="button" onclick="toggleForm('create-contact-form')">Отмена</button>
-        </form>
-    </div>
-    <h1>Внешние контакты</h1>
-</div>
-
+<h1>Внешние контакты</h1>
 <div class="filter">
     <div class="zagolovok"><p>Фильтрация</p></div>
     <form method="get" class="elements-contact">
@@ -79,6 +60,23 @@
             {% endfor %}
         </tbody>
     </table>
+</div>
+
+<div class="create-contact">
+    <button type="button" onclick="toggleForm('create-contact-form')" class="btn back-link"> + Создать контакт</button>
+    
+    <form id="create-contact-form" class="hidden inline-form" method="post" action="{% url 'contactbook:contact_create' %}">
+        {% csrf_token %}
+        <input type="text" name="last_name" placeholder="Фамилия" required>
+        <input type="text" name="first_name" placeholder="Имя">
+        <input type="text" name="organization" placeholder="Организация">
+        <input type="text" name="position" placeholder="Должность">
+        <input type="tel" name="phone" placeholder="Телефон">
+        <input type="email" name="email" placeholder="Email">
+        
+        <button type="submit">Сохранить</button>
+        <button type="button" onclick="toggleForm('create-contact-form')">Отмена</button>
+    </form>
 </div>
 
 <div class="pagination">

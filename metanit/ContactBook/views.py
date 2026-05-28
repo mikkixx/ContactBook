@@ -537,26 +537,29 @@ def edit_department(request, pk):
 
 @login_required
 def add_department(request):
+    if request.method != 'POST':
+        return JsonResponse({'success': False, 'message': 'Метод не поддерживается'}, status=405)
+
     if not is_admin(request.user):
-        messages.error(request, "Доступ запрещён")
-        return redirect('contactbook:organization_structure')
-        
-    if request.method == 'POST':
-        name = request.POST.get('name', '').strip()
-        if not name:
-            messages.error(request, "Название отдела не может быть пустым")
-            return redirect('contactbook:add_department')
-        if Department.objects.filter(name__iexact=name).exists():
-            messages.error(request, "Отдел с таким названием уже существует")
-            return redirect('contactbook:add_department')
-        try:
-            Department.objects.create(name=name)
-            messages.success(request, f"Отдел «{name}» успешно добавлен")
-        except Exception as e:
-            messages.error(request, f"Ошибка создания: {str(e)}")
-        return redirect('contactbook:organization_structure')
-        
-    return render(request, 'contactbook/add_department.html')
+        return JsonResponse({'success': False, 'message': 'Доступ запрещён'}, status=403)
+
+    name = request.POST.get('name', '').strip()
+    if not name:
+        return JsonResponse({'success': False, 'message': 'Название не может быть пустым'}, status=400)
+
+    if Department.objects.filter(name__iexact=name).exists():
+        return JsonResponse({'success': False, 'message': 'Отдел уже существует'}, status=400)
+
+    try:
+        dept = Department.objects.create(name=name)
+        return JsonResponse({
+            'success': True,
+            'message': f'Отдел «{name}» успешно добавлен',
+            'dept_id': dept.id,
+            'dept_name': dept.name
+        })
+    except Exception as e:
+        return JsonResponse({'success': False, 'message': f'Ошибка: {str(e)}'}, status=500)
 
 @login_required
 def delete_department(request, pk):
@@ -852,8 +855,7 @@ def contact_create(request):
             Contact.objects.create(
                 last_name=last_name, first_name=first_name, middle_name=middle_name,
                 phone=phone, email=email, organization=organization,
-                position=position, category=category, notes=notes,
-                owner=request.user 
+                position=position, category=category, owner=request.user 
             )
             messages.success(request, 'Контакт успешно добавлен')
             return redirect('contactbook:contact_list')
