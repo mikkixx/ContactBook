@@ -61,6 +61,7 @@
     </div>
     {% if is_admin or contact.owner == request.user %}
     <div class="prof-btn">
+<<<<<<< HEAD
         <form method="post" action="{% url 'contactbook:toggle_contact_favorite' contact.pk %}" style="display: inline;">
             {% csrf_token %}
             <button type="submit" class="btn btn-secondary">
@@ -69,6 +70,10 @@
         </form>
         <button type="button" class="btn btn-primary" onclick="openEditModal()">Редактировать контакт</button>
         <button type="button" class="btn btn-delete" onclick="openDeleteModal()">Удалить контакт</button>
+=======
+        <button type="button" class="btn btn-secondary" onclick="openEditModal()">Редактировать контакт</button>
+        <button type="button" class="btn btn-danger" onclick="openDeleteModal()">Удалить контакт</button>
+>>>>>>> 225120adbd980888d621f766b59a9cb9c9d2bf21
     </div>
     {% endif %}
 </div>

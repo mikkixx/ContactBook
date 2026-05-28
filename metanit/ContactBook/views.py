@@ -8,11 +8,6 @@ from django.contrib.auth.models import User
 from django.contrib.auth import update_session_auth_hash
 import io
 from django.http import HttpResponse
-from openpyxl import Workbook
-from reportlab.lib.pagesizes import letter
-from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
-from reportlab.lib import colors
-from reportlab.lib.units import inch
 from django.http import JsonResponse
 from django.core.mail import send_mail
 from django.urls import reverse
@@ -24,6 +19,8 @@ from django.utils.encoding import force_str
 from django.db import IntegrityError
 from .utils import normalize_phone
 import re
+import logging
+from django.utils import timezone 
 
 def is_admin(user):
     return user.is_authenticated and hasattr(user, 'employee_profile') and user.employee_profile.role == 'admin'
@@ -84,9 +81,6 @@ def toggle_favorite(request, pk):
 
     if not created:
         fav.delete()
-        messages.success(request, "Контакт удалён из избранного")
-    else:
-        messages.success(request, "Контакт добавлен в избранное")
         
     return redirect('contactbook:employee_detail', pk=pk)
 
@@ -214,31 +208,30 @@ def my_profile(request):
 @login_required
 def edit_profile(request):
     employee = request.user.employee_profile
-    is_admin_user = is_admin(request.user)
-
+    
     if request.method == 'POST':
-        new_email = request.POST.get('email', '').strip()
-        last_name = request.POST.get('last_name', '').strip()
-        first_name = request.POST.get('first_name', '').strip()
-        middle_name = request.POST.get('middle_name', '').strip() or None  
-        phone = request.POST.get('phone', '').strip()
-        floor = request.POST.get('floor', '').strip()
-        cabinet = request.POST.get('cabinet', '').strip() or None  # 
+        try:
+            new_email = request.POST.get('email', '').strip()
+            last_name = request.POST.get('last_name', '').strip()
+            first_name = request.POST.get('first_name', '').strip()
+            middle_name = request.POST.get('middle_name', '').strip() or None
+            phone = request.POST.get('phone', '').strip()
+            floor = request.POST.get('floor', '').strip()
+            cabinet = request.POST.get('cabinet', '').strip() or None
 
-        if is_admin_user:
-            position = request.POST.get('position', '').strip()
-            dept_id = request.POST.get('department')
-            sub_id = request.POST.get('subdivision') or None  
-        else:
+            is_admin_user = request.user.is_staff or getattr(employee, 'role', None) == 'admin'
             position = employee.position
             dept_id = employee.department_id
             sub_id = employee.subdivision_id
 
-        if not last_name or not first_name or not phone or not floor or not new_email or not position or not dept_id:
-            messages.error(request, "Фамилия, имя, телефон, этаж, почта, должность и отдел обязательны для заполнения")
-            return redirect('contactbook:my_profile')
+            if is_admin_user:
+                position = request.POST.get('position', '').strip()
+                dept_id = request.POST.get('department')
+                sub_id = request.POST.get('subdivision') or None
 
-        try:
+            if not all([last_name, first_name, phone, floor, new_email, dept_id]):
+                return JsonResponse({'success': False, 'message': 'Заполните все обязательные поля'}, status=400)
+
             employee.last_name = last_name
             employee.first_name = first_name
             employee.middle_name = middle_name
@@ -252,169 +245,71 @@ def edit_profile(request):
 
             if new_email and new_email != request.user.email:
                 if User.objects.filter(email=new_email).exclude(id=request.user.id).exists():
-                    messages.error(request, "Этот email уже зарегистрирован в системе")
-                    return redirect('contactbook:my_profile')
+                    return JsonResponse({'success': False, 'message': 'Этот email уже зарегистрирован'}, status=400)
                 User.objects.filter(id=request.user.id).update(email=new_email)
 
-            messages.success(request, "Профиль успешно обновлён")
-            return redirect('contactbook:my_profile')
+            return JsonResponse({'success': True, 'message': 'Профиль успешно обновлён'})
 
         except Exception as e:
-            messages.error(request, f"Ошибка сохранения: {str(e)}")
-            return redirect('contactbook:my_profile')
+            import logging
+            logging.error(f"Ошибка обновления профиля: {e}", exc_info=True)
+            return JsonResponse({'success': False, 'message': f'Ошибка сервера: {str(e)}'}, status=500)
+
+    departments = employee.department.__class__.objects.all() if hasattr(employee, 'department') else []
+    subdivisions = employee.subdivision.__class__.objects.all() if hasattr(employee, 'subdivision') else []
+    
+    return render(request, 'contactbook/my_profile.html', {
+        'employee': employee,
+        'user_email': request.user.email,
+        'departments': departments,
+        'subdivisions': subdivisions
+    })
 
 @login_required
 def change_password(request):
-    if request.method == 'POST':
+    if request.method != 'POST':
+        return redirect('contactbook:my_profile')
+
+    try:
         current_pw = request.POST.get('current_password', '').strip()
         new_pw = request.POST.get('new_password', '').strip()
         confirm_pw = request.POST.get('confirm_password', '').strip()
 
         if not request.user.check_password(current_pw):
-            messages.error(request, "Неверный текущий пароль")
-            return redirect('contactbook:my_profile')
-
+            return JsonResponse({'success': False, 'message': 'Неверный текущий пароль'}, status=400)
         if not (6 <= len(new_pw) <= 32):
-            messages.error(request, "Новый пароль должен содержать от 6 до 32 символов")
-            return redirect('contactbook:my_profile')
-
+            return JsonResponse({'success': False, 'message': 'Пароль должен быть от 6 до 32 символов'}, status=400)
         if new_pw != confirm_pw:
-            messages.error(request, "Пароли не совпадают")
-            return redirect('contactbook:my_profile')
-
+            return JsonResponse({'success': False, 'message': 'Пароли не совпадают'}, status=400)
         if request.user.check_password(new_pw):
-            messages.error(request, "Новый пароль не должен совпадать с предыдущим")
-            return redirect('contactbook:my_profile')
+            return JsonResponse({'success': False, 'message': 'Новый пароль не должен совпадать с предыдущим'}, status=400)
 
         request.user.set_password(new_pw)
         request.user.save()
         update_session_auth_hash(request, request.user) 
-        
-        messages.success(request, "Пароль успешно изменён")
-        return redirect('contactbook:my_profile')
+        return JsonResponse({'success': True, 'message': 'Пароль успешно изменён'})
 
-
-@login_required
-def generate_report(request):
-    """Генерация отчёта в Excel/PDF по фильтрам (только для админов)."""
-    # Проверка роли администратора
-    if not is_admin(request.user):
-        return redirect('contactbook:employee_list')
-
-    if request.method == 'POST':
-        # Сбор параметров из формы
-        report_name = request.POST.get('report_name', 'Справочник_сотрудников').strip()
-        dept_id = request.POST.get('department')
-        sub_id = request.POST.get('subdivision')
-        position = request.POST.get('position', '').strip()
-        cabinet = request.POST.get('cabinet', '').strip()
-        floor = request.POST.get('floor', '').strip()
-        fmt = request.POST.get('format', 'excel')
-
-        # ✅ ИСПРАВЛЕНО: убран is_active=True (нет такого поля в модели)
-        qs = Employee.objects.select_related('department', 'subdivision').all()
-        
-        # Применение фильтров (только если переданы)
-        if dept_id:
-            qs = qs.filter(department_id=dept_id)
-        if sub_id:
-            qs = qs.filter(subdivision_id=sub_id)
-        if position:
-            qs = qs.filter(position__icontains=position)
-        if cabinet:
-            qs = qs.filter(cabinet__icontains=cabinet)
-        if floor:
-            qs = qs.filter(floor__icontains=floor)
-
-        # Получение данных для экспорта
-        data = list(qs.values(
-            'last_name', 'first_name', 'middle_name', 'position',
-            'department__name', 'subdivision__name',
-            'phone', 'floor', 'cabinet'
-        ))
-
-        if not data:
-            messages.warning(request, "⚠️ Нет данных для экспорта по выбранным фильтрам")
-            return redirect('contactbook:generate_report')
-
-        # Генерация файла в выбранном формате
-        if fmt == 'excel':
-            return _export_excel(report_name, data)
-        elif fmt == 'pdf':
-            return _export_pdf(report_name, data)
-
-    # GET: отрисовка формы с фильтрами
-    return render(request, 'contactbook/generate_report.html', {
-        'departments': Department.objects.all(),
-        'subdivisions': Subdivision.objects.all()
-    })
-
-def _export_excel(filename, data):
-    wb = Workbook()
-    ws = wb.active
-    ws.title = filename[:31]  
-    
-    headers = ['Фамилия', 'Имя', 'Отчество', 'Должность', 'Отдел', 'Подразделение', 'Телефон', 'Этаж', 'Кабинет']
-    ws.append(headers)
-    
-    for row in data:
-        ws.append([
-            row.get('last_name'), row.get('first_name'), row.get('middle_name'),
-            row.get('position'), row.get('department__name'), row.get('subdivision__name'),
-            row.get('phone'), row.get('floor'), row.get('cabinet')
-        ])
-
-    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-    response['Content-Disposition'] = f'attachment; filename="{filename}.xlsx"'
-    wb.save(response)
-    return response
-
-def _export_pdf(filename, data):
-    buffer = io.BytesIO()
-    doc = SimpleDocTemplate(buffer, pagesize=letter)
-    elements = []
-    
-    elements.append(Paragraph(f"Отчёт: {filename}", style={'fontSize': 16, 'alignment': 1}))
-    elements.append(Spacer(1, 12))
-
-    headers = ['ФИО', 'Должность', 'Отдел/Подразделение', 'Телефон', 'Место']
-    table_data = [headers]
-    for row in data:
-        fio = f"{row['last_name']} {row['first_name']}"
-        dept = f"{row['department__name']}"
-        if row['subdivision__name']: dept += f" / {row['subdivision__name']}"
-        place = f"{row['floor'] or ''} эт., каб. {row['cabinet'] or '—'}"
-        table_data.append([fio, row['position'], dept, row['phone'], place])
-
-    table = Table(table_data, colWidths=[1.5*inch, 1.2*inch, 1.5*inch, 1*inch, 1.3*inch])
-    table.setStyle(TableStyle([
-        ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
-        ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
-        ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
-        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-        ('FONTSIZE', (0, 0), (-1, -1), 9),
-        ('BOTTOMPADDING', (0, 0), (-1, -1), 6),
-        ('GRID', (0, 0), (-1, -1), 0.5, colors.grey)
-    ]))
-    elements.append(table)
-    doc.build(elements)
-    buffer.seek(0)
-    
-    response = HttpResponse(buffer, content_type='application/pdf')
-    response['Content-Disposition'] = f'attachment; filename="{filename}.pdf"'
-    return response
+    except Exception as e:
+        logging.error(f"Ошибка смены пароля: {e}", exc_info=True)
+        return JsonResponse({'success': False, 'message': 'Ошибка сервера. Попробуйте позже.'}, status=500)
 
 @login_required
 def edit_employee(request, pk):
     employee = get_object_or_404(Employee, pk=pk)
     
+    if request.method != 'POST':
+        return render(request, 'contactbook/edit_employee.html', {
+            'employee': employee,
+            'departments': Department.objects.all(),
+            'subdivisions': Subdivision.objects.all()
+        })
+
     if not is_admin(request.user):
         if request.user.employee_profile == employee:
             return redirect('contactbook:edit_profile')
-        messages.error(request, "❌ У вас нет прав для редактирования этой карточки")
-        return redirect('contactbook:employee_detail', pk=employee.pk)
+        return JsonResponse({'success': False, 'message': 'У вас нет прав для редактирования этой карточки'}, status=403)
 
-    if request.method == 'POST':
+    try:
         last_name = request.POST.get('last_name', '').strip()
         first_name = request.POST.get('first_name', '').strip()
         middle_name = request.POST.get('middle_name', '').strip() or None
@@ -427,70 +322,65 @@ def edit_employee(request, pk):
         role = request.POST.get('role', 'user')
         new_email = request.POST.get('email', '').strip()
 
-        if not last_name or not first_name or not phone or not floor or not new_email or not position or not dept_id:
-            messages.error(request, "Фамилия, имя, телефон, этаж, почта, должность и отдел обязательны")
-            return redirect('contactbook:edit_employee', pk=employee.pk)
+        if not all([last_name, first_name, phone, floor, new_email, position, dept_id]):
+            return JsonResponse({'success': False, 'message': 'Заполните все обязательные поля'}, status=400)
 
-        try:
-            employee.last_name = last_name
-            employee.first_name = first_name
-            employee.middle_name = middle_name
-            employee.position = position
-            employee.department_id = dept_id
-            employee.subdivision_id = sub_id
-            employee.phone = phone
-            employee.floor = floor
-            employee.cabinet = cabinet
-            employee.role = role
-            employee.save()
+        employee.last_name = last_name
+        employee.first_name = first_name
+        employee.middle_name = middle_name
+        employee.position = position
+        employee.department_id = dept_id
+        employee.subdivision_id = sub_id
+        employee.phone = phone
+        employee.floor = floor
+        employee.cabinet = cabinet
+        employee.role = role
+        employee.save()
 
-            if new_email and employee.user_account and new_email != employee.user_account.email:
-                if User.objects.filter(email=new_email).exclude(id=employee.user_account.id).exists():
-                    messages.error(request, "Этот email уже используется другим аккаунтом")
-                    return redirect('contactbook:edit_employee', pk=employee.pk)
-                User.objects.filter(id=employee.user_account.id).update(email=new_email)
+        if new_email and employee.user_account and new_email != employee.user_account.email:
+            if User.objects.filter(email=new_email).exclude(id=employee.user_account.id).exists():
+                return JsonResponse({'success': False, 'message': 'Этот email уже используется другим аккаунтом'}, status=400)
+            User.objects.filter(id=employee.user_account.id).update(email=new_email)
 
-            messages.success(request, "Данные сотрудника успешно обновлены")
-            return redirect('contactbook:employee_detail', pk=employee.pk)
+        return JsonResponse({'success': True, 'message': 'Данные сотрудника успешно обновлены'})
 
-        except Exception as e:
-            messages.error(request, f"Ошибка сохранения: {str(e)}")
-            return redirect('contactbook:edit_employee', pk=employee.pk)
-
-    return render(request, 'contactbook/edit_employee.html', {
-        'employee': employee,
-        'is_admin': True,
-        'departments': Department.objects.all(),
-        'subdivisions': Subdivision.objects.all()
-    })
+    except Exception as e:
+        logging.error(f"Ошибка обновления сотрудника #{pk}: {e}", exc_info=True)
+        return JsonResponse({'success': False, 'message': f'Ошибка сервера: {str(e)}'}, status=500)
 
 @login_required
 def delete_employee(request, pk):
+    if request.method != 'POST':
+        manager = getattr(Employee, 'all_objects', Employee.objects)
+        employee = get_object_or_404(manager, pk=pk)
+        return render(request, 'contactbook/confirm_delete_employee.html', {'employee': employee})
+
     if not is_admin(request.user):
-        messages.error(request, "Только администратор может удалять сотрудников")
-        return redirect('contactbook:employee_list')
-    
-    # ✅ ИСПОЛЬЗУЙ all_objects чтобы найти даже "удалённого"
-    employee = get_object_or_404(Employee.all_objects, pk=pk)
+        return JsonResponse({'success': False, 'message': 'Только администратор может удалять сотрудников'}, status=403)
 
-    if request.method == 'POST':
-        try:
-            employee_name = f"{employee.last_name} {employee.first_name}"
-            
-            #МЯГКОЕ УДАЛЕНИЕ вместо employee.delete()
-            employee.soft_delete()
-            
-            # Опционально: деактивируем учётную запись
-            if employee.user_account:
-                employee.user_account.is_active = False
-                employee.user_account.save()
-            
-            messages.success(request, f"Карточка «{employee_name}» перемещена в корзину")
-        except Exception as e:
-            messages.error(request, f"Ошибка при удалении: {str(e)}")
-        return redirect('contactbook:employee_list')
+    try:
+        manager = getattr(Employee, 'all_objects', Employee.objects)
+        employee = get_object_or_404(manager, pk=pk)
 
-    return render(request, 'contactbook/confirm_delete_employee.html', {'employee': employee})
+        if getattr(employee, 'is_deleted', False):
+            return JsonResponse({'success': False, 'message': 'Этот сотрудник уже удалён'}, status=400)
+
+        employee.is_deleted = True
+        employee.deleted_at = timezone.now()
+        employee.save()
+
+        if employee.user_account:
+            employee.user_account.is_active = False
+            employee.user_account.save()
+
+        return JsonResponse({
+            'success': True, 
+            'message': f'Карточка «{employee.last_name} {employee.first_name}» перемещена в корзину'
+        })
+
+    except Exception as e:
+        logging.error(f"Ошибка удаления сотрудника #{pk}: {e}", exc_info=True)
+        return JsonResponse({'success': False, 'message': f'Ошибка сервера: {str(e)}'}, status=500)
 
 @login_required
 def restore_employee(request, pk):
