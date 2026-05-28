@@ -45,7 +45,7 @@
                 <td class="movements">
                     <div class="dept-actions">
                         <button type="button" class="btn btn-dept-actions open-sub-modal" data-dept-id="{{ dept.id }}" data-dept-name="{{ dept.name }}" data-url="{% url 'contactbook:add_subdivision' dept.id %}">+ Подразделение</button>
-                        <button onclick="toggleForm('edit-dept-{{ dept.id }}')" class="btn btn-dept-actions">✍🏻</button>
+                        <button type="button" class="btn btn-dept-actions open-edit-dept-modal" data-dept-id="{{ dept.id }}" data-dept-name="{{ dept.name }}" data-url="{% url 'contactbook:edit_department' dept.pk %}">✍🏻</button>
                         <button onclick="toggleForm('delete-dept-{{ dept.id }}')" class="btn btn-dept-actions">🗑️</button>
                     </div>
 
@@ -121,16 +121,34 @@
         </div>
     </div>
 
-    <div id="modal-edit-sub">
+    <div id="modal-edit-dept">
         <h2>Редактирование отдела</h2>
-        <form id="add-sub-form" method="post">
+        <form id="edit-dept-form" method="post">
             {% csrf_token %}
-            <input type="text" name="name" value="{{ dept.name }}" required>
+            <input type="text" id="edit-dept-name" name="name" placeholder="Введите новое название отдела" required>
+            <div class="btn-add-sub">
+                <button type="submit" id="save-edit-dept" class="btn btn-secondary">Сохранить</button>
+                <button type="button" id="cancel-edit-dept" class="btn btn-danger">Отмена</button>
+            </div>
+        </form>
+        <div id="modal-message-edit" class="hidden">
+            <p id="result-text-edit"></p>
+        </div>
+    </div>
+
+    <div id="modal-edit-sub">
+        <h2>Редактирование подразделения</h2>
+        <form id="edit-sub-form" method="post">
+            {% csrf_token %}
+            <input type="text" id="edit-sub-name" name="name" placeholder="Введите новое название подразделения" required>
             <div class="btn-add-sub">
                 <button type="submit" id="save-edit-sub" class="btn btn-secondary">Сохранить</button>
                 <button type="button" id="cancel-edit-sub" class="btn btn-danger">Отмена</button>
             </div>
         </form>
+        <div id="modal-message-edit" class="hidden">
+            <p id="result-text-edit"></p>
+        </div>
     </div>
 </div>
 
@@ -282,4 +300,65 @@
     })
 </script>
 
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const modalEdit = document.getElementById('modal-edit-dept')
+        const formEdit = document.getElementById('edit-dept-form')
+        const inputEdit = document.getElementById('edit-dept-name')
+        const msgBoxEdit = document.getElementById('modal-message-edit')
+        const msgTextEdit = document.getElementById('result-text-edit')
+        const cancelEdit = document.getElementById('cancel-edit-dept')
+        const overflow = document.querySelector('.overflow')
+
+        const toggleEdit = show => {
+            overflow.classList.toggle('no_active', !show)
+            modalEdit.style.display = show ? 'flex' : 'none'
+            if (show) {
+                formEdit.classList.remove('hidden')
+                msgBoxEdit.classList.add('hidden')
+            } else {
+                formEdit.classList.add('hidden')
+            }
+        }
+
+        document.querySelectorAll('.open-edit-dept-modal').forEach(btn => {
+            btn.onclick = () => {
+                formEdit.action = btn.dataset.url
+                inputEdit.value = btn.dataset.deptName
+                toggleEdit(true)
+            }
+        })
+
+        cancelEdit.onclick = () => toggleEdit(false)
+        overflow.addEventListener('click', (e) => {
+            if (e.target === overflow && modalEdit.style.display === 'flex') toggleEdit(false)
+        })
+
+        formEdit.onsubmit = async e => {
+            e.preventDefault()
+            const fd = new FormData(formEdit)
+            fd.append('csrfmiddlewaretoken', document.querySelector('[name=csrfmiddlewaretoken]').value)
+
+            try {
+                const res = await fetch(formEdit.action, { method: 'POST', body: fd })
+                const data = await res.json()
+
+                msgTextEdit.textContent = data.message
+                msgTextEdit.style.color = data.success ? '#20623b' : '#a63a3a'
+                msgBoxEdit.classList.remove('hidden')
+
+                if (data.success) {
+                    setTimeout(() => window.location.reload(), 1000)
+                } else {
+                    formEdit.classList.remove('hidden')
+                }
+            } catch {
+                msgTextEdit.textContent = 'Ошибка сети'
+                msgTextEdit.style.color = '#a63a3a'
+                msgBoxEdit.classList.remove('hidden')
+                formEdit.classList.remove('hidden')
+            }
+        }
+    })
+</script>
 {% endblock %}

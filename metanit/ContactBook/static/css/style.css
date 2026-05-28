@@ -1177,7 +1177,7 @@ form{
     z-index: 999;
 }
 
-#modal, #modal-sub{
+#modal, #modal-sub, #modal-edit-dept{
     width: 500px;
     height: auto;
     background-color: white;
@@ -1195,11 +1195,11 @@ form{
     z-index: 1001;
     gap: 10px;
 }
-#modal, #modal-sub > h2{
+#modal, #modal-sub, #modal-edit-dept > h2{
     margin-top: 0;
 }
 
-#add-dept-form, #add-sub-form{
+#add-dept-form, #add-sub-form, #edit-dept-form{
     width: 100%;
     display: flex;
     flex-direction: column;
@@ -1207,7 +1207,7 @@ form{
     gap: 20px;
 }
 
-#add-dept-form, #add-sub-form > input{
+#add-dept-form, #add-sub-form, #edit-dept-form > input{
     width: 90%;
     height: 28px;
     border: solid 1px rgb(163, 163, 163);
@@ -1217,7 +1217,7 @@ form{
     padding: 5px 10px;
 }
 
-#add-dept-form, #add-sub-form > input:focus{
+#add-dept-form, #add-sub-form, #edit-dept-form > input:focus{
     box-shadow: 0 0 10px rgba(41, 48, 73, 0.22);
     outline: none;
 }
@@ -1247,7 +1247,7 @@ form{
     display: none !important; 
 }
 
-#modal-message, #modal-message-sub > p{
+#modal-message, #modal-message-sub, #modal-message-edit > p{
     text-align: center;
 }
 

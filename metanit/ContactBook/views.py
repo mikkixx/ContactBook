@@ -509,29 +509,31 @@ def organization_structure(request):
 
 @login_required
 def edit_department(request, pk):
+    if request.method != 'POST':
+        return JsonResponse({'success': False, 'message': 'Метод не поддерживается'}, status=405)
+
     if not is_admin(request.user):
-        messages.error(request, "Доступ запрещён")
-        return redirect('contactbook:organization_structure')
-        
+        return JsonResponse({'success': False, 'message': 'Доступ запрещён'}, status=403)
+
     dept = get_object_or_404(Department, pk=pk)
-    
-    if request.method == 'POST':
-        new_name = request.POST.get('name', '').strip()
-        if not new_name:
-            messages.error(request, "Название отдела не может быть пустым")
-            return redirect('contactbook:edit_department', pk=dept.pk)
-        if Department.objects.filter(name__iexact=new_name).exclude(pk=dept.pk).exists():
-            messages.error(request, "Отдел с таким названием уже существует")
-            return redirect('contactbook:edit_department', pk=dept.pk)
-        try:
-            dept.name = new_name
-            dept.save()
-            messages.success(request, f"Название отдела «{new_name}» обновлено")
-        except Exception as e:
-            messages.error(request, f"Ошибка сохранения: {str(e)}")
-        return redirect('contactbook:organization_structure')
-        
-    return render(request, 'contactbook/edit_department.html', {'department': dept})
+    new_name = request.POST.get('name', '').strip()
+
+    if not new_name:
+        return JsonResponse({'success': False, 'message': 'Название не может быть пустым'}, status=400)
+
+    if new_name.lower() == dept.name.lower():
+        return JsonResponse({'success': False, 'message': f'Отдел уже называется «{dept.name}»'}, status=400)
+
+    if Department.objects.filter(name__iexact=new_name).exists():
+        return JsonResponse({'success': False, 'message': 'Отдел с таким названием уже существует'}, status=400)
+
+    try:
+        old_name = dept.name
+        dept.name = new_name
+        dept.save()
+        return JsonResponse({'success': True, 'message': f'Название обновлено: «{old_name}» → «{new_name}»'})
+    except Exception as e:
+        return JsonResponse({'success': False, 'message': f'Ошибка сохранения: {str(e)}'}, status=500)
 
 @login_required
 def add_department(request):
