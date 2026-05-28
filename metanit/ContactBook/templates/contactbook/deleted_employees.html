@@ -69,11 +69,11 @@
 
 <div class="pagination">
     {% if page_obj.has_previous %}
-        <a href="?page={{ page_obj.previous_page_number }}&search={{ search }}&position={{ position }}&sort={{ sort_order }}"><p>←</p></a>
+        <a href="?page={{ page_obj.previous_page_number }}&search={{ search }}&position={{ position }}&sort={{ sort_order }}"><p>◀</p></a>
     {% endif %}
     <p>Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}</p>
     {% if page_obj.has_next %}
-        <a href="?page={{ page_obj.next_page_number }}&search={{ search }}&position={{ position }}&sort={{ sort_order }}"><p>→</p></a>
+        <a href="?page={{ page_obj.next_page_number }}&search={{ search }}&position={{ position }}&sort={{ sort_order }}">▶</a>
     {% endif %}
 </div>
 

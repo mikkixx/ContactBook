@@ -841,8 +841,9 @@ form{
 }
 
 .copy-data {
-    color: #005eff;
+    color: #1247a2;
     text-decoration: none;
+    cursor: pointer;
 }
 
 .none{

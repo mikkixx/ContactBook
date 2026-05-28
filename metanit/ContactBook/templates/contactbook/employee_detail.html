@@ -226,9 +226,12 @@
         const text = el.innerText;
         navigator.clipboard.writeText(text).then(() => {
             const original = el.textContent;
-            el.textContent = '✓ Скопировано';
+            el.textContent = 'Скопировано'; 
             el.style.color = '#20623b';
-            setTimeout(() => { el.textContent = original; el.style.color = ''; }, 1200);
+            setTimeout(() => { 
+                el.textContent = original; 
+                el.style.color = ''; 
+            }, 1200);
         }).catch(() => alert('Не удалось скопировать'));
     };
 </script>

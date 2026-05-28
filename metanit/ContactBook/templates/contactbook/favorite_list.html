@@ -131,11 +131,11 @@
 
 <div class="pagination">
     {% if cont_page.has_previous %}
-        <a href="?tab=contacts&cont_page={{ cont_page.previous_page_number }}&cont_search={{ cont_search }}&cont_position={{ cont_position }}&cont_org={{ cont_org }}&cont_category={{ cont_category }}">←</a>
+        <a href="?tab=contacts&cont_page={{ cont_page.previous_page_number }}&cont_search={{ cont_search }}&cont_position={{ cont_position }}&cont_org={{ cont_org }}&cont_category={{ cont_category }}">◀</a>
     {% endif %}
     <p>Страница {{ cont_page.number }} из {{ cont_page.paginator.num_pages }}</p>
     {% if cont_page.has_next %}
-        <a href="?tab=contacts&cont_page={{ cont_page.next_page_number }}&cont_search={{ cont_search }}&cont_position={{ cont_position }}&cont_org={{ cont_org }}&cont_category={{ cont_category }}">→</a>
+        <a href="?tab=contacts&cont_page={{ cont_page.next_page_number }}&cont_search={{ cont_search }}&cont_position={{ cont_position }}&cont_org={{ cont_org }}&cont_category={{ cont_category }}">▶</a>
     {% endif %}
 </div>
 {% endif %}

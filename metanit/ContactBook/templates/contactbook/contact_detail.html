@@ -156,11 +156,16 @@
     });
 
     window.copyToClipboard = function(el) {
-        navigator.clipboard.writeText(el.innerText).then(() => {
-            const orig = el.textContent;
-            el.textContent = '✓ Скопировано'; el.style.color = '#20623b';
-            setTimeout(() => { el.textContent = orig; el.style.color = ''; }, 1200);
-        });
+        const text = el.innerText;
+        navigator.clipboard.writeText(text).then(() => {
+            const original = el.textContent;
+            el.textContent = 'Скопировано'; 
+            el.style.color = '#20623b';
+            setTimeout(() => { 
+                el.textContent = original; 
+                el.style.color = ''; 
+            }, 1200);
+        }).catch(() => alert('Не удалось скопировать'));
     };
 </script>
 {% endblock %}

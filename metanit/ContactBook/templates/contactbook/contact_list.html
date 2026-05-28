@@ -99,13 +99,13 @@
 
 <div class="pagination">
     {% if page_obj.has_previous %}
-        <a href="?page={{ page_obj.previous_page_number }}&search={{ search|urlencode }}&position={{ position|urlencode }}&organization={{ organization|urlencode }}&category={{ category }}&mine_only={% if mine_only %}on{% endif %}">←</a>
+        <a href="?page={{ page_obj.previous_page_number }}&search={{ search|urlencode }}&position={{ position|urlencode }}&organization={{ organization|urlencode }}&category={{ category }}&mine_only={% if mine_only %}on{% endif %}">◀</a>
     {% endif %}
     
     <p>Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}</p>
     
     {% if page_obj.has_next %}
-        <a href="?page={{ page_obj.next_page_number }}&search={{ search|urlencode }}&position={{ position|urlencode }}&organization={{ organization|urlencode }}&category={{ category }}&mine_only={% if mine_only %}on{% endif %}">→</a>
+        <a href="?page={{ page_obj.next_page_number }}&search={{ search|urlencode }}&position={{ position|urlencode }}&organization={{ organization|urlencode }}&category={{ category }}&mine_only={% if mine_only %}on{% endif %}">▶</a>
     {% endif %}
 </div>
 
