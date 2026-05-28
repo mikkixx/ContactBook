@@ -7,11 +7,11 @@
 <!-- Вкладки -->
 <div class="tabs" style="margin-bottom: 20px; display: flex; gap: 10px;">
     <a href="?tab=employees&emp_search={{ emp_search }}&emp_position={{ emp_position }}&emp_dept={{ emp_dept }}&emp_sub={{ emp_sub }}" 
-       class="btn {% if active_tab == 'employees' %}btn-primary{% else %}btn-secondary{% endif %}">
+       class="btn {% if active_tab == 'employees' %}btn-secondary{% else %}btn-primary{% endif %}">
         Сотрудники ({{ emp_page.paginator.count }})
     </a>
     <a href="?tab=contacts&cont_search={{ cont_search }}&cont_position={{ cont_position }}&cont_org={{ cont_org }}&cont_category={{ cont_category }}" 
-       class="btn {% if active_tab == 'contacts' %}btn-primary{% else %}btn-secondary{% endif %}">
+       class="btn {% if active_tab == 'contacts' %}btn-secondary{% else %}btn-primary{% endif %}">
         Внешние контакты ({{ cont_page.paginator.count }})
     </a>
 </div>
@@ -19,14 +19,14 @@
 <!-- === ВКЛАДКА: СОТРУДНИКИ === -->
 {% if active_tab == 'employees' %}
 <div class="filter">
-    <div class="zagolovok">Фильтр:</div>
+    <div class="zagolovok">Фильтрация</div>
     <div class="elements">
-        <input type="text" id="emp_search" name="emp_search" placeholder="Поиск по ФИО..." value="{{ emp_search }}">
-        <input type="text" name="emp_position" placeholder="Должность..." value="{{ emp_position }}">
-        <select name="department" id="dept-select" onchange="loadSubdivisions(this.value)">
+        <input type="text" id="emp_search" name="emp_search" placeholder="Поиск по имени/фамилии" value="{{ emp_search }}">
+        <input type="text" name="emp_position" placeholder="Поиск по должности" value="{{ emp_position }}">
+        <select name="department" id="dept-select">
             <option value="">Все отделы</option>
             {% for dept in departments %}
-                <option value="{{ dept.id }}" {% if dept.id|stringformat:"s" == dept_id %}selected{% endif %}>
+                <option value="{{ dept.id }}" {% if dept.id|stringformat:"s" == emp_dept %}selected{% endif %}>
                     {{ dept.name }}
                 </option>
             {% endfor %}
@@ -35,13 +35,13 @@
             <option value="">Все подразделения</option>
             {% for sub in subdivisions %}
                 <option value="{{ sub.id }}" data-dept="{{ sub.department_id }}" 
-                        {% if sub.id|stringformat:"s" == sub_id %}selected{% endif %}>
+                        {% if sub.id|stringformat:"s" == emp_sub %}selected{% endif %}>
                     {{ sub.name }}
                 </option>
             {% endfor %}
         </select>
-        <button type="button" onclick="applyFilters()">Применить</button>
-        <a href="?tab=employees" class="btn-reset">Сбросить</a>
+        <button type="button" onclick="applyFilters() " class="btn btn-primary">Применить</button>
+        <a href="?tab=employees" class="btn btn-secondary">Сбросить</a>
     </div>
 </div>
 
@@ -85,11 +85,11 @@
 <!-- === ВКЛАДКА: ВНЕШНИЕ КОНТАКТЫ === -->
 {% if active_tab == 'contacts' %}
 <div class="filter">
-    <div class="zagolovok">Фильтр:</div>
+    <div class="zagolovok">Фильтрация</div>
     <div class="elements-contact">
-        <input type="text" id="cont_search" name="cont_search" placeholder="Поиск по ФИО..." value="{{ cont_search }}">
-        <input type="text" name="cont_position" placeholder="Должность..." value="{{ cont_position }}">
-        <input type="text" name="cont_org" placeholder="Организация..." value="{{ cont_org }}">
+        <input type="text" id="cont_search" name="cont_search" placeholder="Поиск по имени/фамилии" value="{{ cont_search }}">
+        <input type="text" name="cont_position" placeholder="Поиск по должности" value="{{ cont_position }}">
+        <input type="text" name="cont_org" placeholder="Поиск по организации" value="{{ cont_org }}">
         <select name="cont_category">
             <option value="">Все категории</option>
             {% for cat_value, cat_label in categories %}
@@ -98,8 +98,8 @@
                 </option>
             {% endfor %}
         </select>
-        <button type="button" onclick="applyContFilters()">Применить</button>
-        <a href="?tab=contacts" class="btn-reset">Сбросить</a>
+        <button class="btn btn-primary" type="button" onclick="applyContFilters()">Применить</button>
+        <a href="?tab=contacts" class="btn btn-secondary">Сбросить</a>
     </div>
 </div>
 
@@ -150,33 +150,49 @@
         const subSelect = document.getElementById('sub-select');
         const allOptions = subSelect.querySelectorAll('option[data-dept]');
         
-        // Показываем/скрываем подразделения в зависимости от выбранного отдела
+        if (!deptId) {
+            // Если отдел не выбран, показываем все подразделения
+            allOptions.forEach(option => {
+                option.style.display = '';
+            });
+            return;
+        }
+        
+        // Показываем только подразделения выбранного отдела
         allOptions.forEach(option => {
-            if (!deptId || option.getAttribute('data-dept') == deptId) {
+            if (option.getAttribute('data-dept') == deptId) {
                 option.style.display = '';
             } else {
                 option.style.display = 'none';
             }
         });
         
-        // Сбрасываем выбор подразделения при смене отдела
-        if (deptId && subSelect.value) {
-            const selectedOption = subSelect.querySelector(`option[value="${subSelect.value}"]`);
-            if (selectedOption && selectedOption.style.display === 'none') {
+        // Если текущее выбранное подразделение не принадлежит выбранному отделу - сбрасываем
+        const currentValue = subSelect.value;
+        if (currentValue) {
+            const selectedOption = subSelect.querySelector(`option[value="${currentValue}"]`);
+            if (selectedOption && selectedOption.getAttribute('data-dept') != deptId) {
                 subSelect.value = '';
             }
         }
     }
-    // Фильтрация для сотрудников
-    function applyEmpFilters() {
+    
+    function applyFilters() {
         const search = document.getElementById('emp_search').value;
         const position = document.querySelector('[name="emp_position"]').value;
-        const dept = document.getElementById('emp_dept').value;
-        const sub = document.getElementById('emp_sub').value;
-        window.location.href = `?tab=employees&emp_search=${encodeURIComponent(search)}&emp_position=${encodeURIComponent(position)}&emp_dept=${dept}&emp_sub=${sub}`;
+        const dept = document.getElementById('dept-select').value;
+        const sub = document.getElementById('sub-select').value;
+        
+        let url = `?tab=employees`;
+        
+        if (search) url += `&emp_search=${encodeURIComponent(search)}`;
+        if (position) url += `&emp_position=${encodeURIComponent(position)}`;
+        if (dept && dept !== '') url += `&emp_dept=${encodeURIComponent(dept)}`;
+        if (sub && sub !== '') url += `&emp_sub=${encodeURIComponent(sub)}`;
+        
+        window.location.href = url;
     }
 
-    // Фильтрация для контактов
     function applyContFilters() {
         const search = document.getElementById('cont_search').value;
         const position = document.querySelector('[name="cont_position"]').value;
@@ -185,40 +201,17 @@
         window.location.href = `?tab=contacts&cont_search=${encodeURIComponent(search)}&cont_position=${encodeURIComponent(position)}&cont_org=${encodeURIComponent(org)}&cont_category=${category}`;
     }
 
-    // Фильтрация подразделений для сотрудников
-    function loadEmpSubdivisions(deptId) {
-        const subSelect = document.getElementById('emp_sub');
-        subSelect.innerHTML = '<option value="">Все подразделения</option>';
-        document.querySelectorAll('#emp_sub option[data-dept]').forEach(opt => {
-            if (!deptId || opt.getAttribute('data-dept') == deptId) {
-                subSelect.appendChild(opt);
-            }
-        });
-    }
-
-    
-    function applyFilters() {
-        const search = document.getElementById('search').value;
-        const dept = document.getElementById('dept-select').value;
-        const sub = document.getElementById('sub-select').value;
-        
-        // Формируем URL с параметрами
-        let url = `?tab=employees`;
-        
-        if (search) url += `&search=${encodeURIComponent(search)}`;
-        if (dept && dept !== '') url += `&department=${encodeURIComponent(dept)}`;
-        if (sub && sub !== '') url += `&subdivision=${encodeURIComponent(sub)}`;
-        
-        // Перенаправляем
-        window.location.href = url;
-    }
-
     document.addEventListener('DOMContentLoaded', function() {
         const deptSelect = document.getElementById('dept-select');
-        if (deptSelect && deptSelect.value) {
+        if (deptSelect) {
+            // Загружаем подразделения при загрузке страницы
             loadSubdivisions(deptSelect.value);
+            
+            // Добавляем обработчик изменения отдела
+            deptSelect.addEventListener('change', function() {
+                loadSubdivisions(this.value);
+            });
         }
     });
-
 </script>
 {% endblock %}

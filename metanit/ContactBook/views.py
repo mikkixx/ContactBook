@@ -124,13 +124,12 @@ def favorite_list(request):
     ).select_related('department', 'subdivision').order_by('last_name')
     
     if emp_search:
-        search_escaped = re.escape(emp_search)
-        pattern = f'^{search_escaped}'
         emp_qs = emp_qs.filter(
-            Q(last_name__iregex=pattern) | Q(first_name__iregex=pattern)
+            Q(last_name__iregex=rf'^{re.escape(emp_search)}') | 
+            Q(first_name__iregex=rf'^{re.escape(emp_search)}')
         )
     if emp_position:
-        emp_qs = emp_qs.filter(position__icontains=emp_position)
+        emp_qs = emp_qs.filter(position__iregex=rf'{re.escape(emp_position)}')
     if emp_dept and emp_dept != '':
         emp_qs = emp_qs.filter(department_id=emp_dept)
     if emp_sub and emp_sub != '':
@@ -139,28 +138,32 @@ def favorite_list(request):
     emp_paginator = Paginator(emp_qs, 10)
     emp_page = emp_paginator.get_page(request.GET.get('emp_page'))
     
-    # === ИЗБРАННЫЕ КОНТАКТЫ ===
     cont_qs = Contact.objects.filter(
         favorited_by__user=request.user
     ).order_by('last_name')
-    
+
     if cont_search:
-        search_escaped = re.escape(cont_search)
-        pattern = f'^{search_escaped}'
+        # Регистронезависимый поиск с начала строки (как у сотрудников)
         cont_qs = cont_qs.filter(
-            Q(last_name__iregex=pattern) | Q(first_name__iregex=pattern)
+            Q(last_name__iregex=rf'^{re.escape(cont_search)}') | 
+            Q(first_name__iregex=rf'^{re.escape(cont_search)}')
         )
     if cont_position:
-        cont_qs = cont_qs.filter(position__icontains=cont_position)
+        # Регистронезависимый поиск по должности (частичное совпадение)
+        cont_qs = cont_qs.filter(position__iregex=rf'{re.escape(cont_position)}')
     if cont_org:
-        cont_qs = cont_qs.filter(organization__icontains=cont_org)
+        # Регистронезависимый поиск по организации (частичное совпадение)
+        cont_qs = cont_qs.filter(organization__iregex=rf'{re.escape(cont_org)}')
     if cont_category:
         cont_qs = cont_qs.filter(category=cont_category)
     
     cont_paginator = Paginator(cont_qs, 10)
     cont_page = cont_paginator.get_page(request.GET.get('cont_page'))
     
-    # === КОНТЕКСТ ДЛЯ ШАБЛОНА ===
+    filtered_subdivisions = Subdivision.objects.all()
+    if emp_dept and emp_dept != '':
+        filtered_subdivisions = Subdivision.objects.filter(department_id=emp_dept)
+
     context = {
         'active_tab': active_tab,
         
@@ -171,7 +174,7 @@ def favorite_list(request):
         'emp_dept': emp_dept,
         'emp_sub': emp_sub,
         'departments': Department.objects.all(),
-        'subdivisions': Subdivision.objects.all(),
+        'subdivisions': filtered_subdivisions,  # ← изменено
         
         # Контакты
         'cont_page': cont_page,
