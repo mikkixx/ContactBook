@@ -586,28 +586,29 @@ def delete_department(request, pk):
 
 @login_required
 def add_subdivision(request, dept_pk):
+    if request.method != 'POST':
+        return JsonResponse({'success': False, 'message': 'Метод не поддерживается'}, status=405)
+
     if not is_admin(request.user):
-        messages.error(request, "Доступ запрещён")
-        return redirect('contactbook:organization_structure')
-        
+        return JsonResponse({'success': False, 'message': 'Доступ запрещён'}, status=403)
+
     dept = get_object_or_404(Department, pk=dept_pk)
-    
-    if request.method == 'POST':
-        name = request.POST.get('name', '').strip()
-        if not name:
-            messages.error(request, "Название подразделения не может быть пустым")
-            return redirect('contactbook:organization_structure')
-        if Subdivision.objects.filter(name__iexact=name, department=dept).exists():
-            messages.error(request, "Подразделение с таким названием уже существует в этом отделе")
-            return redirect('contactbook:organization_structure')
-        try:
-            Subdivision.objects.create(name=name, department=dept)
-            messages.success(request, f"Подразделение «{name}» добавлено в отдел «{dept.name}»")
-        except Exception as e:
-            messages.error(request, f"Ошибка создания: {str(e)}")
-        return redirect('contactbook:organization_structure')
-        
-    return render(request, 'contactbook/add_subdivision.html', {'department': dept})
+    name = request.POST.get('name', '').strip()
+
+    if not name:
+        return JsonResponse({'success': False, 'message': 'Название не может быть пустым'}, status=400)
+
+    if Subdivision.objects.filter(name__iexact=name, department=dept).exists():
+        return JsonResponse({'success': False, 'message': 'Такое подразделение уже есть в этом отделе'}, status=400)
+
+    try:
+        Subdivision.objects.create(name=name, department=dept)
+        return JsonResponse({
+            'success': True,
+            'message': f'Подразделение «{name}» добавлено в отдел «{dept.name}»'
+        })
+    except Exception as e:
+        return JsonResponse({'success': False, 'message': f'Ошибка: {str(e)}'}, status=500)
 
 @login_required
 def edit_subdivision(request, pk):

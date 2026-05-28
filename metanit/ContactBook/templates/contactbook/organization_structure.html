@@ -44,28 +44,10 @@
                 </td>
                 <td class="movements">
                     <div class="dept-actions">
-                        <button onclick="toggleForm('add-sub-{{ dept.id }}')" class="btn btn-dept-actions">+ Подразделение</button>
+                        <button type="button" class="btn btn-dept-actions open-sub-modal" data-dept-id="{{ dept.id }}" data-dept-name="{{ dept.name }}" data-url="{% url 'contactbook:add_subdivision' dept.id %}">+ Подразделение</button>
                         <button onclick="toggleForm('edit-dept-{{ dept.id }}')" class="btn btn-dept-actions">✍🏻</button>
                         <button onclick="toggleForm('delete-dept-{{ dept.id }}')" class="btn btn-dept-actions">🗑️</button>
                     </div>
-
-                    <form id="edit-dept-{{ dept.id }}" class="hidden inline-form" method="post" action="{% url 'contactbook:edit_department' dept.pk %}">
-                        {% csrf_token %}
-                        <p><input type="text" name="name" value="{{ dept.name }}" required></p>
-                        <p>
-                            <button type="submit"><p>💾</p></button>
-                            <button type="button" onclick="toggleForm('edit-dept-{{ dept.id }}')"><p>✖</p></button>
-                        </p>
-                    </form>
-
-                    <form id="add-sub-{{ dept.id }}" class="hidden inline-form" method="post" action="{% url 'contactbook:add_subdivision' dept.pk %}">
-                        {% csrf_token %}
-                        <p><input type="text" name="name" placeholder="Название подразделения" required></p>
-                        <p>
-                            <button type="submit"><p>Добавить</p></button>
-                            <button type="button" onclick="toggleForm('add-sub-{{ dept.id }}')"><p>Отмена</p></button>
-                        </p>
-                    </form>
 
                     <form id="delete-dept-{{ dept.id }}" class="hidden inline-form" method="post" action="{% url 'contactbook:delete_department' dept.pk %}">
                         {% csrf_token %}
@@ -122,7 +104,36 @@
             {% endfor %}
         </tbody>
     </table>
+
+    <div id="modal-sub">
+        <h2>Добавление подразделения</h2>
+        <form id="add-sub-form" method="post">
+            {% csrf_token %}
+            <input type="hidden" id="sub-dept-id" name="dept_pk">
+            <input type="text" id="sub-name" name="name" placeholder="Название нового подразделения" required>
+            <div class="btn-add-sub">
+                <button type="submit" id="save-sub" class="btn btn-secondary">Сохранить</button>
+                <button type="button" id="cancel-sub" class="btn btn-danger">Отмена</button>
+            </div>
+        </form>
+        <div id="modal-message-sub" class="hidden">
+            <p id="result-text-sub"></p>
+        </div>
+    </div>
+
+    <div id="modal-edit-sub">
+        <h2>Редактирование отдела</h2>
+        <form id="add-sub-form" method="post">
+            {% csrf_token %}
+            <input type="text" name="name" value="{{ dept.name }}" required>
+            <div class="btn-add-sub">
+                <button type="submit" id="save-edit-sub" class="btn btn-secondary">Сохранить</button>
+                <button type="button" id="cancel-edit-sub" class="btn btn-danger">Отмена</button>
+            </div>
+        </form>
+    </div>
 </div>
+
 <div class="pagination">
     {% if page_obj.has_previous %}
         <a href="?page={{ page_obj.previous_page_number }}&search={{ search }}&department={{ dept_id }}&subdivision={{ sub_id }}&position={{ position }}">←</a>
@@ -172,7 +183,73 @@
             }
         }
 
-        openBtn.onclick = () => toggle(true)
+        openBtn.addEventListener('click', () => toggle(true))
+        closeBtn.addEventListener('click', () => toggle(false))
+        
+        overflow.addEventListener('click', (e) => {
+            if (e.target === overflow) {
+                toggle(false)
+            }
+        })
+
+        form.onsubmit = async e => {
+            e.preventDefault()
+            const fd = new FormData(form)
+            fd.append('csrfmiddlewaretoken', document.querySelector('[name=csrfmiddlewaretoken]').value)
+
+            try {
+                const res = await fetch(form.action, { method: 'POST', body: fd })
+                const data = await res.json()
+
+                msgText.textContent = data.message
+                msgText.style.color = data.success ? '#20623b' : '#a63a3a'
+                msgBox.classList.remove('hidden')
+
+                if (data.success) {
+                    setTimeout(() => window.location.reload(), 1000)
+                } else {
+                    form.classList.remove('hidden')
+                }
+            } catch {
+                msgText.textContent = 'Ошибка сети'
+                msgText.style.color = '#a63a3a'
+                msgBox.classList.remove('hidden')
+                form.classList.remove('hidden')
+            }
+        }
+    })
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const modal = document.getElementById('modal-sub')
+        const overflow = document.querySelector('.overflow')
+        const saveBtn = document.getElementById('save-sub')
+        const closeBtn = document.getElementById('cancel-sub')
+        const form = document.getElementById('add-sub-form')
+        const msgBox = document.getElementById('modal-message-sub')
+        const msgText = document.getElementById('result-text-sub')
+        const deptIdInput = document.getElementById('sub-dept-id')
+
+        const toggle = show => {
+            overflow.classList.toggle('no_active', !show)
+            modal.style.display = show ? 'flex' : 'none'
+            if (show) {
+                form.classList.remove('hidden')
+                msgBox.classList.add('hidden')
+                form.reset()
+            } else {
+                form.classList.add('hidden')
+            }
+        }
+
+        document.querySelectorAll('.open-sub-modal').forEach(btn => {
+            btn.onclick = () => {
+                deptIdInput.value = btn.dataset.deptId
+                form.action = btn.dataset.url  
+                toggle(true)
+            }
+        })
         closeBtn.onclick = () => toggle(false)
         overflow.onclick = () => toggle(false)
 
@@ -204,4 +281,5 @@
         }
     })
 </script>
+
 {% endblock %}

@@ -1177,7 +1177,7 @@ form{
     z-index: 999;
 }
 
-#modal{
+#modal, #modal-sub{
     width: 500px;
     height: auto;
     background-color: white;
@@ -1195,11 +1195,11 @@ form{
     z-index: 1001;
     gap: 10px;
 }
-#modal > h2{
+#modal, #modal-sub > h2{
     margin-top: 0;
 }
 
-#add-dept-form{
+#add-dept-form, #add-sub-form{
     width: 100%;
     display: flex;
     flex-direction: column;
@@ -1207,7 +1207,7 @@ form{
     gap: 20px;
 }
 
-#add-dept-form > input{
+#add-dept-form, #add-sub-form > input{
     width: 90%;
     height: 28px;
     border: solid 1px rgb(163, 163, 163);
@@ -1217,19 +1217,19 @@ form{
     padding: 5px 10px;
 }
 
-#add-dept-form > input:focus{
+#add-dept-form, #add-sub-form > input:focus{
     box-shadow: 0 0 10px rgba(41, 48, 73, 0.22);
     outline: none;
 }
 
-.btn-add-dept{
+.btn-add-dept, .btn-add-sub{
     width: 95%;
     display: flex;
     justify-content: right;
     gap: 10px;
 }
 
-.btn-add-dept > button{
+.btn-add-dept, .btn-add-sub > button{
     width: 50%;
     font-size: 14px;
     display: flex;
@@ -1242,15 +1242,11 @@ form{
 .is_active{
     display:block;
 }
-input{
-    border-radius: 3px;
-    border: 1px solid black;
-}
-button{
-    border-radius: 3px;
-    border: 1px solid black;
-}
 
 .hidden { 
     display: none !important; 
+}
+
+#modal-message, #modal-message-sub > p{
+    text-align: center;
 }
