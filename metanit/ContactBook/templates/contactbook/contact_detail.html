@@ -61,8 +61,8 @@
     </div>
     {% if is_admin or contact.owner == request.user %}
     <div class="prof-btn">
-        <button type="button" class="btn btn-primary" onclick="openEditModal()">Редактировать контакт</button>
-        <button type="button" class="btn btn-delete" onclick="openDeleteModal()">Удалить контакт</button>
+        <button type="button" class="btn btn-secondary" onclick="openEditModal()">Редактировать контакт</button>
+        <button type="button" class="btn btn-danger" onclick="openDeleteModal()">Удалить контакт</button>
     </div>
     {% endif %}
 </div>

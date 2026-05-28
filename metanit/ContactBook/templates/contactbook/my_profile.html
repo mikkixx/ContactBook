@@ -5,48 +5,43 @@
 <div class="profile-container">
     <div class="profile-header">
         <div class="nazad">
-            <a href="{% url 'contactbook:employee_list' %}" class="btn back-link"><--Назад к списку</a>
+            <a href="{% url 'contactbook:employee_list' %}" class="btn back-link">← Назад к списку</a>
         </div>
         <h1>Мой профиль</h1>
     </div>
 
     <div class="profile-card">
         <div class="profile-info">
-                <h2>{{ employee.last_name }} {{ employee.first_name }} {{ employee.middle_name|default:"" }}</h2>
-                <p class="profile-position">{{ employee.position }}</p>
+            <h2>{{ employee.last_name }} {{ employee.first_name }} {{ employee.middle_name|default:"" }}</h2>
+            <p class="profile-position">{{ employee.position }}</p>
 
             <div class="profile-details">
                 <div class="detail-item">
                     <span class="detail-label">ОТДЕЛ:</span>
                     <span class="detail-value">{{ employee.department.name }}</span>
                 </div>
-                
                 <div class="detail-item">
                     <span class="detail-label">ПОДРАЗДЕЛЕНИЕ:</span>
                     <span class="detail-value">{{ employee.subdivision.name|default:"Не указано" }}</span>
                 </div>
-                
                 <div class="detail-item">
                     <span class="detail-label">ТЕЛЕФОН:</span>
                     <span class="detail-value">
-                        <a href="#" onclick="navigator.clipboard.writeText(this.innerText); alert('Скопировано'); return false;" class="copy-data">{{ employee.phone }}</a>
+                        <span class="copy-data" onclick="copyToClipboard(this)">{{ employee.phone }}</span>
                     </span>
                 </div>
-                
                 <div class="detail-item">
                     <span class="detail-label">EMAIL:</span>
                     <span class="detail-value">
-                        <a href="#" onclick="navigator.clipboard.writeText(this.innerText); alert('Скопировано'); return false;" class="copy-data">{{ user_email }}</a>
+                        <span class="copy-data" onclick="copyToClipboard(this)">{{ user_email }}</span>
                     </span>
                 </div>
-                
                 <div class="detail-item">
                     <span class="detail-label">МЕСТО:</span>
                     <span class="detail-value">
                         Этаж {{ employee.floor }}{% if employee.cabinet %}, каб. {{ employee.cabinet }}{% endif %}
                     </span>
                 </div>
-                
                 <div class="detail-item">
                     <span class="detail-label">РОЛЬ:</span>
                     <span class="detail-value">{{ employee.get_role_display }}</span>
@@ -54,21 +49,20 @@
             </div>
         </div>
     </div>
+
     <div class="prof-btn">
-        <button type="button" class="btn btn-primary" onclick="openEditModal()">Редактировать профиль</button>
-                
+        <button type="button" id="open-edit-modal" class="btn btn-primary">Редактировать профиль</button>
         {% if employee.user_account == request.user %}
-            <button type="button" class="btn btn-secondary" onclick="openPasswordModal()">Сменить пароль</button>
+            <button type="button" id="open-pass-modal" class="btn btn-secondary">Сменить пароль</button>
         {% endif %}
     </div>
 </div>
 
+<div class="overflow no_active"></div>
 
-<div class="overflow" id="modalOverlay" style="display:none;" onclick="closeModals()"></div>
-
-<div id="modal-edit" class="modal-custom" style="display:none;">
-    <h3>Редактирование профиля</h3>
-    <form method="post" action="{% url 'contactbook:edit_profile' %}" class="modal-form">
+<div id="modal-edit" class="modal-custom">
+    <h2>Редактирование профиля</h2>
+    <form id="form-edit" method="post" action="{% url 'contactbook:edit_profile' %}">
         {% csrf_token %}
         <div class="modal-grid">
             <div class="modal-field"><label>Фамилия *</label><input type="text" name="last_name" value="{{ employee.last_name }}" required></div>
@@ -79,105 +73,164 @@
             <div class="modal-field"><label>Этаж *</label><input type="text" name="floor" value="{{ employee.floor }}" required></div>
             <div class="modal-field"><label>Кабинет</label><input type="text" name="cabinet" value="{{ employee.cabinet|default:'' }}"></div>
 
-            {% if request.user.employee_profile.role == 'admin' %}
+            {% if request.user.is_staff or request.user.employee_profile.role == 'admin' %}
             <div class="modal-field"><label>Должность *</label><input type="text" name="position" value="{{ employee.position }}" required></div>
-            
             <div class="modal-field">
                 <label>Отдел *</label>
-                <select name="department" required id="departmentSelect" onchange="filterSubdivisions()">
+                <select name="department" required id="dept-select" onchange="filterSubdivisions()">
                     {% for dept in departments %}
-                        <option value="{{ dept.id }}" {% if dept.id == employee.department.id %}selected{% endif %}>
-                            {{ dept.name }}
-                        </option>
+                        <option value="{{ dept.id }}" {% if dept.id == employee.department.id %}selected{% endif %}>{{ dept.name }}</option>
                     {% endfor %}
                 </select>
             </div>
-
             <div class="modal-field">
                 <label>Подразделение</label>
-                <select name="subdivision" id="subdivisionSelect">
+                <select name="subdivision" id="sub-select">
                     <option value="">Не назначено</option>
                     {% for sub in subdivisions %}
-                        <option value="{{ sub.id }}" data-dept="{{ sub.department_id }}" {% if sub.id == employee.subdivision_id %}selected{% endif %}>
-                            {{ sub.name }}
-                        </option>
+                        <option value="{{ sub.id }}" data-dept="{{ sub.department_id }}" {% if sub.id == employee.subdivision_id %}selected{% endif %}>{{ sub.name }}</option>
                     {% endfor %}
                 </select>
             </div>
             {% endif %}
         </div>
         <div class="modal-btns">
-            <button type="submit" class="btn btn-primary">Сохранить</button>
-            <button type="button" class="btn btn-secondary" onclick="closeModals()">Отмена</button>
+            <button type="submit" class="btn btn-secondary">Сохранить</button>
+            <button type="button" id="cancel-edit" class="btn btn-danger">Отмена</button>
         </div>
     </form>
+    <div id="modal-message-edit" class="hidden"><p id="result-text-edit"></p></div>
 </div>
 
-<div id="modal-password" class="modal-custom" style="display:none;">
-    <h3>Смена пароля</h3>
-    <form method="post" action="{% url 'contactbook:change_password' %}" class="modal-form">
+<div id="modal-password" class="modal">
+    <h2>Смена пароля</h2>
+    <form id="form-pass" method="post" action="{% url 'contactbook:change_password' %}">
         {% csrf_token %}
-        <div class="modal-grid single-col">
-            <div class="modal-field"><label>Текущий пароль</label><input type="password" name="current_password" required></div>
-            <div class="modal-field"><label>Новый пароль</label><input type="password" name="new_password" minlength="6" required></div>
-            <div class="modal-field"><label>Подтверждение пароля</label><input type="password" name="confirm_password" minlength="6" required></div>
+        <div class="modal-field-pass">
+            <label for="current_password">Текущий пароль</label>
+            <input type="password" name="current_password" required>
+        </div>
+        <div class="modal-field-pass">
+            <label for="new_password">Новый пароль</label>
+            <input type="password" name="new_password" minlength="6" required>
+        </div>
+        <div class="modal-field-pass">
+            <label for="confirm_password">Подтверждение пароля</label>
+            <input type="password" name="confirm_password" minlength="6" required>
         </div>
         <div class="modal-btns">
-            <button type="submit" class="btn btn-primary">Сменить пароль</button>
-            <button type="button" class="btn btn-secondary" onclick="closeModals()">Отмена</button>
+            <button type="submit" class="btn btn-secondary">Сменить пароль</button>
+            <button type="button" id="cancel-pass" class="btn btn-danger">Отмена</button>
         </div>
     </form>
+    <div id="modal-message-pass" class="hidden"><p id="result-text-pass"></p></div>
 </div>
 
 <script>
-    function filterSubdivisions() {
-        const deptSelect = document.getElementById('departmentSelect');
-        const subSelect = document.getElementById('subdivisionSelect');
-        
-        if (!subSelect) return;
+    document.addEventListener('DOMContentLoaded', () => {
+        const overflow = document.querySelector('.overflow');
+        const modalEdit = document.getElementById('modal-edit');
+        const formEdit = document.getElementById('form-edit');
+        const openEditBtn = document.getElementById('open-edit-modal');
+        const cancelEditBtn = document.getElementById('cancel-edit');
+        const msgBoxEdit = document.getElementById('modal-message-edit');
+        const msgTextEdit = document.getElementById('result-text-edit');
 
-        const selectedDeptId = deptSelect.value;
+        const modalPass = document.getElementById('modal-password');
+        const formPass = document.getElementById('form-pass');
+        const openPassBtn = document.getElementById('open-pass-modal');
+        const cancelPassBtn = document.getElementById('cancel-pass');
+        const msgBoxPass = document.getElementById('modal-message-pass');
+        const msgTextPass = document.getElementById('result-text-pass');
 
-        subSelect.querySelectorAll('option').forEach(option => {
-            if (option.value === '') {
-                option.style.display = '';
-                return;
-            }
+        if (!overflow) return;
 
-            if (option.getAttribute('data-dept') === selectedDeptId) {
-                option.style.display = '';
-            } else {
-                option.style.display = 'none';
+        const toggleModal = (modal, show) => {
+            overflow.classList.toggle('no_active', !show);
+            modal.style.display = show ? 'flex' : 'none';
+        };
+
+        if (openEditBtn) openEditBtn.onclick = () => { toggleModal(modalEdit, true); filterSubdivisions(); };
+        if (cancelEditBtn) cancelEditBtn.onclick = () => toggleModal(modalEdit, false);
+
+        if (openPassBtn) openPassBtn.onclick = () => toggleModal(modalPass, true);
+        if (cancelPassBtn) cancelPassBtn.onclick = () => toggleModal(modalPass, false);
+
+        overflow.addEventListener('click', (e) => {
+            if (e.target === overflow) {
+                toggleModal(modalEdit, false);
+                toggleModal(modalPass, false);
             }
         });
 
-        const currentSubOption = subSelect.options[subSelect.selectedIndex];
-        if (currentSubOption && currentSubOption.style.display === 'none') {
-            subSelect.value = '';
+        if (formEdit) {
+            formEdit.onsubmit = async e => {
+                e.preventDefault();
+                const fd = new FormData(formEdit);
+                fd.append('csrfmiddlewaretoken', document.querySelector('[name=csrfmiddlewaretoken]').value);
+
+                try {
+                    const res = await fetch(formEdit.action, { method: 'POST', body: fd });
+                    const data = await res.json();
+                    msgTextEdit.textContent = data.message;
+                    msgTextEdit.style.color = data.success ? '#20623b' : '#a63a3a';
+                    msgBoxEdit.classList.remove('hidden');
+
+                    if (data.success) setTimeout(() => window.location.reload(), 1000);
+                    else formEdit.classList.remove('hidden');
+                } catch {
+                    msgTextEdit.textContent = 'Ошибка сети';
+                    msgTextEdit.style.color = '#a63a3a';
+                    msgBoxEdit.classList.remove('hidden');
+                }
+            };
         }
-    }
 
-    document.addEventListener('DOMContentLoaded', filterSubdivisions);
+        if (formPass) {
+            formPass.onsubmit = async e => {
+                e.preventDefault();
+                const fd = new FormData(formPass);
+                fd.append('csrfmiddlewaretoken', document.querySelector('[name=csrfmiddlewaretoken]').value);
 
-    function openEditModal() {
-        document.getElementById('modalOverlay').style.display = 'block';
-        document.getElementById('modal-edit').style.display = 'flex';
-        filterSubdivisions();
-    }
+                try {
+                    const res = await fetch(formPass.action, { method: 'POST', body: fd });
+                    const data = await res.json();
+                    msgTextPass.textContent = data.message;
+                    msgTextPass.style.color = data.success ? '#20623b' : '#a63a3a';
+                    msgBoxPass.classList.remove('hidden');
 
-    function openPasswordModal() {
-        document.getElementById('modalOverlay').style.display = 'block';
-        document.getElementById('modal-password').style.display = 'flex';
-    }
-
-    function closeModals() {
-        document.getElementById('modalOverlay').style.display = 'none';
-        document.getElementById('modal-edit').style.display = 'none';
-        document.getElementById('modal-password').style.display = 'none';
-    }
-
-    document.addEventListener('keydown', e => {
-        if (e.key === 'Escape') closeModals();
+                    if (data.success) setTimeout(() => window.location.reload(), 1000);
+                    else formPass.classList.remove('hidden');
+                } catch {
+                    msgTextPass.textContent = 'Ошибка сети';
+                    msgTextPass.style.color = '#a63a3a';
+                    msgBoxPass.classList.remove('hidden');
+                }
+            };
+        }
     });
+
+    window.filterSubdivisions = function() {
+        const deptSelect = document.getElementById('dept-select');
+        const subSelect = document.getElementById('sub-select');
+        if (!deptSelect || !subSelect) return;
+
+        const selectedDeptId = deptSelect.value;
+        subSelect.querySelectorAll('option').forEach(option => {
+            if (option.value === '') { option.style.display = ''; return; }
+            option.style.display = (option.getAttribute('data-dept') === selectedDeptId) ? '' : 'none';
+        });
+        if (subSelect.options[subSelect.selectedIndex].style.display === 'none') subSelect.value = '';
+    };
+
+    window.copyToClipboard = function(el) {
+        const text = el.innerText;
+        navigator.clipboard.writeText(text).then(() => {
+            const original = el.textContent;
+            el.textContent = '✓ Скопировано';
+            el.style.color = '#20623b';
+            setTimeout(() => { el.textContent = original; el.style.color = ''; }, 1200);
+        }).catch(() => alert('Не удалось скопировать'));
+    };
 </script>
 {% endblock %}
