@@ -1385,6 +1385,14 @@ form{
     height: 42px;
 }
 
-
-
-
+.error-box{
+    width: 70%;
+    height: 15%;
+    list-style-type: none;
+    color: #a63a3a;
+    text-align: center;
+}
+.error-box > ul{
+   list-style-type: none;
+   padding-inline-start: 0px;
+}
