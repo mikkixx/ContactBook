@@ -51,34 +51,30 @@ class Employee(models.Model):
     is_deleted = models.BooleanField(default=False, verbose_name='Удалён')
     deleted_at = models.DateTimeField(null=True, blank=True, verbose_name='Дата удаления')
 
-    objects = EmployeeManager()  # По умолчанию показывает только активные
-    all_objects = models.Manager()  # Показывает всех, включая удалённых
+    objects = EmployeeManager()
+    all_objects = models.Manager()
 
     class Meta:
         verbose_name_plural = 'Сотрудники'
 
     def save(self, *args, **kwargs):
-        # Нормализуем телефон перед сохранением
         if self.phone:
             self.phone = normalize_phone(self.phone)
         super().save(*args, **kwargs)
     
     @property
     def phone_formatted(self):
-        """Возвращает номер в формате +7 (900) 123-45-67"""
         return format_phone_display(self.phone)
     
     def __str__(self):
         return f"{self.last_name} {self.first_name}"
     
     def soft_delete(self):
-        """Мягкое удаление"""
         self.is_deleted = True
         self.deleted_at = timezone.now()
         self.save()
     
     def restore(self):
-        """Восстановление"""
         self.is_deleted = False
         self.deleted_at = None
         self.save()
@@ -118,14 +114,12 @@ class Contact(models.Model):
         return f"{self.last_name} {self.first_name} ({self.organization or 'Без организации'})"
     
     def save(self, *args, **kwargs):
-        # Нормализуем телефон перед сохранением (делаем слитно: +79001234567)
         if self.phone:
             self.phone = normalize_phone(self.phone)
         super().save(*args, **kwargs)
 
     @property
     def phone_formatted(self):
-        """Возвращает номер в формате +7 (900) 123-45-67"""
         return format_phone_display(self.phone)
     
 class ContactFavorite(models.Model):
