@@ -22,9 +22,6 @@ def normalize_phone(phone):
 
 
 def format_phone_display(phone):
-    """
-    Форматирует номер для красивого отображения: +7 (900) 123-45-67
-    """
     if not phone:
         return ''
 

@@ -4,7 +4,6 @@
 {% block content %}
 <h1>Избранное</h1>
 
-<!-- Вкладки -->
 <div class="tabs" style="margin-bottom: 20px; display: flex; gap: 10px;">
     <a href="?tab=employees&emp_search={{ emp_search }}&emp_position={{ emp_position }}&emp_dept={{ emp_dept }}&emp_sub={{ emp_sub }}" 
        class="btn {% if active_tab == 'employees' %}btn-secondary{% else %}btn-primary{% endif %}">
@@ -16,7 +15,6 @@
     </a>
 </div>
 
-<!-- === ВКЛАДКА: СОТРУДНИКИ === -->
 {% if active_tab == 'employees' %}
 <div class="filter">
     <div class="zagolovok">Фильтрация</div>

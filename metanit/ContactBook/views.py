@@ -549,11 +549,6 @@ def add_subdivision(request, dept_pk):
     except Exception as e:
         return JsonResponse({'success': False, 'message': f'Ошибка: {str(e)}'}, status=500)
 
-from django.http import JsonResponse
-from django.shortcuts import get_object_or_404
-from django.contrib.auth.decorators import login_required
-from .models import Subdivision
-
 @login_required
 def edit_subdivision(request, pk):
     if request.method != 'POST':
@@ -705,10 +700,10 @@ def activate(request, uidb64, token):
         user.is_active = True
         user.save()
         
-        messages.success(request, "✅ Email подтверждён! Теперь вы можете войти в систему.")
+        messages.success(request, "Email подтверждён! Теперь вы можете войти в систему.")
         return redirect('contactbook:login')
     else:
-        messages.error(request, "❌ Ссылка подтверждения недействительна или устарела.")
+        messages.error(request, "Ссылка подтверждения недействительна или устарела.")
         return redirect('contactbook:register')
 
 def get_subdivisions_by_dept(request):
