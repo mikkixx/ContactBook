@@ -35,7 +35,6 @@ def employee_list(request):
     sub_id = request.GET.get('subdivision')
     position = request.GET.get('position', '').strip()
 
-    # === ФИЛЬТРАЦИЯ ===
     if search:
         search_escaped = re.escape(search)
         pattern = f'^{search_escaped}'
@@ -96,23 +95,19 @@ def toggle_contact_favorite(request, pk):
 
 @login_required
 def favorite_list(request):
-    
-    # Определяем активную вкладку (по умолчанию сотрудники)
+
     active_tab = request.GET.get('tab', 'employees')
-    
-    # === ФИЛЬТРЫ ДЛЯ СОТРУДНИКОВ ===
+
     emp_search = request.GET.get('emp_search', '').strip()
     emp_position = request.GET.get('emp_position', '').strip()
     emp_dept = request.GET.get('emp_dept', '')
     emp_sub = request.GET.get('emp_sub', '')
     
-    # === ФИЛЬТРЫ ДЛЯ КОНТАКТОВ ===
     cont_search = request.GET.get('cont_search', '').strip()
     cont_position = request.GET.get('cont_position', '').strip()
     cont_org = request.GET.get('cont_org', '').strip()
     cont_category = request.GET.get('cont_category', '')
     
-    # === ИЗБРАННЫЕ СОТРУДНИКИ ===
     emp_qs = Employee.objects.filter(
         favorites_by__user=request.user,
         is_deleted=False
@@ -138,16 +133,13 @@ def favorite_list(request):
     ).order_by('last_name')
 
     if cont_search:
-        # Регистронезависимый поиск с начала строки (как у сотрудников)
         cont_qs = cont_qs.filter(
             Q(last_name__iregex=rf'^{re.escape(cont_search)}') | 
             Q(first_name__iregex=rf'^{re.escape(cont_search)}')
         )
     if cont_position:
-        # Регистронезависимый поиск по должности (частичное совпадение)
         cont_qs = cont_qs.filter(position__iregex=rf'{re.escape(cont_position)}')
     if cont_org:
-        # Регистронезависимый поиск по организации (частичное совпадение)
         cont_qs = cont_qs.filter(organization__iregex=rf'{re.escape(cont_org)}')
     if cont_category:
         cont_qs = cont_qs.filter(category=cont_category)
@@ -162,16 +154,14 @@ def favorite_list(request):
     context = {
         'active_tab': active_tab,
         
-        # Сотрудники
         'emp_page': emp_page,
         'emp_search': emp_search,
         'emp_position': emp_position,
         'emp_dept': emp_dept,
         'emp_sub': emp_sub,
         'departments': Department.objects.all(),
-        'subdivisions': filtered_subdivisions,  # ← изменено
+        'subdivisions': filtered_subdivisions,
         
-        # Контакты
         'cont_page': cont_page,
         'cont_search': cont_search,
         'cont_position': cont_position,
@@ -404,7 +394,6 @@ def restore_employee(request, pk):
 
 @login_required
 def deleted_employees(request):
-    """Список удалённых сотрудников (только для админов)"""
     if not is_admin(request.user):
         messages.error(request, "Доступ запрещён")
         return redirect('contactbook:employee_list')
@@ -639,7 +628,6 @@ def register(request):
         floor = request.POST.get('floor', '').strip()
         cabinet = request.POST.get('cabinet', '').strip() or None
 
-        # Валидация
         if not email or not password or not last_name or not first_name or not phone or not department or not floor:
             messages.error(request, "Все поля, отмеченные *, обязательны")
             return redirect('contactbook:register')
@@ -652,7 +640,6 @@ def register(request):
             messages.error(request, "Пароль должен содержать минимум 6 символов")
             return redirect('contactbook:register')
         
-        # ✅ ПРОВЕРКА уникальности username
         if User.objects.filter(username=username).exists():
             messages.error(request, "Этот логин уже занят. Выберите другой.")
             return redirect('contactbook:register')
@@ -662,12 +649,11 @@ def register(request):
             return redirect('contactbook:register')
 
         try:
-            # Создаём пользователя НЕактивным
             user = User.objects.create_user(
                 username=username,
                 email=email,
                 password=password,
-                is_active=False  # ⚡ Пользователь не может войти до подтверждения
+                is_active=False
             )
             Employee.objects.create(
                 user_account=user,
@@ -681,12 +667,9 @@ def register(request):
                 floor=floor,
                 cabinet=cabinet or ''
             )
-
-            # 📧 Отправляем письмо с подтверждением
             token = default_token_generator.make_token(user)
             uid = urlsafe_base64_encode(force_bytes(user.pk))
             
-            # Для локального тестирования используем http://127.0.0.1:8000
             activation_link = f"http://127.0.0.1:8000/activate/{uid}/{token}/"
             
             send_mail(
@@ -695,12 +678,12 @@ def register(request):
                         f'Для завершения регистрации перейдите по ссылке:\n'
                         f'{activation_link}\n\n'
                         f'Если вы не регистрировались, просто проигнорируйте это письмо.',
-                from_email='your_email@gmail.com',  # Замените на вашу почту
+                from_email='your_email@gmail.com',
                 recipient_list=[email],
                 fail_silently=False,
             )
 
-            messages.success(request, "✅ Регистрация успешна! Проверьте почту для подтверждения email.")
+            messages.success(request, "Регистрация успешна! Проверьте почту для подтверждения email.")
             return redirect('contactbook:login')
             
         except Exception as e:
@@ -712,7 +695,6 @@ def register(request):
     })
 
 def activate(request, uidb64, token):
-    """Подтверждение email через ссылку из письма"""
     try:
         uid = force_str(urlsafe_base64_decode(uidb64))
         user = User.objects.get(pk=uid)
@@ -720,7 +702,6 @@ def activate(request, uidb64, token):
         user = None
 
     if user is not None and default_token_generator.check_token(user, token):
-        # ✅ Активируем пользователя
         user.is_active = True
         user.save()
         
