@@ -1249,7 +1249,7 @@ form{
 
 #modal-message, #modal-message-sub > p{
     text-align: center;
-
+}
 
 .modal-container {
     position: fixed; 
@@ -1370,9 +1370,4 @@ form{
     gap: 12px; 
     justify-content: flex-end; 
     margin-top: 10px; 
-}
-
-@media (max-width: 600px) {
-    .modal-grid { grid-template-columns: 1fr; }
-    .modal-custom { padding: 15px; }
 }
