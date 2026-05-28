@@ -47,7 +47,7 @@ def employee_list(request):
     if sub_id and sub_id != 'None':
         qs = qs.filter(subdivision_id=sub_id)
     if position:
-        qs = qs.filter(position__icontains=position)
+        qs = qs.filter(position__iregex=rf'{re.escape(position)}')
 
     paginator = Paginator(qs, 10)
     page_obj = paginator.get_page(request.GET.get('page'))
@@ -735,9 +735,9 @@ def contact_list(request):
             Q(first_name__iregex=pattern)
         )
     if position:
-        qs = qs.filter(position__icontains=position)
+        qs = qs.filter(position__iregex=rf'{re.escape(position)}')
     if org:
-        qs = qs.filter(organization__icontains=org)
+        qs = qs.filter(organization__iregex=rf'{re.escape(org)}')
     if category:
         qs = qs.filter(category=category)
         
