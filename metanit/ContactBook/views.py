@@ -373,7 +373,7 @@ def delete_employee(request, pk):
 
         return JsonResponse({
             'success': True, 
-            'message': f'Карточка «{employee.last_name} {employee.first_name}» перемещена в корзину'
+            'message': f'Карточка «{employee.last_name} {employee.first_name}» перемещена в удаленные сотрудники'
         })
 
     except Exception as e:
@@ -382,28 +382,25 @@ def delete_employee(request, pk):
 
 @login_required
 def restore_employee(request, pk):
-    """Восстановление удалённого сотрудника (только для админов)"""
     if not is_admin(request.user):
-        messages.error(request, "Доступ запрещён")
-        return redirect('contactbook:employee_list')
+        return JsonResponse({'success': False, 'message': "Доступ запрещён"}, status=403)
     
-    # ✅ Ищем среди удалённых
     employee = get_object_or_404(Employee.all_objects, pk=pk, is_deleted=True)
     
     if request.method == 'POST':
         try:
             employee.restore()
             
-            # Активируем учётную запись
             if employee.user_account:
                 employee.user_account.is_active = True
                 employee.user_account.save()
             
-            messages.success(request, f"Сотрудник {employee} восстановлен")
+            full_name = f"{employee.last_name} {employee.first_name} {(employee.middle_name or '')}".strip()
+            return JsonResponse({'success': True, 'message': f'Сотрудник {full_name} успешно восстановлен'})
         except Exception as e:
-            messages.error(request, f"Ошибка при восстановлении: {str(e)}")
-    
-    return redirect('contactbook:deleted_employees')  # Или куда хочешь
+            return JsonResponse({'success': False, 'message': f'Ошибка при восстановлении: {str(e)}'}, status=500)
+            
+    return JsonResponse({'success': False, 'message': 'Метод не поддерживается'}, status=405)
 
 @login_required
 def deleted_employees(request):

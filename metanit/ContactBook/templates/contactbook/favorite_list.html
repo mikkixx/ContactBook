@@ -50,7 +50,7 @@
         <thead>
             <tr>
                 <th>Фамилия</th><th>Имя</th><th>Отчество</th><th>Должность</th>
-                <th>Отдел</th><th>Подразделение</th><th>Телефон</th><th>Профиль</th>
+                <th>Отдел</th><th>Подразделение</th><th>Телефон</th><th class="last-column">Профиль</th>
             </tr>
         </thead>
         <tbody>
@@ -61,7 +61,7 @@
                 <td>{{ emp.department.name }}</td>
                 <td>{{ emp.subdivision.name|default:"—" }}</td>
                 <td>{{ emp.phone }}</td>
-                <td><a href="{% url 'contactbook:employee_detail' emp.pk %}">Перейти</a></td>
+                <td class="last-column"><a href="{% url 'contactbook:employee_detail' emp.pk %}">Перейти</a></td>
             </tr>
             {% empty %}
             <tr><td colspan="8" id="employee-none">Избранных сотрудников не найдено</td></tr>
@@ -70,7 +70,6 @@
     </table>
 </div>
 
-<!-- Пагинация для сотрудников -->
 <div class="pagination">
     {% if emp_page.has_previous %}
         <a href="?tab=employees&emp_page={{ emp_page.previous_page_number }}&emp_search={{ emp_search }}&emp_position={{ emp_position }}&emp_dept={{ emp_dept }}&emp_sub={{ emp_sub }}">←</a>
@@ -82,7 +81,6 @@
 </div>
 {% endif %}
 
-<!-- === ВКЛАДКА: ВНЕШНИЕ КОНТАКТЫ === -->
 {% if active_tab == 'contacts' %}
 <div class="filter">
     <div class="zagolovok">Фильтрация</div>
@@ -108,7 +106,7 @@
         <thead>
             <tr>
                 <th>Фамилия</th><th>Имя</th><th>Отчество</th><th>Должность</th>
-                <th>Организация</th><th>Категория</th><th>Телефон</th><th>Профиль</th>
+                <th>Организация</th><th>Категория</th><th>Телефон</th><th class="last-column">Профиль</th>
             </tr>
         </thead>
         <tbody>
@@ -124,7 +122,7 @@
                     {% else %}Другое{% endif %}
                 </td>
                 <td>{{ contact.phone }}</td>
-                <td><a href="{% url 'contactbook:contact_detail' contact.pk %}">Перейти</a></td>
+                <td class="last-column"><a href="{% url 'contactbook:contact_detail' contact.pk %}">Перейти</a></td>
             </tr>
             {% empty %}
             <tr><td colspan="8" id="employee-none">Избранных контактов не найдено</td></tr>
@@ -133,7 +131,6 @@
     </table>
 </div>
 
-<!-- Пагинация для контактов -->
 <div class="pagination">
     {% if cont_page.has_previous %}
         <a href="?tab=contacts&cont_page={{ cont_page.previous_page_number }}&cont_search={{ cont_search }}&cont_position={{ cont_position }}&cont_org={{ cont_org }}&cont_category={{ cont_category }}">←</a>
@@ -151,14 +148,12 @@
         const allOptions = subSelect.querySelectorAll('option[data-dept]');
         
         if (!deptId) {
-            // Если отдел не выбран, показываем все подразделения
             allOptions.forEach(option => {
                 option.style.display = '';
             });
             return;
         }
         
-        // Показываем только подразделения выбранного отдела
         allOptions.forEach(option => {
             if (option.getAttribute('data-dept') == deptId) {
                 option.style.display = '';
@@ -167,7 +162,6 @@
             }
         });
         
-        // Если текущее выбранное подразделение не принадлежит выбранному отделу - сбрасываем
         const currentValue = subSelect.value;
         if (currentValue) {
             const selectedOption = subSelect.querySelector(`option[value="${currentValue}"]`);
@@ -204,10 +198,8 @@
     document.addEventListener('DOMContentLoaded', function() {
         const deptSelect = document.getElementById('dept-select');
         if (deptSelect) {
-            // Загружаем подразделения при загрузке страницы
             loadSubdivisions(deptSelect.value);
-            
-            // Добавляем обработчик изменения отдела
+
             deptSelect.addEventListener('change', function() {
                 loadSubdivisions(this.value);
             });
