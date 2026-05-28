@@ -127,3 +127,17 @@ class Contact(models.Model):
     def phone_formatted(self):
         """Возвращает номер в формате +7 (900) 123-45-67"""
         return format_phone_display(self.phone)
+    
+class ContactFavorite(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='contact_favorites', verbose_name='Пользователь')
+    contact = models.ForeignKey(Contact, on_delete=models.CASCADE, related_name='favorited_by', verbose_name='Контакт')
+    
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['user', 'contact'], name='unique_contact_favorite')
+        ]
+        verbose_name = 'Избранный контакт'
+        verbose_name_plural = 'Избранные контакты'
+    
+    def __str__(self):
+        return f"{self.user.email} -> {self.contact}"

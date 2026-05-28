@@ -61,6 +61,12 @@
     </div>
     {% if is_admin or contact.owner == request.user %}
     <div class="prof-btn">
+        <form method="post" action="{% url 'contactbook:toggle_contact_favorite' contact.pk %}" style="display: inline;">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-secondary">
+                {% if is_contact_favorite %}★ Убрать из избранного{% else %}☆ Добавить в избранное{% endif %}
+            </button>
+        </form>
         <button type="button" class="btn btn-primary" onclick="openEditModal()">Редактировать контакт</button>
         <button type="button" class="btn btn-delete" onclick="openDeleteModal()">Удалить контакт</button>
     </div>

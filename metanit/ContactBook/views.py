@@ -3,7 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.core.paginator import Paginator
 from django.db.models import Q
-from .models import Employee, Department, Subdivision, Favorite, Contact
+from .models import Employee, Department, Subdivision, Favorite, Contact, ContactFavorite
 from django.contrib.auth.models import User
 from django.contrib.auth import update_session_auth_hash
 import io
@@ -91,39 +91,104 @@ def toggle_favorite(request, pk):
     return redirect('contactbook:employee_detail', pk=pk)
 
 @login_required
+def toggle_contact_favorite(request, pk):
+    """Добавление/удаление внешнего контакта из избранного"""
+    contact = get_object_or_404(Contact, pk=pk)
+    fav, created = ContactFavorite.objects.get_or_create(user=request.user, contact=contact)
+    
+    if not created:
+        fav.delete()
+        messages.success(request, "Контакт удалён из избранного")
+    else:
+        messages.success(request, "Контакт добавлен в избранное")
+    
+    return redirect('contactbook:contact_detail', pk=pk)
+
+@login_required
 def favorite_list(request):
-    qs = Employee.objects.filter(favorites_by__user=request.user) \
-                         .select_related('department', 'subdivision') \
-                         .order_by('last_name')
-
-    search = request.GET.get('search', '').strip()
-    dept_id = request.GET.get('department')
-    sub_id = request.GET.get('subdivision')
-    position = request.GET.get('position', '').strip()
-
-    if search:
-        search_escaped = re.escape(search)
+    """Список избранного: сотрудники и внешние контакты с раздельной фильтрацией"""
+    
+    # Определяем активную вкладку (по умолчанию сотрудники)
+    active_tab = request.GET.get('tab', 'employees')
+    
+    # === ФИЛЬТРЫ ДЛЯ СОТРУДНИКОВ ===
+    emp_search = request.GET.get('emp_search', '').strip()
+    emp_position = request.GET.get('emp_position', '').strip()
+    emp_dept = request.GET.get('emp_dept', '')
+    emp_sub = request.GET.get('emp_sub', '')
+    
+    # === ФИЛЬТРЫ ДЛЯ КОНТАКТОВ ===
+    cont_search = request.GET.get('cont_search', '').strip()
+    cont_position = request.GET.get('cont_position', '').strip()
+    cont_org = request.GET.get('cont_org', '').strip()
+    cont_category = request.GET.get('cont_category', '')
+    
+    # === ИЗБРАННЫЕ СОТРУДНИКИ ===
+    emp_qs = Employee.objects.filter(
+        favorites_by__user=request.user,
+        is_deleted=False
+    ).select_related('department', 'subdivision').order_by('last_name')
+    
+    if emp_search:
+        search_escaped = re.escape(emp_search)
         pattern = f'^{search_escaped}'
-        qs = qs.filter(
-            Q(last_name__iregex=pattern) | 
-            Q(first_name__iregex=pattern)
+        emp_qs = emp_qs.filter(
+            Q(last_name__iregex=pattern) | Q(first_name__iregex=pattern)
         )
-    if dept_id:
-        qs = qs.filter(department_id=dept_id)
-    if sub_id:
-        qs = qs.filter(subdivision_id=sub_id)
-    if position:
-        qs = qs.filter(position__icontains=position)
-
-    paginator = Paginator(qs, 10)
-    page_obj = paginator.get_page(request.GET.get('page'))
-
-    return render(request, 'contactbook/favorite_list.html', {
-        'page_obj': page_obj,
-        'search': search, 'dept_id': dept_id, 'sub_id': sub_id, 'position': position,
+    if emp_position:
+        emp_qs = emp_qs.filter(position__icontains=emp_position)
+    if emp_dept and emp_dept != '':
+        emp_qs = emp_qs.filter(department_id=emp_dept)
+    if emp_sub and emp_sub != '':
+        emp_qs = emp_qs.filter(subdivision_id=emp_sub)
+    
+    emp_paginator = Paginator(emp_qs, 10)
+    emp_page = emp_paginator.get_page(request.GET.get('emp_page'))
+    
+    # === ИЗБРАННЫЕ КОНТАКТЫ ===
+    cont_qs = Contact.objects.filter(
+        favorited_by__user=request.user
+    ).order_by('last_name')
+    
+    if cont_search:
+        search_escaped = re.escape(cont_search)
+        pattern = f'^{search_escaped}'
+        cont_qs = cont_qs.filter(
+            Q(last_name__iregex=pattern) | Q(first_name__iregex=pattern)
+        )
+    if cont_position:
+        cont_qs = cont_qs.filter(position__icontains=cont_position)
+    if cont_org:
+        cont_qs = cont_qs.filter(organization__icontains=cont_org)
+    if cont_category:
+        cont_qs = cont_qs.filter(category=cont_category)
+    
+    cont_paginator = Paginator(cont_qs, 10)
+    cont_page = cont_paginator.get_page(request.GET.get('cont_page'))
+    
+    # === КОНТЕКСТ ДЛЯ ШАБЛОНА ===
+    context = {
+        'active_tab': active_tab,
+        
+        # Сотрудники
+        'emp_page': emp_page,
+        'emp_search': emp_search,
+        'emp_position': emp_position,
+        'emp_dept': emp_dept,
+        'emp_sub': emp_sub,
         'departments': Department.objects.all(),
-        'subdivisions': Subdivision.objects.all()
-    })
+        'subdivisions': Subdivision.objects.all(),
+        
+        # Контакты
+        'cont_page': cont_page,
+        'cont_search': cont_search,
+        'cont_position': cont_position,
+        'cont_org': cont_org,
+        'cont_category': cont_category,
+        'categories': [('client', 'Клиент'), ('partner', 'Партнёр'), ('supplier', 'Поставщик'), ('other', 'Другое')],
+    }
+    
+    return render(request, 'contactbook/favorite_list.html', context)
 
 @login_required
 def remove_from_favorite(request, pk):
@@ -833,14 +898,18 @@ def contact_list(request):
 @login_required
 def contact_detail(request, pk):
     contact = get_object_or_404(Contact, pk=pk)
-    
     is_owner = (contact.owner == request.user)
     is_admin_user = is_admin(request.user)
-    
+    is_contact_favorite = ContactFavorite.objects.filter(
+        user=request.user, 
+        contact=contact
+    ).exists()
+
     return render(request, 'contactbook/contact_detail.html', {
         'contact': contact,
         'is_owner': is_owner,
-        'is_admin': is_admin_user
+        'is_admin': is_admin_user,
+        'is_contact_favorite': is_contact_favorite  # Добавь эту строку
     })
 
 @login_required

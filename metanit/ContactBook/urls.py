@@ -12,7 +12,8 @@ urlpatterns = [
     
     path('', views.employee_list, name='employee_list'),
     path('employee/<int:pk>/', views.employee_detail, name='employee_detail'),
-    path('favorites/', views.favorite_list, name='favorite_list'),
+    path('contact/<int:pk>/toggle-favorite/', views.toggle_contact_favorite, name='toggle_contact_favorite'),
+path('favorites/', views.favorite_list, name='favorite_list'),
     path('favorites/<int:pk>/toggle/', views.toggle_favorite, name='toggle_favorite'),
     path('favorites/<int:pk>/remove/', views.remove_from_favorite, name='remove_from_favorite'),
     path('report/', views.generate_report, name='generate_report'),
