@@ -780,48 +780,32 @@ def contact_detail(request, pk):
 
 @login_required
 def contact_create(request):
-    if request.method == 'POST':
-        last_name = request.POST.get('last_name', '').strip()
-        first_name = request.POST.get('first_name', '').strip()
-        middle_name = request.POST.get('middle_name', '').strip() or None
-        phone = request.POST.get('phone', '').strip()
-        email = request.POST.get('email', '').strip() or None
-        organization = request.POST.get('organization', '').strip() or None
-        position = request.POST.get('position', '').strip() or None
-        category = request.POST.get('category', 'client')
-        
-        if not last_name or not first_name or not phone:
-            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-                return JsonResponse({'success': False, 'message': 'Фамилия, имя и телефон обязательны'}, status=400)
-            messages.error(request, 'Фамилия, имя и телефон обязательны')
-            return redirect('contactbook:contact_create')
-            
-        try:
-            Contact.objects.create(
-                last_name=last_name,
-                first_name=first_name,
-                middle_name=middle_name,
-                phone=phone,
-                email=email,
-                organization=organization,
-                position=position,
-                category=category,
-                owner=request.user
-            )
-            msg = 'Контакт успешно добавлен'
-            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-                return JsonResponse({'success': True, 'message': msg})
-            messages.success(request, msg)
-            return redirect('contactbook:contact_list')
-            
-        except IntegrityError:
-            msg = 'Контакт с таким телефоном или email уже существует'
-            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-                return JsonResponse({'success': False, 'message': msg}, status=400)
-            messages.error(request, msg)
-            return redirect('contactbook:contact_create')
-            
-    return render(request, 'contactbook/contact_form.html', {'is_create': True})
+    if request.method != 'POST':
+        return JsonResponse({'success': False, 'message': 'Метод не поддерживается'}, status=405)
+
+    last_name = request.POST.get('last_name', '').strip()
+    first_name = request.POST.get('first_name', '').strip()
+    phone = request.POST.get('phone', '').strip()
+    email = request.POST.get('email', '').strip() or None
+    middle_name = request.POST.get('middle_name', '').strip() or None
+    organization = request.POST.get('organization', '').strip() or None
+    position = request.POST.get('position', '').strip() or None
+    category = request.POST.get('category', 'client')
+
+    if not last_name or not first_name or not phone:
+        return JsonResponse({'success': False, 'message': 'Фамилия, имя и телефон обязательны'}, status=400)
+
+    try:
+        Contact.objects.create(
+            last_name=last_name, first_name=first_name, phone=phone, email=email,
+            middle_name=middle_name, organization=organization, position=position,
+            category=category, owner=request.user
+        )
+        return JsonResponse({'success': True, 'message': 'Контакт успешно создан'})
+    except IntegrityError:
+        return JsonResponse({'success': False, 'message': 'Контакт с таким телефоном или email уже существует'}, status=400)
+    except Exception as e:
+        return JsonResponse({'success': False, 'message': f'Ошибка: {str(e)}'}, status=500)
 
 @login_required
 def contact_edit(request, pk):

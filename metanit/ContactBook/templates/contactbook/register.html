@@ -83,36 +83,36 @@
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', () => {
-    const deptSelect = document.getElementById('dept');
-    const subSelect = document.getElementById('sub');
-    
-    function loadSubdivisions(deptId) {
-        subSelect.innerHTML = '<option value="">Нет</option>';
+    document.addEventListener('DOMContentLoaded', () => {
+        const deptSelect = document.getElementById('dept');
+        const subSelect = document.getElementById('sub');
         
-        if (!deptId) {
-            subSelect.disabled = true;
-            return;
+        function loadSubdivisions(deptId) {
+            subSelect.innerHTML = '<option value="">Нет</option>';
+            
+            if (!deptId) {
+                subSelect.disabled = true;
+                return;
+            }
+
+            subSelect.disabled = false;
+
+            fetch(`/api/subdivisions/?dept_id=${deptId}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.subdivisions && data.subdivisions.length > 0) {
+                        data.subdivisions.forEach(sub => {
+                            const opt = document.createElement('option');
+                            opt.value = sub.id;
+                            opt.textContent = sub.name;
+                            subSelect.appendChild(opt);
+                        });
+                    }
+                })
+                .catch(err => console.error('Ошибка загрузки подразделений:', err));
         }
 
-        subSelect.disabled = false;
-
-        fetch(`/api/subdivisions/?dept_id=${deptId}`)
-            .then(res => res.json())
-            .then(data => {
-                if (data.subdivisions && data.subdivisions.length > 0) {
-                    data.subdivisions.forEach(sub => {
-                        const opt = document.createElement('option');
-                        opt.value = sub.id;
-                        opt.textContent = sub.name;
-                        subSelect.appendChild(opt);
-                    });
-                }
-            })
-            .catch(err => console.error('Ошибка загрузки подразделений:', err));
-    }
-
-    deptSelect.addEventListener('change', () => loadSubdivisions(deptSelect.value));
-});
+        deptSelect.addEventListener('change', () => loadSubdivisions(deptSelect.value));
+    });
 </script>
 {% endblock %}

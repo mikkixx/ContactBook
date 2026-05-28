@@ -1392,7 +1392,18 @@ form{
     color: #a63a3a;
     text-align: center;
 }
+
 .error-box > ul{
    list-style-type: none;
    padding-inline-start: 0px;
+}
+
+.alert{
+    width: 70%;
+    height: 15%;
+    list-style-type: none;
+    color: #a63a3a;
+    text-align: center;
+    margin-top: 25px;
+    font-weight: 600;
 }
