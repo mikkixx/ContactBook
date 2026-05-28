@@ -16,8 +16,8 @@ def fix_all_phones():
             emp.phone = normalized
             emp.save(update_fields=['phone'])
             updated += 1
-            print(f"✅ {emp}: '{original}' → '{normalized}'")
-    print(f"\n🎉 Готово! Обновлено {updated} номеров")
+            print(f"{emp}: '{original}' → '{normalized}'")
+    print(f"\nГотово! Обновлено {updated} номеров")
 
 if __name__ == '__main__':
     fix_all_phones()

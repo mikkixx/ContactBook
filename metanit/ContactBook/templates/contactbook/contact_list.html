@@ -51,7 +51,7 @@
                 <td>{{ contact.middle_name|default:"Нет" }}</td>
                 <td>{{ contact.position|default:"Нет" }}</td>
                 <td>{{ contact.organization|default:"Нет" }}</td>
-                <td>{{ contact.category|default:"Нет" }}</td>
+                <td>{{ contact.get_category_display|default:"Нет" }}</td>
                 <td>{{ contact.phone }}</td>
                 <td class="last-column"><a href="{% url 'contactbook:contact_detail' contact.pk %}">Перейти</a></td>
             </tr>

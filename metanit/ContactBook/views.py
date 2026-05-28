@@ -886,7 +886,7 @@ def contact_edit(request, pk):
         
         if not contact.last_name or not contact.first_name or not contact.phone:
             messages.error(request, 'Фамилия, имя и телефон обязательны')
-            return redirect('contactbook:contact_edit', pk=pk)
+            return redirect('contactbook:contact_detail', pk=pk)
             
         try:
             contact.save()
@@ -894,9 +894,7 @@ def contact_edit(request, pk):
             return redirect('contactbook:contact_detail', pk=pk)
         except IntegrityError:
             messages.error(request, 'Контакт с таким телефоном или email уже существует')
-            return redirect('contactbook:contact_edit', pk=pk)
-            
-    return render(request, 'contactbook/contact_form.html', {'contact': contact, 'is_create': False})
+            return redirect('contactbook:contact_detail', pk=pk)
 
 @login_required
 def contact_delete(request, pk):
@@ -910,5 +908,3 @@ def contact_delete(request, pk):
         contact.delete()
         messages.success(request, 'Контакт удалён')
         return redirect('contactbook:contact_list')
-        
-    return render(request, 'contactbook/contact_confirm_delete.html', {'contact': contact})

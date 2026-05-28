@@ -3,7 +3,7 @@
 
 {% block content %}
 <div class="profile-container">
-    <div class="employee-header">
+    <div class="profile-header">
         <div class="nazad">
             <a href="{% url 'contactbook:employee_list' %}" class="btn back-link"><--Назад к списку</a>
         </div>
@@ -12,49 +12,49 @@
 
     <div class="profile-card">
         <div class="profile-info">
-            <h2>{{ employee.last_name }} {{ employee.first_name }} {{ employee.middle_name|default:"" }}</h2>
-            <p class="profile-position">{{ employee.position }}</p>
-        </div>
+                <h2>{{ employee.last_name }} {{ employee.first_name }} {{ employee.middle_name|default:"" }}</h2>
+                <p class="profile-position">{{ employee.position }}</p>
 
-        <div class="profile-details">
-            <div class="detail-item">
-                <span class="detail-label">ОТДЕЛ:</span>
-                <span class="detail-value">{{ employee.department.name }}</span>
-            </div>
-            
-            <div class="detail-item">
-                <span class="detail-label">ПОДРАЗДЕЛЕНИЕ:</span>
-                <span class="detail-value">{{ employee.subdivision.name|default:"Не указано" }}</span>
-            </div>
-            
-            <div class="detail-item">
-                <span class="detail-label">ТЕЛЕФОН:</span>
-                <span class="detail-value">
-                    <a href="#" onclick="navigator.clipboard.writeText(this.innerText); alert('Скопировано'); return false;" class="copy-data">{{ employee.phone }}</a>
-                </span>
-            </div>
-            
-            <div class="detail-item">
-                <span class="detail-label">EMAIL:</span>
-                <span class="detail-value">
-                    <a href="#" onclick="navigator.clipboard.writeText(this.innerText); alert('Скопировано'); return false;" class="copy-data">{{ user_email }}</a>
-                </span>
-            </div>
-            
-            <div class="detail-item">
-                <span class="detail-label">МЕСТО:</span>
-                <span class="detail-value">
-                    Этаж {{ employee.floor }}{% if employee.cabinet %}, каб. {{ employee.cabinet }}{% endif %}
-                </span>
-            </div>
-            
-            <div class="detail-item">
-                <span class="detail-label">РОЛЬ:</span>
-                <span class="detail-value">{{ employee.get_role_display }}</span>
+            <div class="profile-details">
+                <div class="detail-item">
+                    <span class="detail-label">ОТДЕЛ:</span>
+                    <span class="detail-value">{{ employee.department.name }}</span>
+                </div>
+                
+                <div class="detail-item">
+                    <span class="detail-label">ПОДРАЗДЕЛЕНИЕ:</span>
+                    <span class="detail-value">{{ employee.subdivision.name|default:"Не указано" }}</span>
+                </div>
+                
+                <div class="detail-item">
+                    <span class="detail-label">ТЕЛЕФОН:</span>
+                    <span class="detail-value">
+                        <a href="#" onclick="navigator.clipboard.writeText(this.innerText); alert('Скопировано'); return false;" class="copy-data">{{ employee.phone }}</a>
+                    </span>
+                </div>
+                
+                <div class="detail-item">
+                    <span class="detail-label">EMAIL:</span>
+                    <span class="detail-value">
+                        <a href="#" onclick="navigator.clipboard.writeText(this.innerText); alert('Скопировано'); return false;" class="copy-data">{{ user_email }}</a>
+                    </span>
+                </div>
+                
+                <div class="detail-item">
+                    <span class="detail-label">МЕСТО:</span>
+                    <span class="detail-value">
+                        Этаж {{ employee.floor }}{% if employee.cabinet %}, каб. {{ employee.cabinet }}{% endif %}
+                    </span>
+                </div>
+                
+                <div class="detail-item">
+                    <span class="detail-label">РОЛЬ:</span>
+                    <span class="detail-value">{{ employee.get_role_display }}</span>
+                </div>
             </div>
         </div>
     </div>
-    <div class="profile-actions">
+    <div class="prof-btn">
         <button type="button" class="btn btn-primary" onclick="openEditModal()">Редактировать профиль</button>
                 
         {% if employee.user_account == request.user %}

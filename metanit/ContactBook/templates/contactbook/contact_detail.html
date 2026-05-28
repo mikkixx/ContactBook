@@ -2,68 +2,137 @@
 {% block title %}Профиль контакта{% endblock %}
 
 {% block content %}
-<a href="{% url 'contactbook:contact_list' %}" class="back-link">← Назад к списку</a>
-
-<div class="profile-card">
-    <div class="profile-info">
-        <h2>{{ contact.last_name }} {{ contact.first_name }} {{ contact.middle_name|default:"" }}</h2>
-        {% if contact.position %}
-            <p class="profile-position">{{ contact.position }}</p>
-        {% endif %}
+<div class="profile-container">
+    <div class="employee-header">
+        <div class="nazad">
+            <a href="{% url 'contactbook:contact_list' %}" class="btn back-link"><--Назад к списку</a>
+        </div>
+        <h1>Профиль контакта</h1>
     </div>
 
-    <div class="profile-details">
-        <div class="detail-item">
-            <span class="detail-label">Телефон</span>
-            <span class="detail-value">
-                <a href="#" onclick="navigator.clipboard.writeText(this.innerText); alert('Скопировано'); return false;" class="copy-data">{{ contact.phone }}</a>
-            </span>
-        </div>
+    <div class="profile-card">
+        <div class="profile-info">
+            <h2>{{ contact.last_name }} {{ contact.first_name }} {{ contact.middle_name|default:"" }}</h2>
+            {% if contact.position %}
+                <p class="profile-position">{{ contact.position }}</p>
+            {% endif %}
+        
 
-        <div class="detail-item">
-            <span class="detail-label">Email</span>
-            <span class="detail-value">
-                {% if contact.email %}
-                    <a href="#" onclick="navigator.clipboard.writeText(this.innerText); alert('Скопировано'); return false;" class="copy-data">{{ contact.email }}</a>
-                {% else %}
-                    <span class="none">Не указан</span>
-                {% endif %}
-            </span>
+            <div class="profile-details">
+                <div class="detail-item">
+                    <span class="detail-label">ТЕЛЕФОН:</span>
+                    <span class="detail-value">
+                        <a href="#" onclick="navigator.clipboard.writeText(this.innerText); alert('Скопировано'); return false;" class="copy-data">{{ contact.phone }}</a>
+                    </span>
+                </div>
+                
+                <div class="detail-item">
+                    <span class="detail-label">EMAIL:</span>
+                    <span class="detail-value">
+                        {% if contact.email %}
+                            <a href="#" onclick="navigator.clipboard.writeText(this.innerText); alert('Скопировано'); return false;" class="copy-data">{{ contact.email }}</a>
+                        {% else %}
+                            <span style="color: #6b7280;">Не указан</span>
+                        {% endif %}
+                    </span>
+                </div>
+                
+                <div class="detail-item">
+                    <span class="detail-label">ОРГАНИЗАЦИЯ:</span>
+                    <span class="detail-value">{{ contact.organization|default:"Не указана" }}</span>
+                </div>
+                
+                <div class="detail-item">
+                    <span class="detail-label">КАТЕГОРИЯ:</span>
+                    <span class="detail-value">
+                        {% if contact.category == 'client' %}Клиент
+                        {% elif contact.category == 'partner' %}Партнёр
+                        {% elif contact.category == 'supplier' %}Поставщик
+                        {% else %}Другое{% endif %}
+                    </span>
+                </div>
+                
+                <div class="detail-item">
+                    <span class="detail-label">ОТВЕТСТВЕННЫЙ:</span>
+                    <span class="detail-value">{{ contact.owner.get_full_name|default:contact.owner.username|default:"Не назначен" }}</span>
+                </div>
+            </div>
         </div>
-
-        <div class="detail-item">
-            <span class="detail-label">Организация</span>
-            <span class="detail-value">{{ contact.organization|default:"Не указана" }}</span>
-        </div>
-
-        <div class="detail-item">
-            <span class="detail-label">Категория</span>
-            <span class="detail-value">
-                {% if contact.category == 'client' %}
-                    Клиент
-                {% elif contact.category == 'partner' %}
-                    Партнёр
-                {% elif contact.category == 'supplier' %}
-                    Поставщик
-                {% else %}
-                    Другое
-                {% endif %}
-            </span>
-        </div>
-
-        {% if contact.owner %}
-        <div class="detail-item">
-            <span class="detail-label">Ответственный</span>
-            <span class="detail-value">{{ contact.owner.get_full_name|default:contact.owner.username }}</span>
-        </div>
-        {% endif %}
     </div>
-
-    {% if is_admin %}
-    <div class="profile-actions">
-        <a href="{% url 'contactbook:contact_edit' contact.pk %}" class="btn btn-primary">Редактировать</a>
-        <a href="{% url 'contactbook:contact_delete' contact.pk %}" class="btn btn-delete">Удалить</a>
+    {% if is_admin or contact.owner == request.user %}
+    <div class="prof-btn">
+        <button type="button" class="btn btn-primary" onclick="openEditModal()">Редактировать контакт</button>
+        <button type="button" class="btn btn-delete" onclick="openDeleteModal()">Удалить контакт</button>
     </div>
     {% endif %}
 </div>
+
+<!-- Затемнение фона -->
+<div class="overflow" id="modalOverlay" style="display:none;" onclick="closeModals()"></div>
+
+<!-- МОДАЛЬНОЕ ОКНО: Редактирование -->
+<div id="modal-edit" class="modal-custom" style="display:none;">
+    <h3>Редактирование контакта</h3>
+    <form method="post" action="{% url 'contactbook:contact_edit' contact.pk %}" class="modal-form">
+        {% csrf_token %}
+        <div class="modal-grid">
+            <div class="modal-field"><label>Фамилия *</label><input type="text" name="last_name" value="{{ contact.last_name }}" required></div>
+            <div class="modal-field"><label>Имя *</label><input type="text" name="first_name" value="{{ contact.first_name }}" required></div>
+            <div class="modal-field"><label>Отчество</label><input type="text" name="middle_name" value="{{ contact.middle_name|default:'' }}"></div>
+            <div class="modal-field"><label>Телефон *</label><input type="tel" name="phone" value="{{ contact.phone }}" required></div>
+            <div class="modal-field"><label>Email</label><input type="email" name="email" value="{{ contact.email|default:'' }}"></div>
+            <div class="modal-field"><label>Организация</label><input type="text" name="organization" value="{{ contact.organization|default:'' }}"></div>
+            <div class="modal-field"><label>Должность</label><input type="text" name="position" value="{{ contact.position|default:'' }}"></div>
+            <div class="modal-field">
+                <label>Категория</label>
+                <select name="category">
+                    <option value="client" {% if contact.category == 'client' %}selected{% endif %}>Клиент</option>
+                    <option value="partner" {% if contact.category == 'partner' %}selected{% endif %}>Партнёр</option>
+                    <option value="supplier" {% if contact.category == 'supplier' %}selected{% endif %}>Поставщик</option>
+                    <option value="other" {% if contact.category == 'other' %}selected{% endif %}>Другое</option>
+                </select>
+            </div>
+        </div>
+        <div class="modal-btns">
+            <button type="submit" class="btn btn-primary">Сохранить</button>
+            <button type="button" class="btn btn-secondary" onclick="closeModals()">Отмена</button>
+        </div>
+    </form>
+</div>
+
+<!-- МОДАЛЬНОЕ ОКНО: Удаление -->
+<div id="modal-delete" class="modal-custom" style="display:none;">
+    <h3>Подтверждение удаления</h3>
+    <p class="delete-text">Вы действительно хотите удалить контакт <strong>«{{ contact.last_name }} {{ contact.first_name }}»</strong>?</p>
+    <form method="post" action="{% url 'contactbook:contact_delete' contact.pk %}">
+        {% csrf_token %}
+        <div class="modal-btns">
+            <button type="submit" class="btn btn-delete">Удалить</button>
+            <button type="button" class="btn btn-secondary" onclick="closeModals()">Отмена</button>
+        </div>
+    </form>
+</div>
+
+<script>
+    function openEditModal() {
+        document.getElementById('modalOverlay').style.display = 'block';
+        document.getElementById('modal-edit').style.display = 'flex';
+    }
+
+    function openDeleteModal() {
+        document.getElementById('modalOverlay').style.display = 'block';
+        document.getElementById('modal-delete').style.display = 'flex';
+    }
+
+    function closeModals() {
+        document.getElementById('modalOverlay').style.display = 'none';
+        document.getElementById('modal-edit').style.display = 'none';
+        document.getElementById('modal-delete').style.display = 'none';
+    }
+
+    // Закрытие по клавише Escape
+    document.addEventListener('keydown', e => {
+        if (e.key === 'Escape') closeModals();
+    });
+</script>
 {% endblock %}

@@ -718,7 +718,7 @@ form{
     display: flex;
     gap: 20px;
     justify-content: center;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     margin-top: 20px;
     padding-top: 30px;
     border-top: 1px solid #e5e7eb;
@@ -744,6 +744,7 @@ form{
     border: none;
     cursor: pointer;
     font-family: "Inter", sans-serif;
+    white-space: nowrap;
 }
 
 .btn-primary {
@@ -1368,6 +1369,6 @@ form{
 
 .modal-btns { display: flex; 
     gap: 12px; 
-    justify-content: flex-end; 
+    justify-content: center; 
     margin-top: 10px; 
 }

@@ -51,12 +51,9 @@
             {% if is_favorite %}★ Убрать из избранного{% else %}☆ Добавить в избранное{% endif %}
         </a>
         {% if request.user.is_authenticated and request.user.employee_profile.role == 'admin' %}
-        <div class="prof-btn">
             <button type="button" class="btn btn-secondary" onclick="openEditModal()">Редактировать сотрудника</button>
             <button type="button" class="btn btn-danger" onclick="openDeleteModal()">Удалить сотрудника</button>
-        </div>
         
-
         <div class="overflow" id="modalOverlay" onclick="closeModals()" style="display: none;"></div>
         
         <div id="editModal" class="modal-container" style="display:none;">
@@ -115,7 +112,7 @@
                 <form method="post" action="{% url 'contactbook:delete_employee' employee.pk %}">
                     {% csrf_token %}
                     <div class="modal-btns">
-                        <button type="submit" class="btn btn-delete">Да, удалить</button>
+                        <button type="submit" class="btn btn-delete">Удалить</button>
                         <button type="button" class="btn btn-secondary" onclick="closeModals()">Отмена</button>
                     </div>
                 </form>

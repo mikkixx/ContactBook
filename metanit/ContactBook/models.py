@@ -116,3 +116,14 @@ class Contact(models.Model):
 
     def __str__(self):
         return f"{self.last_name} {self.first_name} ({self.organization or 'Без организации'})"
+    
+    def save(self, *args, **kwargs):
+        # Нормализуем телефон перед сохранением (делаем слитно: +79001234567)
+        if self.phone:
+            self.phone = normalize_phone(self.phone)
+        super().save(*args, **kwargs)
+
+    @property
+    def phone_formatted(self):
+        """Возвращает номер в формате +7 (900) 123-45-67"""
+        return format_phone_display(self.phone)
