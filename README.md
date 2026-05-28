@@ -63,7 +63,7 @@ ContactBook/
 ### 1. Клонировать репозиторий
 
 ```bash
-git clone <url-репозитория>
+git clone <https://github.com/mikkixx/ContactBook>
 cd ContactBook/metanit
 ```
 
