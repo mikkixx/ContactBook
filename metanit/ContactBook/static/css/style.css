@@ -1254,3 +1254,131 @@ button{
 .hidden { 
     display: none !important; 
 }
+
+/* Модалки на странице профиля сотрудника */
+.modal-container {
+    position: fixed; 
+    top: 50%; 
+    left: 50%; 
+    transform: translate(-50%, -50%);
+    background: #fff; 
+    border-radius: 20px; 
+    padding: 30px;
+    width: 90%; 
+    max-width: 650px; 
+    max-height: 90vh; 
+    overflow-y: auto;
+    z-index: 1000; 
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    display: flex; 
+    flex-direction: column; gap: 15px;
+}
+.modal-grid {
+    display: grid; 
+    grid-template-columns: 1fr 1fr; 
+    gap: 15px;
+}
+.modal-field label {
+    display: block; 
+    font-size: 14px; 
+    color: #6b7280; 
+    margin-bottom: 5px; 
+    font-weight: 500;
+}
+.modal-field input, .modal-field select {
+    width: 100%; 
+    padding: 10px; 
+    border: 1px solid #a3a3a3; 
+    border-radius: 10px;
+    font-size: 16px; 
+    box-sizing: border-box; 
+    transition: 0.2s;
+}
+.modal-field input:focus, .modal-field select:focus {
+    outline: none; 
+    border-color: #2b5192; 
+    box-shadow: 0 0 8px rgba(43,81,146,0.25);
+}
+.modal-btns {
+    display: flex; 
+    gap: 12px; 
+    justify-content: flex-end;
+    margin-top: 15px;
+}
+
+/* Модальные окна профиля */
+.modal-custom {
+    width: 650px;
+    max-width: 90%;
+    background-color: white;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(10, 18, 32, 0.25);
+    display: none;
+    flex-direction: column;
+    padding: 25px;
+    box-sizing: border-box;
+    align-items: center;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1001;
+    gap: 15px;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.modal-form { 
+    width: 100%; 
+    display: flex; 
+    flex-direction: column; 
+    gap: 15px; 
+}
+
+.modal-grid { 
+    display: grid; 
+    grid-template-columns: 1fr 1fr; 
+    gap: 15px; 
+    width: 100%; 
+}
+.modal-grid.single-col { 
+    grid-template-columns: 1fr; 
+}
+
+.modal-field { display: flex; 
+    flex-direction: column; 
+    gap: 5px; 
+}
+
+.modal-field label { 
+    font-size: 14px; 
+    color: #6b7280; 
+    font-weight: 500; 
+}
+
+.modal-field input, .modal-field select {
+    width: 100%; 
+    padding: 10px; 
+    border: 1px solid #a3a3a3; 
+    border-radius: 12px;
+    font-size: 15px; 
+    box-sizing: border-box; 
+    background: #fff;
+}
+
+.modal-field input:focus, .modal-field select:focus {
+    outline: none; 
+    border-color: #2b5192; 
+    box-shadow: 0 0 8px rgba(43,81,146,0.2);
+}
+
+.modal-btns { display: flex; 
+    gap: 12px; 
+    justify-content: flex-end; 
+    margin-top: 10px; 
+}
+
+@media (max-width: 600px) {
+    .modal-grid { grid-template-columns: 1fr; }
+    .modal-custom { padding: 15px; }
+}
