@@ -563,26 +563,26 @@ def add_department(request):
 
 @login_required
 def delete_department(request, pk):
+    if request.method != 'POST':
+        return JsonResponse({'success': False, 'message': 'Метод не поддерживается'}, status=405)
     if not is_admin(request.user):
-        messages.error(request, "Доступ запрещён")
-        return redirect('contactbook:organization_structure')
-        
+        return JsonResponse({'success': False, 'message': 'Доступ запрещён'}, status=403)
+
     dept = get_object_or_404(Department, pk=pk)
-    
-    if request.method == 'POST':
-        if dept.employee_set.filter(is_deleted=True).exists():
-            count = dept.employee_set.filter(is_deleted=True).count()
-            messages.warning(request, f"Нельзя удалить отдел: в нём числится {count} сотрудник(ов). Сначала переведите их в другой отдел.")
-            return redirect('contactbook:organization_structure')
-        try:
-            dept_name = dept.name
-            dept.delete() 
-            messages.success(request, f"Отдел «{dept_name}» и все его подразделения удалены")
-        except Exception as e:
-            messages.error(request, f"Ошибка при удалении: {str(e)}")
-        return redirect('contactbook:organization_structure')
-        
-    return render(request, 'contactbook/confirm_delete_department.html', {'department': dept})
+
+    if dept.employee_set.exists():
+        count = dept.employee_set.count()
+        return JsonResponse({
+            'success': False, 
+            'message': f'Нельзя удалить: в отделе числится {count} сотрудник(ов). Переведите их в другой отдел.'
+        }, status=400)
+
+    try:
+        dept_name = dept.name
+        dept.delete()
+        return JsonResponse({'success': True, 'message': f'Отдел «{dept_name}» и все подразделения удалены'})
+    except Exception as e:
+        return JsonResponse({'success': False, 'message': f'Ошибка при удалении: {str(e)}'}, status=500)
 
 @login_required
 def add_subdivision(request, dept_pk):
@@ -610,61 +610,68 @@ def add_subdivision(request, dept_pk):
     except Exception as e:
         return JsonResponse({'success': False, 'message': f'Ошибка: {str(e)}'}, status=500)
 
+from django.http import JsonResponse
+from django.shortcuts import get_object_or_404
+from django.contrib.auth.decorators import login_required
+from .models import Subdivision
+
 @login_required
 def edit_subdivision(request, pk):
+    if request.method != 'POST':
+        return JsonResponse({'success': False, 'message': 'Метод не поддерживается'}, status=405)
+
     if not is_admin(request.user):
-        messages.error(request, "Доступ запрещён")
-        return redirect('contactbook:organization_structure')
-        
+        return JsonResponse({'success': False, 'message': 'Доступ запрещён'}, status=403)
+
     sub = get_object_or_404(Subdivision, pk=pk)
-    
-    if request.method == 'POST':
-        new_name = request.POST.get('name', '').strip()
-        if not new_name:
-            messages.error(request, "Название подразделения не может быть пустым")
-            return redirect('contactbook:edit_subdivision', pk=sub.pk)
-        if Subdivision.objects.filter(name__iexact=new_name, department=sub.department).exclude(pk=sub.pk).exists():
-            messages.error(request, "Такое подразделение уже существует в этом отделе")
-            return redirect('contactbook:edit_subdivision', pk=sub.pk)
-        try:
-            sub.name = new_name
-            sub.save()
-            messages.success(request, f"Название подразделения «{new_name}» обновлено")
-        except Exception as e:
-            messages.error(request, f"Ошибка сохранения: {str(e)}")
-        return redirect('contactbook:organization_structure')
-        
-    return render(request, 'contactbook/edit_subdivision.html', {'subdivision': sub})
+    new_name = request.POST.get('name', '').strip()
+
+    if not new_name:
+        return JsonResponse({'success': False, 'message': 'Название не может быть пустым'}, status=400)
+
+    if new_name.lower() == sub.name.lower():
+        return JsonResponse({'success': False, 'message': f'Подразделение уже называется «{sub.name}»'}, status=400)
+
+    if Subdivision.objects.filter(name__iexact=new_name, department=sub.department).exists():
+        return JsonResponse({'success': False, 'message': 'Такое подразделение уже существует в этом отделе'}, status=400)
+
+    try:
+        old_name = sub.name
+        sub.name = new_name
+        sub.save()
+        return JsonResponse({'success': True, 'message': f'Название обновлено: «{old_name}» → «{new_name}»'})
+    except Exception as e:
+        return JsonResponse({'success': False, 'message': f'Ошибка сохранения: {str(e)}'}, status=500)
 
 @login_required
 def delete_subdivision(request, pk):
+    if request.method != 'POST':
+        return JsonResponse({'success': False, 'message': 'Метод не поддерживается'}, status=405)
+    
     if not is_admin(request.user):
-        messages.error(request, "Доступ запрещён")
-        return redirect('contactbook:organization_structure')
-        
+        return JsonResponse({'success': False, 'message': 'Доступ запрещён'}, status=403)
+    
     sub = get_object_or_404(Subdivision, pk=pk)
+    target_dept = sub.department
     
     if request.method == 'POST':
-        employees_in_sub = Employee.objects.filter(subdivision=sub, is_deleted=False)
+        employees_in_sub = Employee.objects.filter(subdivision=sub)
         emp_count = employees_in_sub.count()
         
         if emp_count > 0:
             employees_in_sub.update(subdivision=None)
-            messages.info(request, f"{emp_count} сотрудник(ов) автоматически перенесён(ы) в отдел «{sub.department.name}». Подразделение удалено.")
         
         try:
             sub_name = sub.name
             sub.delete()
-            messages.success(request, f"Подразделение «{sub_name}» удалено")
+            msg = f"Подразделение «{sub_name}» удалено"
+            if emp_count > 0:
+                msg += f". {emp_count} сотрудник(ов) перенесён(ы) в отдел «{target_dept.name}»"
+            return JsonResponse({'success': True, 'message': msg})
         except Exception as e:
-            messages.error(request, f"Ошибка при удалении: {str(e)}")
-        return redirect('contactbook:organization_structure')
-        
-    emp_count = Employee.objects.filter(subdivision=sub, is_deleted=False).count()
-    return render(request, 'contactbook/confirm_delete_subdivision.html', {
-        'subdivision': sub,
-        'employee_count': emp_count
-    })
+            return JsonResponse({'success': False, 'message': f'Ошибка при удалении: {str(e)}'}, status=500)
+    
+    return JsonResponse({'success': False, 'message': 'Некорректный запрос'}, status=400)
 
 def register(request):
     if request.method == 'POST':
@@ -849,19 +856,34 @@ def contact_create(request):
         category = request.POST.get('category', 'client')
         
         if not last_name or not first_name or not phone:
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return JsonResponse({'success': False, 'message': 'Фамилия, имя и телефон обязательны'}, status=400)
             messages.error(request, 'Фамилия, имя и телефон обязательны')
             return redirect('contactbook:contact_create')
             
         try:
             Contact.objects.create(
-                last_name=last_name, first_name=first_name, middle_name=middle_name,
-                phone=phone, email=email, organization=organization,
-                position=position, category=category, owner=request.user 
+                last_name=last_name,
+                first_name=first_name,
+                middle_name=middle_name,
+                phone=phone,
+                email=email,
+                organization=organization,
+                position=position,
+                category=category,
+                owner=request.user
             )
-            messages.success(request, 'Контакт успешно добавлен')
+            msg = 'Контакт успешно добавлен'
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return JsonResponse({'success': True, 'message': msg})
+            messages.success(request, msg)
             return redirect('contactbook:contact_list')
+            
         except IntegrityError:
-            messages.error(request, 'Контакт с таким телефоном или email уже существует')
+            msg = 'Контакт с таким телефоном или email уже существует'
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return JsonResponse({'success': False, 'message': msg}, status=400)
+            messages.error(request, msg)
             return redirect('contactbook:contact_create')
             
     return render(request, 'contactbook/contact_form.html', {'is_create': True})
