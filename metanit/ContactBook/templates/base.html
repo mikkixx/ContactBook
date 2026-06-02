@@ -13,15 +13,16 @@
 <body>
     <header>
         <img src="{% static 'img/logo.png' %}" alt="" id="logo">
+        {% if request.user.is_authenticated %}
         <nav class="header">
             <ul>
-                <li><a href="{% url 'contactbook:employee_list' %}" class="{% if request.resolver_match.url_name == 'employee_list' %}nav-active{% endif %}">Контакты сотрудников</a></li>
-                <li><a href="{% url 'contactbook:contact_list' %}" class="{% if request.resolver_match.url_name == 'contact_list' %}nav-active{% endif %}">Внешние контакты</a></li>
-                <li><a href="{% url 'contactbook:favorite_list' %}" class="{% if request.resolver_match.url_name == 'favorite_list' %}nav-active{% endif %}">Избранное</a></li>
-                <li><a href="{% url 'contactbook:my_profile' %}" class="{% if request.resolver_match.url_name == 'my_profile' %}nav-active{% endif %}">Профиль</a></li>
+                <li><a href="{% url 'contactbook:employee_list' %}" class="{% if request.resolver_match.url_name == 'employee_list' %}nav-active{% endif %}" data-text="Контакты сотрудников">Контакты сотрудников</a></li>
+                <li><a href="{% url 'contactbook:contact_list' %}" class="{% if request.resolver_match.url_name == 'contact_list' %}nav-active{% endif %}" data-text="Внешние контакты">Внешние контакты</a></li>
+                <li><a href="{% url 'contactbook:favorite_list' %}" class="{% if request.resolver_match.url_name == 'favorite_list' %}nav-active{% endif %}" data-text="Избранное">Избранное</a></li>
+                <li><a href="{% url 'contactbook:my_profile' %}" class="{% if request.resolver_match.url_name == 'my_profile' %}nav-active{% endif %}" data-text="Профиль">Профиль</a></li>
                 {% if request.user.is_authenticated and request.user.employee_profile.role == 'admin' %}
-                    <li><a href="{% url 'contactbook:organization_structure' %}" class="{% if request.resolver_match.url_name == 'organization_structure' %}nav-active{% endif %}">Структура</a></li>
-                    <li><a href="{% url 'contactbook:deleted_employees' %}" class="{% if request.resolver_match.url_name == 'deleted_employees' %}nav-active{% endif %}">Удаленные сотрудники</a></li>
+                    <li><a href="{% url 'contactbook:organization_structure' %}" class="{% if request.resolver_match.url_name == 'organization_structure' %}nav-active{% endif %}" data-text="Структура">Структура</a></li>
+                    <li><a href="{% url 'contactbook:deleted_employees' %}" class="{% if request.resolver_match.url_name == 'deleted_employees' %}nav-active{% endif %}" data-text="Удаленные сотрудники">Удаленные сотрудники</a></li>
                 {% endif %}
             </ul>
             
@@ -34,6 +35,7 @@
                 {% endif %}
             </div>
         </nav>
+        {% endif %}
     </header> 
 
     <main>

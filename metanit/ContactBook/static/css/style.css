@@ -31,6 +31,7 @@ header{
 }
 .header > ul > li{
     list-style-type: none;
+    position: relative;
 }
 .header > ul > li > a{
     color: #ffffffbd;
@@ -39,12 +40,33 @@ header{
     font-size: 20px;
     font-weight: 400;
     text-align: center;
+    position: relative;
+    z-index: 2;
+}
+.header > ul > li > a::before{
+    content: attr(data-text);
+    display: block;
+    visibility: hidden;
+    height: 0;
+    font-size: 22px;
+    overflow: hidden;
 }
 .header > ul > li > a:hover{
     color: #ffffff;
     font-size: 22px;
 }
-
+.header > ul > li > a.nav-active {
+    color: #ffffff;
+    font-weight: 600;
+    font-size: 22px;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.9);
+    padding-bottom: 4px;
+    pointer-events: none;
+}
+.header > ul > li > a.nav-active:hover {
+    font-size: 22px;
+    color: #ffffff;
+}
 #logo{
     width: 10%;
     height: auto;
@@ -1407,18 +1429,4 @@ form{
     text-align: center;
     margin-top: 25px;
     font-weight: 600;
-}
-
-.header > ul > li > a.nav-active {
-    color: #ffffff;
-    font-weight: 600;
-    font-size: 22px;
-    border-bottom: 2px solid rgba(255, 255, 255, 0.9);
-    padding-bottom: 4px;
-    pointer-events: none;
-}
-
-.header > ul > li > a.nav-active:hover {
-    font-size: 22px;
-    color: #ffffff;
 }
