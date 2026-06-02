@@ -1408,3 +1408,17 @@ form{
     margin-top: 25px;
     font-weight: 600;
 }
+
+.header > ul > li > a.nav-active {
+    color: #ffffff;
+    font-weight: 600;
+    font-size: 22px;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.9);
+    padding-bottom: 4px;
+    pointer-events: none;
+}
+
+.header > ul > li > a.nav-active:hover {
+    font-size: 22px;
+    color: #ffffff;
+}
