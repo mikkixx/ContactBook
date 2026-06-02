@@ -27,7 +27,7 @@ header{
 .header > ul{
     display: flex;
     justify-content: center;
-    gap: 50px;
+    gap: 30px;
 }
 .header > ul > li{
     list-style-type: none;
@@ -1429,4 +1429,44 @@ form{
     text-align: center;
     margin-top: 25px;
     font-weight: 600;
+}
+
+.favorites-tabs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+.tab-link {
+    padding: 12px 28px;
+    background-color: #e5eaf5;
+    color: #555a64;
+    text-decoration: none;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+.tab-link:hover {
+    background-color: #e5e7eb;
+    color: #2b5192;
+    transform: translateY(-2px);
+}
+
+.tab-link.active {
+    background-color: #2b5192;
+    color: #ffffff;
+    border-color: #2b5192;
+    box-shadow: 0 4px 12px rgba(43, 81, 146, 0.3);
+}
+
+.tab-link.active:hover {
+    background-color: #1e3a6f;
+    color: #ffffff;
+    transform: translateY(-2px);
 }
