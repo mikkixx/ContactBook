@@ -401,6 +401,9 @@ def deleted_employees(request):
     search = request.GET.get('search', '').strip()
     position = request.GET.get('position', '').strip()
     sort_order = request.GET.get('sort', 'desc')
+    dept_id = request.GET.get('department', '')
+    sub_id = request.GET.get('subdivision', '')
+    sort_order = request.GET.get('sort', 'desc')
 
 
     qs = Employee.all_objects.filter(is_deleted=True).select_related('department')
@@ -420,6 +423,13 @@ def deleted_employees(request):
     
     if sort_order == 'asc':
         qs = qs.order_by('deleted_at')
+    
+    if dept_id:
+        qs = qs.filter(department_id=dept_id)
+
+    if sub_id:
+        qs = qs.filter(subdivision_id=sub_id)
+
     else:
         qs = qs.order_by('-deleted_at')
 
@@ -431,7 +441,11 @@ def deleted_employees(request):
         'is_admin': True,
         'search': search,
         'position': position,
-        'sort_order': sort_order
+        'dept_id': dept_id,
+        'sub_id': sub_id,
+        'sort_order': sort_order,
+        'departments': Department.objects.all(),
+        'subdivisions': Subdivision.objects.all(),
     })
 
 @login_required

@@ -18,10 +18,12 @@
             {% endfor %}
         </select>
         
-        <select name="subdivision" id="sub-select"><option value="">Нет</option></select>
+        <select name="subdivision" id="sub-select">
+            <option value="">Нет</option>
+        </select>
         
         <button type="submit" class="btn btn-primary">Применить</button>
-        <a href="{% url 'contactbook:employee_list' %}" class="btn btn-secondary">Сбросить</a>
+        <a href="{% url 'contactbook:deleted_employees' %}" class="btn btn-secondary">Сбросить</a>
     </form>
 </div>
 
@@ -83,6 +85,38 @@
 </div>
 
 <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const deptSelect = document.getElementById('dept-select');
+        const subSelect = document.getElementById('sub-select');
+            
+        function loadSubdivisions(deptId) {
+            subSelect.innerHTML = '<option value="">Нет</option>';
+            if (!deptId) return;
+
+            fetch(`/api/subdivisions/?dept_id=${deptId}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.subdivisions.length > 0) {
+                        const allOpt = document.createElement('option');
+                        allOpt.value = "";
+                        allOpt.textContent = "Все подразделения";
+                        subSelect.appendChild(allOpt);
+
+                        data.subdivisions.forEach(sub => {
+                            const opt = document.createElement('option');
+                            opt.value = sub.id;
+                            opt.textContent = sub.name;
+                            if ("{{ sub_id }}" === String(sub.id)) opt.selected = true;
+                            subSelect.appendChild(opt);
+                        });
+                    }
+                });
+        }
+
+        deptSelect.addEventListener('change', () => loadSubdivisions(deptSelect.value));
+        if (deptSelect.value) loadSubdivisions(deptSelect.value);
+    });
+
     function applyFilters() {
         const search = document.getElementById('search').value;
         const position = document.querySelector('input[name="position"]').value;
