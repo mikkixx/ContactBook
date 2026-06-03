@@ -3,7 +3,10 @@
 
 {% block content %}
 <h1>Контакты сотрудников</h1>
-<div class="filter">
+
+<button class="filter-toggle-btn" onclick="toggleFilter()">Фильтрация</button>
+
+<div class="filter" id="filterBlock">
     <div class="zagolovok"><p>Фильтрация</p></div>
     <form method="get" class="elements">
         <input type="text" id="search" name="search" value="{{ search }}" placeholder="Поиск по имени/фамилии">
@@ -43,7 +46,7 @@
         </thead>
         <tbody>
             {% for emp in page_obj %}
-            <tr class="{% if not emp.user_account.is_active %}unconfirmed{% endif %}">
+            <tr>
                 <td>{{ emp.last_name }}</td>
                 <td>{{ emp.first_name }}</td>
                 <td>{{ emp.middle_name|default:"Нет" }}</td>
@@ -103,6 +106,49 @@ document.addEventListener('DOMContentLoaded', () => {
 
     deptSelect.addEventListener('change', () => loadSubdivisions(deptSelect.value));
     if (deptSelect.value) loadSubdivisions(deptSelect.value);
+});
+
+// Показ/скрытие фильтров на мобильных
+function toggleFilter() {
+    const filterBlock = document.getElementById('filterBlock');
+    filterBlock.classList.toggle('show');
+}
+
+// Применение фильтров
+function applyFilters() {
+    const search = document.getElementById('search').value;
+    const position = document.querySelector('[name="position"]').value;
+    const dept = document.getElementById('dept-select').value;
+    const sub = document.getElementById('sub-select').value;
+    
+    window.location.href = `?search=${encodeURIComponent(search)}&position=${encodeURIComponent(position)}&department=${dept}&subdivision=${sub}`;
+}
+
+// Фильтрация подразделений
+function filterSubdivisions() {
+    const deptId = document.getElementById('dept-select').value;
+    const subSelect = document.getElementById('sub-select');
+    const currentSubId = subSelect.value;
+    
+    subSelect.innerHTML = '<option value="">Все подразделения</option>';
+    
+    document.querySelectorAll('#sub-select option[data-dept]').forEach(opt => {
+        if (!deptId || opt.getAttribute('data-dept') == deptId) {
+            subSelect.appendChild(opt);
+        }
+    });
+    
+    if (Array.from(subSelect.options).some(o => o.value == currentSubId)) {
+        subSelect.value = currentSubId;
+    }
+}
+
+// Инициализация
+document.addEventListener('DOMContentLoaded', function() {
+    const deptSelect = document.getElementById('dept-select');
+    if (deptSelect && deptSelect.value) {
+        filterSubdivisions();
+    }
 });
 </script>
 {% endblock %}

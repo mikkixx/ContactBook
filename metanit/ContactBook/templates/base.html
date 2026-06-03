@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}ContactBook{% endblock %}</title>
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="{% static 'css/responsive.css' %}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
@@ -14,7 +15,13 @@
     <header>
         <img src="{% static 'img/logo.png' %}" alt="" id="logo">
         {% if request.user.is_authenticated %}
-        <nav class="header">
+        <!-- Кнопка Бургер (три полоски) - видна только на мобильных -->
+        <div class="burger-menu" onclick="toggleMobileMenu()">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+        <nav class="header nav-links" id="mainNav">
             <ul>
                 <li><a href="{% url 'contactbook:employee_list' %}" class="{% if request.resolver_match.url_name == 'employee_list' %}nav-active{% endif %}" data-text="Контакты сотрудников">Контакты сотрудников</a></li>
                 <li><a href="{% url 'contactbook:contact_list' %}" class="{% if request.resolver_match.url_name == 'contact_list' %}nav-active{% endif %}" data-text="Внешние контакты">Внешние контакты</a></li>
@@ -48,4 +55,13 @@
         {% block content %}{% endblock %}
     </main>
 </body>
+<script>
+    function toggleMobileMenu() {
+        const nav = document.getElementById('mainNav');
+        const burger = document.querySelector('.burger-menu');
+        
+        nav.classList.toggle('active'); // Показываем/скрываем меню
+        burger.classList.toggle('toggle'); // Превращаем бургер в крестик
+    }
+</script>
 </html>

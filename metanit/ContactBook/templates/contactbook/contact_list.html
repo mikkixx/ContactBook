@@ -3,7 +3,10 @@
 
 {% block content %}
 <h1>Внешние контакты</h1>
-<div class="filter">
+
+<button class="filter-toggle-btn" onclick="toggleFilter()">Фильтрация</button>
+
+<div class="filter" id="filterBlock">
     <div class="zagolovok"><p>Фильтрация</p></div>
     <form method="get" class="elements-contact">
         <input type="text" name="search" value="{{ search }}" placeholder="Поиск по имени/фамилии">
@@ -164,5 +167,25 @@
             }
         }
     })
+
+        // Показ/скрытие фильтров на мобильных
+    function toggleFilter() {
+        const filterBlock = document.getElementById('filterBlock');
+        filterBlock.classList.toggle('show');
+    }
+
+    // Применение фильтров
+    function applyFilters() {
+        const search = document.getElementById('search').value;
+        const position = document.querySelector('[name="position"]').value;
+        const org = document.querySelector('[name="organization"]').value;
+        const category = document.querySelector('[name="category"]').value;
+        const mineOnly = document.getElementById('mine_only').checked ? 'on' : '';
+        
+        let url = `?search=${encodeURIComponent(search)}&position=${encodeURIComponent(position)}&organization=${encodeURIComponent(org)}&category=${category}`;
+        if (mineOnly) url += `&mine_only=${mineOnly}`;
+        
+        window.location.href = url;
+    }
 </script>
 {% endblock %}

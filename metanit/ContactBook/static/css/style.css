@@ -227,7 +227,7 @@ form{
 
 .elements > input{
     width: 17%;
-    height: 42px;
+    height: 52px;
     border: solid 1px rgb(163, 163, 163);
     background-color: white;
     border-radius: 12px;
@@ -241,7 +241,7 @@ form{
 
 #search{
     width: 30%;
-    height: 42px;
+    height: 52px;
 }
 
 .elements > select{
@@ -311,7 +311,7 @@ form{
 
 .elements-contact > input{
     width: 13%;
-    height: 42px;
+    height: 52px;
     border: solid 1px rgb(163, 163, 163);
     background-color: white;
     border-radius: 12px;
@@ -321,11 +321,6 @@ form{
 .elements-contact > input:focus{
     box-shadow: 0 0 10px rgba(41, 48, 73, 0.22);
     outline: none;
-}
-
-#search{
-    width: 30%;
-    height: 42px;
 }
 
 .elements-contact > select{
@@ -378,7 +373,7 @@ form{
     display: flex;
     align-items: center;
     width: 12%;
-    height: 42px;
+    height: 52px;
     border: solid 1px rgb(163, 163, 163);
     background-color: white;
     border-radius: 12px;
@@ -688,7 +683,7 @@ form{
 
 .profile-card {
     width: 100%;
-    max-width: 900px;
+    max-width: 1000px;
     background: #ffffff;
     border: 1.5px solid #a3a3a3;
     border-radius: 20px;
@@ -1405,7 +1400,7 @@ form{
 
 #emp_search{
     width: 30%;
-    height: 42px;
+    height: 52px;
 }
 
 .error-box{
