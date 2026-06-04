@@ -38,24 +38,81 @@ html, body {
    МОБИЛЬНЫЕ УСТРОЙСТВА (до 768px)
    ============================================ */
 @media (max-width: 768px) {
+        /* --- СТРАНИЦА ЛОГИНА --- */
+    .auth-card {
+        width: 90% !important;
+        height: auto !important;
+        padding: 20px 10px;
+    }
+
+    .form {
+        width: 100% !important;
+        height: auto !important;
+        gap: 15px;
+    }
+
+    .form > h1 {
+        font-size: 28px;
+    }
+
+    /* Переделываем .row в колонку (как .pole-vvoda на регистрации) */
+    .row {
+        width: 100% !important;
+        flex-direction: column !important;
+        align-items: stretch !important;
+        justify-content: center;
+        gap: 5px;
+        padding: 0 10px;
+    }
+
+    .row > label {
+        width: 100% !important;
+        text-align: left;
+        font-size: 16px;
+    }
+
+    .row > input {
+        width: 100% !important;
+        max-width: 100% !important;
+        height: 45px;
+        font-size: 16px;
+    }
+
+    /* Кнопка "Войти" */
+    .form > button {
+        width: 98% !important;
+        max-width: 100%;
+        height: 50px;
+        font-size: 18px;
+        margin: 10px auto 0 auto;
+    }
+
+    /* Ссылка "Нет аккаунта? Зарегистрироваться" */
+    .link {
+        flex-direction: column;
+        gap: 8px;
+        font-size: 16px;
+        text-align: center;
+    }
     
     /* --- ШАПКА --- */
     header {
         gap: 15px;
-        padding: 10px 15px;
+        padding: 15px 20px;
         width: 100%;
         max-width: 100vw;
         overflow: hidden;
+        min-height: 70px;  /* добавил минимальную высоту */
     }
     
     .header {
         width: 100% !important;
-        gap: 5px;
+        gap: 20px;
     }
     
     .header > ul {
         flex-wrap: wrap;
-        gap: 10px;
+        gap: 15px;
         justify-content: center;
         padding: 0;
         margin: 0;
@@ -63,13 +120,13 @@ html, body {
     
     .header > ul > li > a {
         font-size: 14px;
-        padding: 5px 8px;
+        padding: 10px 12px;
     }
     
     /* --- MAIN --- */
     main {
         height: auto;
-        min-height: 90vh;
+        min-height: 0vh;
         padding: 15px 0;
         width: 100%;
         overflow-x: hidden;
@@ -221,7 +278,7 @@ html, body {
     .list > table > tbody > tr > td {
         display: table-cell !important;     /* <-- сброс flex на ячейку */
         padding: 12px 6px !important;
-        font-size: 12px;
+        font-size: 17px;
         text-align: center;
         vertical-align: middle;
         border-bottom: 1px solid rgb(28, 28, 28);
@@ -391,14 +448,116 @@ html, body {
     }
     
     /* --- МОДАЛКИ --- */
-    #modal, .modal-custom, .modal-container {
-        width: 95% !important;
-        max-width: 95% !important;
-        padding: 15px;
+    .modal, .modal-custom, .modal-container {
+        width: 90% !important;
+        max-width: 90% !important;
+        max-height: 90vh !important;
+        padding: 15px 10px !important;
+        overflow-y: auto !important;
+        box-sizing: border-box;
     }
-    
+
+    .modal > h2, .modal-custom > h2 {
+        font-size: 18px !important;
+        margin: 0 0 10px 0;
+        text-align: center;
+    }
+
     .modal-grid {
         grid-template-columns: 1fr !important;
+    }
+
+    .modal-field {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 5px;
+        width: 100%;
+    }
+
+    .modal-field label {
+        font-size: 13px;
+        margin-bottom: 3px;
+    }
+
+    .modal-field input,
+    .modal-field select {
+        width: 100% !important;
+        height: 38px;
+        font-size: 14px;
+        padding: 6px 8px;
+    }
+
+    /* Кнопки в модалках - вертикально и на всю ширину */
+    .modal-btns {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 10px;
+        width: 100%;
+        margin-top: 15px;
+    }
+
+    .modal-btns button,
+    .modal-btns a {
+        width: 100% !important;
+        height: 42px;
+        font-size: 14px;
+        text-align: center;
+        justify-content: center;
+    }
+
+    /* Для модалок смены пароля и редактирования профиля */
+    .modal-custom .modal-btns {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 10px;
+        width: 100%;
+    }
+
+    .modal-custom .modal-btns button,
+    .modal-custom .modal-btns a {
+        width: 100% !important;
+        height: 42px;
+        font-size: 14px;
+        text-align: center;
+        justify-content: center;
+    }
+
+    /* Поля ввода в модалке смены пароля */
+    .modal-field-pass {
+        width: 100% !important;
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 5px;
+    }
+
+    .modal-field-pass input {
+        width: 100% !important;
+        height: 38px;
+        font-size: 14px;
+    }
+
+    /* Кнопки в модалках - вертикально и на всю ширину */
+    .modal-btns,
+    .btn-add-dept,
+    .btn-add-sub,
+    .btn-add-contact {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 10px;
+        width: 100%;
+        margin-top: 15px;
+    }
+
+    .modal-btns button,
+    .modal-btns a,
+    .btn-add-dept button,
+    .btn-add-sub button,
+    .btn-add-contact button {
+        width: 100% !important;
+        height: 42px;
+        font-size: 14px;
+        text-align: center;
+        justify-content: center;
     }
     
     /* --- ПАГИНАЦИЯ --- */
