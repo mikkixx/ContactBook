@@ -1,0 +1,43 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: contactbook_db
+      POSTGRES_USER: contactbook_user
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-your_secure_password_here}
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U contactbook_user"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  web:
+    build: .
+    env_file: .env
+    volumes:
+      - static_data:/app/ContactBook/metanit/staticfiles
+      - media_data:/app/ContactBook/metanit/media
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "8080:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - static_data:/app/ContactBook/metanit/staticfiles:ro
+      - media_data:/app/ContactBook/metanit/media:ro
+    depends_on:
+      - web
+    restart: unless-stopped
+
+volumes:
+  pg_data:
+  static_data:
+  media_data:
