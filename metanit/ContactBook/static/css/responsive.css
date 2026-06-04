@@ -8,7 +8,7 @@
 }
 
 html, body {
-    overflow-x: hidden;  /* ✅ ЗАПРЕЩАЕМ прокрутку страницы */
+    overflow-x: hidden;
     width: 100%;
     max-width: 100vw;
     margin: 0;
@@ -31,7 +31,7 @@ html, body {
 }
 
 .filter-toggle-btn:hover {
-    background-color: #f1e8e7;
+    background-color: #1e3a6f;
 }
 
 /* ============================================
@@ -72,12 +72,13 @@ html, body {
         min-height: 90vh;
         padding: 15px 0;
         width: 100%;
-        overflow: hidden;  /* ✅ Запрещаем прокрутку main */
+        overflow-x: hidden;
     }
     
     main > h1 {
         font-size: 24px;
         padding: 0 10px;
+        text-align: center;
     }
     
     /* --- КНОПКА ФИЛЬТРОВ: ПОКАЗАТЬ --- */
@@ -94,11 +95,12 @@ html, body {
         height: auto !important;
         flex-direction: column;
         gap: 15px;
-        padding: 20px 10px;
-        background-color: #f9fafb;
+        padding: 15px 10px;  /* было 20px, стало 15px */
+        background-color: #cce1f7;
         border-radius: 12px;
-        margin: 10px 0 20px 0;
-        overflow: hidden;  /* ✅ Запрещаем прокрутку фильтра */
+        margin: 5px 0 20px 0;  /* было 10px, стало 5px - ближе к кнопке */
+        border: 1px solid #adaeb1;  /* <-- ДОБАВИЛИ РАМКУ */
+        overflow: hidden;
     }
     
     .filter.show {
@@ -106,10 +108,7 @@ html, body {
     }
     
     .zagolovok {
-        width: 100% !important;
-        text-align: center;
-        margin-bottom: 5px;
-        font-size: 18px;
+        display: none !important;
     }
     
     .elements,
@@ -134,6 +133,10 @@ html, body {
         margin: 0;
     }
     
+    #emp_search {
+        width: 100% !important;
+    }
+    
     .mine-toggle {
         width: 100% !important;
         justify-content: center;
@@ -141,43 +144,113 @@ html, body {
     
     /* --- КНОПКИ ФИЛЬТРА --- */
     .elements > button,
-    .elements-contact > button,
-    .elements > a.btn-reset,
-    .elements-contact > a.btn-reset {
-        width: 100% !important;
-        height: 45px;
+    .elements-contact > button {
+        width: 70% !important;           /* Ширина 80% вместо 100% */
+        height: 50px !important;         /* Высота 40px (чуть меньше) */
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 16px;
-        margin-top: 5px;
+        font-size: 15px;
+        margin: 10px auto 0 auto;        /* Отступы и центрирование */
+        border-radius: 10px;
+    }
+    .elements  > a.btn-secondary,
+    .elements-contact  > a.btn-secondary {
+        width: 70% !important;           /* <-- ИСПРАВЛЕНО: было 100%, стало 80% */
+        height: 50px !important;         /* <-- ИСПРАВЛЕНО: было 40px, стало 50px */
+        display: flex !important;
+        align-items: center;
+        justify-content: center;
+        font-size: 15px;
+        margin: 10px auto 0 auto;
+        border-radius: 10px;
+        box-sizing: border-box;
+        text-decoration: none;
     }
     
-    /* --- ТАБЛИЦА: страница не скроллится, таблица - ДА --- */
+    /* --- ТАБЛИЦА - без горизонтального скролла, строки ровные --- */
+/* --- ТАБЛИЦА: сбрасываем flex, возвращаем нативное табличное поведение --- */
     .list {
         width: 100% !important;
         height: auto !important;
         padding: 0 10px;
-        overflow-x: auto;  /* ✅ Таблица скроллится ВНУТРИ контейнера */
-        overflow-y: hidden;
-        -webkit-overflow-scrolling: touch;
         margin-bottom: 20px;
         max-width: 100%;
+        overflow-x: visible !important;
     }
-    
+
     .list > table {
-        min-width: 800px;  /* Таблица остаётся широкой */
+        display: table !important;          /* <-- ключ: сброс flex */
         width: 100%;
+        min-width: auto !important;
+        border-collapse: collapse;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 0 10px rgba(41, 48, 73, 0.22);
+        table-layout: fixed;
+    }
+
+    .list > table > thead {
+        display: table-header-group !important;
+        background-color: #1e59be8d;
+    }
+
+    .list > table > tbody {
+        display: table-row-group !important;
+    }
+
+    .list > table > thead > tr,
+    .list > table > tbody > tr {
+        display: table-row !important;      /* <-- сброс flex на строку */
+        width: 100%;
+    }
+
+    .list > table > thead > tr > th {
+        display: table-cell !important;
+        padding: 12px 6px !important;
+        font-size: 13px !important;
+        font-weight: 600;
+        color: rgb(28, 28, 28);
+        text-align: center;
+        vertical-align: middle;
+        border-bottom: 1px solid rgb(28, 28, 28);
+        border-right: 1px solid rgb(28, 28, 28);
+        white-space: nowrap;
+    }
+
+    .list > table > tbody > tr > td {
+        display: table-cell !important;     /* <-- сброс flex на ячейку */
+        padding: 12px 6px !important;
+        font-size: 12px;
+        text-align: center;
+        vertical-align: middle;
+        border-bottom: 1px solid rgb(28, 28, 28);
+        border-right: 1px solid rgb(28, 28, 28);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
         height: auto !important;
     }
-    
-    /* Скрываем все столбцы по умолчанию */
-    .list > table > thead > tr > th,
-    .list > table > tbody > tr > td {
-        display: none;
+
+    /* Убираем правую границу у последнего столбца */
+    .list > table > thead > tr > th:last-child,
+    .list > table > tbody > tr > td:last-child {
+        border-right: none;
     }
-    
-    /* Показываем только нужные: 1, 2, 7, 8 */
+
+    /* Скрываем ненужные столбцы */
+    .list > table > thead > tr > th:nth-child(3),
+    .list > table > thead > tr > th:nth-child(4),
+    .list > table > thead > tr > th:nth-child(5),
+    .list > table > thead > tr > th:nth-child(6),
+    .list > table > tbody > tr > td:nth-child(3),
+    .list > table > tbody > tr > td:nth-child(4),
+    .list > table > tbody > tr > td:nth-child(5),
+    .list > table > tbody > tr > td:nth-child(6) {
+        display: none !important;
+    }
+
+    /* Показываем нужные столбцы */
     .list > table > thead > tr > th:nth-child(1),
     .list > table > thead > tr > th:nth-child(2),
     .list > table > thead > tr > th:nth-child(7),
@@ -187,50 +260,76 @@ html, body {
     .list > table > tbody > tr > td:nth-child(7),
     .list > table > tbody > tr > td:nth-child(8) {
         display: table-cell !important;
-        width: 25%;
-        text-align: center;
-        vertical-align: middle;
     }
-    
-    /* Заголовки таблицы */
-    .list > table > thead > tr > th {
-        font-size: 14px !important;
-        font-weight: 600;
-        color: rgb(28, 28, 28);
-        padding: 10px 5px !important;
-        background-color: #1e59be8d;
-        height: auto !important;
-        border-bottom: 1px solid rgb(28, 28, 28);
+
+    /* Равномерное распределение ширины столбцов */
+    .list > table > thead > tr > th:nth-child(1),
+    .list > table > tbody > tr > td:nth-child(1) {
+        width: 27%;
     }
-    
-    /* Ячейки таблицы */
-    .list > table > tbody > tr > td {
-        font-size: 14px;
-        padding: 12px 5px !important;
-        height: auto !important;
-        border-bottom: 1px solid #e5e7eb;
-        text-align: center;
-        border-bottom: 1px solid rgb(28, 28, 28);;
-        border-top: none;
-        border-right: 1px solid rgb(28, 28, 28);
+
+    .list > table > thead > tr > th:nth-child(2),
+    .list > table > tbody > tr > td:nth-child(2) {
+        width: 27%;
     }
-    
-    /* Стрелочка вместо кнопки "Перейти" */
+
+    .list > table > thead > tr > th:nth-child(7),
+    .list > table > tbody > tr > td:nth-child(7) {
+        width: 36%;
+    }
+
+    .list > table > thead > tr > th:nth-child(8),
+    .list > table > tbody > tr > td:nth-child(8) {
+        width: 10%;
+    }
+
+    /* Кнопка "Перейти" - стрелочка */
     .list > table > tbody > tr > td:nth-child(8) > a {
-        width: auto !important;
-        height: auto !important;
-        padding: 5px 8px !important;
-        background: transparent !important;
-        color: #000000 !important;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        max-width: 50px;
+        height: 34px;
+        background-color: transparent;
+        border: 2px solid rgb(28, 28, 28);
+        border-radius: 12px;
+        transition: all 0.2s ease;
         font-size: 0 !important;
-        display: inline-block;
+        text-decoration: none;
+        font-weight: 600;
+        margin: 0 auto;
+    }
+
+    .list > table > tbody > tr > td:nth-child(8) > a::before {
+        content: "→";
+        font-size: 16px;
+        font-weight: bold;
+        color: rgb(28, 28, 28);
+    }
+
+    .list > table > tbody > tr > td:nth-child(8) > a:hover {
+        background-color: #104bb149;
     }
     
     .list > table > tbody > tr > td:nth-child(8) > a::before {
         content: "→";
-        font-size: 22px;
+        font-size: 16px;
         font-weight: bold;
-        color: #000000;
+        color: rgb(28, 28, 28);
+    }
+    
+    .list > table > tbody > tr > td:nth-child(8) > a:hover {
+        background-color: #104bb149;
+    }
+    
+    /* Строка "нет данных" */
+    #employee-none, #contact-none {
+        text-align: center;
+        border: none !important;
+        padding: 40px 20px !important;
+        font-size: 16px;
+        color: #999;
     }
     
     /* --- КНОПКА СОЗДАНИЯ КОНТАКТА --- */
@@ -309,6 +408,7 @@ html, body {
         padding: 0 10px;
         box-sizing: border-box;
         flex-wrap: wrap;
+        margin: 20px 0;
     }
     
     /* --- СТРУКТУРА ОРГАНИЗАЦИИ --- */
@@ -319,7 +419,32 @@ html, body {
     }
     
     .structure-list > table {
-        min-width: 600px;
+        min-width: 500px;
+    }
+    
+    /* Вкладки на мобилке */
+    .favorites-tabs {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+        padding: 0 10px;
+    }
+    
+    .tab-link {
+        justify-content: center;
+    }
+    
+    .tabs {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+        padding: 0 10px;
+        margin-bottom: 15px !important;
+    }
+    
+    .tabs a {
+        text-align: center;
+        justify-content: center;
     }
 }
 
@@ -337,13 +462,30 @@ html, body {
     }
     
     .btn {
-        padding: 10px 15px;
+        padding: 8px 12px;
+        font-size: 13px;
+    }
+    
+    /* Еще меньше отступы для таблицы */
+    .list > table > thead > tr > th,
+    .list > table > tbody > tr > td {
+        display: table-cell !important;
+        padding: 8px 2px !important;
+        font-size: 11px !important;
+    }
+    
+    .list > table > tbody > tr > td:nth-child(8) > a {
+        max-width: 40px;
+        height: 28px;
+    }
+    
+    .list > table > tbody > tr > td:nth-child(8) > a::before {
         font-size: 14px;
     }
 }
 
 /* ============================================
-   МОБИЛЬНОЕ МЕНЮ (БУРГЕР)
+   МОБИЛЬНОЕ МЕНЮ (БУРГЕР) - ОРИГИНАЛЬНАЯ ВЕРСИЯ
    ============================================ */
 
 /* Кнопка бургер (три полоски) - скрыта на ПК */
@@ -380,7 +522,7 @@ html, body {
 /* Стили для экранов МЕНЬШЕ 1024px (планшеты и телефоны) */
 @media (max-width: 1024px) {
     header {
-        justify-content: space-between; /* Логотип слева, бургер справа */
+        justify-content: space-between;
         padding: 15px 20px;
         height: auto;
     }
@@ -395,12 +537,12 @@ html, body {
         display: flex;
     }
 
-    /* Навигация скрыта по умолчанию на мобильных (уезжает вправо) */
+    /* Навигация скрыта по умолчанию на мобильных */
     .nav-links {
         position: fixed;
         top: 0;
-        right: -100%; 
-        width: 70%; /* Ширина выезжающего меню */
+        right: -100%;
+        width: 70%;
         height: 100vh;
         background-color: #2b5192;
         flex-direction: column;
@@ -411,7 +553,6 @@ html, body {
         z-index: 1000;
     }
 
-    /* Класс active показывает меню (возвращает на экран) */
     .nav-links.active {
         right: 0;
     }
@@ -435,7 +576,6 @@ html, body {
         color: #fff;
     }
 
-    /* Подсветка активной вкладки на мобильных */
     .header > ul > li > a.nav-active {
         background-color: rgba(255,255,255,0.1);
         color: #fff;
@@ -443,12 +583,15 @@ html, body {
     }
 
     .leave {
-        width: 100%;
+        width: 60%;
         margin-top: 20px;
     }
     
     .leave > form > button {
         width: 90%;
         margin: 0 auto;
+        display: flex;
+        justify-content: center;
+        align-items: center;
     }
 }

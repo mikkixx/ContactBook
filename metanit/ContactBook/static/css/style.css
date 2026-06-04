@@ -148,7 +148,7 @@ form{
 }
 .row > input{
     width: 80%;
-    height: 28px;
+    height: 38px;
     border: solid 1px rgb(163, 163, 163);
     background-color: white;
     border-radius: 12px;
@@ -567,8 +567,8 @@ form{
     font-weight: 600;
 }
 .pole-vvoda > input{
-    width: 730px;
-    height: 28px;
+    width: 750px;
+    height: 40px;
     border: solid 1px rgb(163, 163, 163);
     background-color: white;
     border-radius: 12px;
@@ -1212,8 +1212,8 @@ form{
 
 
 .modal > form > input{
-    width: 90%;
-    height: 28px;
+    width: 95%;
+    height: 42px;
     border: solid 1px rgb(163, 163, 163);
     background-color: white;
     border-radius: 12px;
@@ -1317,8 +1317,8 @@ form{
     font-weight: 500;
 }
 .modal-field input {
-    width: 90%;
-    height: 28px;
+    width: 98%;
+    height: 42px;
     border: solid 1px rgb(163, 163, 163);
     background-color: white;
     border-radius: 12px;
@@ -1375,7 +1375,7 @@ form{
 
 .modal-field-pass > input{
     width: 100%;
-    height: 28px;
+    height: 42px;
     border: solid 1px rgb(163, 163, 163);
     background-color: white;
     border-radius: 12px;
