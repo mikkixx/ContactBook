@@ -20,7 +20,15 @@
                 <div class="detail-item"><span class="detail-label">EMAIL:</span><span class="detail-value">{% if contact.email %}<span class="copy-data" onclick="copyToClipboard(this)">{{ contact.email }}</span>{% else %}<span style="color: #6b7280;">Не указан</span>{% endif %}</span></div>
                 <div class="detail-item"><span class="detail-label">ОРГАНИЗАЦИЯ:</span><span class="detail-value">{{ contact.organization|default:"Не указана" }}</span></div>
                 <div class="detail-item"><span class="detail-label">КАТЕГОРИЯ:</span><span class="detail-value">{{ contact.get_category_display|default:"Другое" }}</span></div>
-                <div class="detail-item"><span class="detail-label">ОТВЕТСТВЕННЫЙ:</span><span class="detail-value">{{ contact.owner.get_full_name|default:contact.owner.username|default:"Не назначен" }}</span></div>
+                <div class="detail-item"><span class="detail-label">ОТВЕТСТВЕННЫЙ:</span><a href="{% url 'contactbook:contact_list' %}?owner_id={{ contact.owner.id }}" 
+                    class="detail-value" 
+                    title="Посмотреть все внешние контакты, добавленные {{ contact.owner.get_full_name|default:contact.owner.username }}">
+                    {% if contact.owner.employee_profile %}
+                        {{ contact.owner.employee_profile.last_name }} {{ contact.owner.employee_profile.first_name }}
+                    {% else %}
+                        {{ contact.owner.get_full_name|default:contact.owner.username|default:"Не назначен" }}
+                    {% endif %}
+                </a></div>
             </div>
         </div>
     </div>

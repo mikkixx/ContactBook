@@ -20,7 +20,7 @@ from django.db import IntegrityError
 from .utils import normalize_phone
 import re
 import logging
-from django.utils import timezone 
+from django.utils import timezone
 
 def is_admin(user):
     return user.is_authenticated and hasattr(user, 'employee_profile') and user.employee_profile.role == 'admin'
@@ -52,12 +52,19 @@ def employee_list(request):
     paginator = Paginator(qs, 10)
     page_obj = paginator.get_page(request.GET.get('page'))
 
+    positions = Employee.objects.exclude(
+        position__isnull=True
+    ).exclude(
+        position=''
+    ).values_list('position', flat=True).distinct().order_by('position')
+
     return render(request, 'contactbook/employee_list.html', {
         'page_obj': page_obj,
         'search': search, 'dept_id': dept_id, 'sub_id': sub_id, 'position': position,
         'departments': Department.objects.all(),
         'subdivisions': Subdivision.objects.all(),
-        'is_admin': is_admin_user
+        'is_admin': is_admin_user,
+        'positions': positions,
     })
 
 @login_required
@@ -433,6 +440,12 @@ def deleted_employees(request):
     else:
         qs = qs.order_by('-deleted_at')
 
+    positions = Employee.all_objects.filter(is_deleted=True).exclude(
+        position__isnull=True
+    ).exclude(
+        position=''
+    ).values_list('position', flat=True).distinct().order_by('position')
+
     paginator = Paginator(qs, 10)
     page_obj = paginator.get_page(request.GET.get('page'))
     
@@ -446,6 +459,7 @@ def deleted_employees(request):
         'sort_order': sort_order,
         'departments': Department.objects.all(),
         'subdivisions': Subdivision.objects.all(),
+        'positions': positions
     })
 
 @login_required
@@ -736,6 +750,10 @@ def contact_list(request):
     if mine_only:
         qs = qs.filter(owner=request.user)
         
+    owner_id = request.GET.get('owner_id')
+    if owner_id and owner_id.isdigit():
+        qs = qs.filter(owner_id=owner_id)
+    
     search = request.GET.get('search', '').strip()
     position = request.GET.get('position', '').strip()
     org = request.GET.get('organization', '').strip()
@@ -759,6 +777,30 @@ def contact_list(request):
     paginator = Paginator(qs, 10)
     page_obj = paginator.get_page(request.GET.get('page'))
     
+    owner_name = None
+    if owner_id:
+        try:
+            owner = User.objects.get(id=owner_id)
+            try:
+                employee_profile = owner.employee_profile
+                owner_name = f"{employee_profile.last_name} {employee_profile.first_name}".strip()
+            except:
+                owner_name = f"{owner.first_name} {employee_profile.last_name}".strip() or owner.username
+        except:
+            pass
+
+    organizations = Contact.objects.exclude(
+        organization__isnull=True
+    ).exclude(
+        organization=''
+    ).values_list('organization', flat=True).distinct().order_by('organization')
+
+    positions = Contact.objects.exclude(
+        position__isnull = True
+    ).exclude(
+        position=''
+    ).values_list('position', flat=True).distinct().order_by('position')
+
     return render(request, 'contactbook/contact_list.html', {
         'page_obj': page_obj,
         'search': search,
@@ -767,7 +809,11 @@ def contact_list(request):
         'category': category,
         'mine_only': mine_only, 
         'categories': [('client', 'Клиент'), ('partner', 'Партнёр'), ('supplier', 'Поставщик'), ('other', 'Другое')],
-        'is_admin': is_admin_user
+        'is_admin': is_admin_user,
+        'organizations': organizations,
+        'positions': positions,
+        'owner_id': owner_id,
+        'owner_name': owner_name,
     })
 
 @login_required

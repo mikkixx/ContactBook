@@ -1465,3 +1465,24 @@ form{
     color: #ffffff;
     transform: translateY(-2px);
 }
+.uvedomlenie{
+    color: #ffffff;
+    border: 2px solid #2b5192;
+    padding: 10px;
+    border-radius: 10px;
+    fill: #2b5192;
+    background-color: #2b5192;
+}
+.my-profile-header{
+    width: 100%;
+    max-width: 970px;
+    display: flex;
+    justify-content: center;
+    align-items: end;
+}
+.my-profile-header > h1{
+    width: 70%;
+    font-size: 40px;
+    margin:0;
+    text-align: center;
+}

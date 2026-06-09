@@ -10,8 +10,12 @@
     <div class="zagolovok"><p>Фильтрация</p></div>
     <form method="get" class="elements">
         <input type="text" id="search" name="search" value="{{ search }}" placeholder="Поиск по имени/фамилии">
-        <input type="text" id="position" name="position" value="{{ position }}" placeholder="Поиск по должности">
-        
+        <input type="text" id="position" name="position" value="{{ position }}" placeholder="Поиск по должности" list="emp-pos-list">
+        <datalist id="emp-pos-list">
+            {% for pos in positions %}
+            <option value="{{ pos }}">
+            {% endfor %}
+        </datalist>
         <select name="department" id="dept-select">
             <option value="">Все отделы</option>
             {% for dept in departments %}
@@ -25,7 +29,7 @@
             <option value="">Нет</option>
         </select>
         
-        <button type="submit" class="btn btn-primary">Применить</button>
+        <button type="submit" class="btn btn-primary">Фильтровать</button>
         <a href="{% url 'contactbook:employee_list' %}" class="btn btn-secondary">Сбросить</a>
     </form>
 </div>

@@ -586,6 +586,12 @@ html, body {
         text-align: center;
         justify-content: center;
     }
+    #logo{
+        width: 130px !important;
+        height: auto !important;
+        flex-shrink: 0;
+        min-width: 130px;
+    }
 }
 
 /* ОЧЕНЬ МАЛЕНЬКИЕ ЭКРАНЫ (до 480px)*/
