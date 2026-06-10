@@ -44,7 +44,8 @@
                 <th>Отдел</th>
                 <th>
                     <a href="?sort={% if sort_order == 'asc' %}desc{% else %}asc{% endif %}&search={{ search }}&position={{ position }}" 
-                       style="color: inherit; text-decoration: none; display: inline-flex; align-items: center; gap: 5px;">
+                       style="color: inherit; text-decoration: none; display: inline-flex; align-items: center; gap: 5px;"
+                       title="{% if sort_order == 'asc' %}Сначала старые удаления.{% else %}Сначала новые удаления.{% endif %}">
                         Дата удаления {% if sort_order == 'asc' %} ↑ {% else %} ↓ {% endif %}
                     </a>
                 </th>

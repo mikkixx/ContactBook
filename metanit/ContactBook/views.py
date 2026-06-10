@@ -449,14 +449,14 @@ def deleted_employees(request):
     if position:
         qs = qs.filter(position__icontains=position)
     
-    if sort_order == 'asc':
-        qs = qs.order_by('deleted_at')
-    
     if dept_id:
         qs = qs.filter(department_id=dept_id)
 
     if sub_id:
         qs = qs.filter(subdivision_id=sub_id)
+        
+    if sort_order == 'asc':
+        qs = qs.order_by('deleted_at')
 
     else:
         qs = qs.order_by('-deleted_at')
