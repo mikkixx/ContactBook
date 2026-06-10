@@ -158,6 +158,24 @@ def favorite_list(request):
     if emp_dept and emp_dept != '':
         filtered_subdivisions = Subdivision.objects.filter(department_id=emp_dept)
 
+    emp_positions = Employee.objects.exclude(
+        position__isnull=True
+    ).exclude(
+        position=''
+    ).values_list('position', flat=True).distinct().order_by('position')
+
+    cont_positions = Contact.objects.exclude(
+        position__isnull=True
+    ).exclude(
+        position=''
+    ).values_list('position', flat=True).distinct().order_by('position')
+
+    cont_organizations = Contact.objects.exclude(
+        organization__isnull=True
+    ).exclude(
+        organization=''
+    ).values_list('organization', flat=True).distinct().order_by('organization')
+
     context = {
         'active_tab': active_tab,
         
@@ -168,6 +186,7 @@ def favorite_list(request):
         'emp_sub': emp_sub,
         'departments': Department.objects.all(),
         'subdivisions': filtered_subdivisions,
+        'emp_positions': emp_positions,
         
         'cont_page': cont_page,
         'cont_search': cont_search,
@@ -175,6 +194,8 @@ def favorite_list(request):
         'cont_org': cont_org,
         'cont_category': cont_category,
         'categories': [('client', 'Клиент'), ('partner', 'Партнёр'), ('supplier', 'Поставщик'), ('other', 'Другое')],
+        'cont_positions': cont_positions,
+        'cont_organizations': cont_organizations,
     }
     
     return render(request, 'contactbook/favorite_list.html', context)

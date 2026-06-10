@@ -20,7 +20,17 @@
     <div class="zagolovok">Фильтрация</div>
     <div class="elements">
         <input type="text" id="emp_search" name="emp_search" placeholder="Поиск по имени/фамилии" value="{{ emp_search }}">
-        <input type="text" name="emp_position" placeholder="Поиск по должности" value="{{ emp_position }}">
+        <input type="text" 
+            name="emp_position" 
+            id="emp_position" 
+            list="emp-positions-list" 
+            placeholder="Поиск по должности"
+            value="{{ emp_position }}">
+        <datalist id="emp-positions-list">
+            {% for pos in emp_positions %}
+            <option value="{{ pos }}">
+            {% endfor %}
+        </datalist>
         <select name="department" id="dept-select">
             <option value="">Все отделы</option>
             {% for dept in departments %}
@@ -84,8 +94,29 @@
     <div class="zagolovok">Фильтрация</div>
     <div class="elements-contact">
         <input type="text" id="cont_search" name="cont_search" placeholder="Поиск по имени/фамилии" value="{{ cont_search }}">
-        <input type="text" name="cont_position" placeholder="Поиск по должности" value="{{ cont_position }}">
-        <input type="text" name="cont_org" placeholder="Поиск по организации" value="{{ cont_org }}">
+        <input type="text" 
+            name="cont_position" 
+            id="cont_position" 
+            list="cont-positions-list" 
+            placeholder="Поиск по должности"
+            value="{{ cont_position }}">
+        <datalist id="cont-positions-list">
+            {% for pos in cont_positions %}
+            <option value="{{ pos }}">
+            {% endfor %}
+        </datalist>
+
+        <input type="text" 
+            name="cont_org" 
+            id="cont_org" 
+            list="cont-orgs-list" 
+            placeholder="Поиск по организации"
+            value="{{ cont_org }}">
+        <datalist id="cont-orgs-list">
+            {% for org in cont_organizations %}
+            <option value="{{ org }}">
+            {% endfor %}
+        </datalist>
         <select name="cont_category">
             <option value="">Все категории</option>
             {% for cat_value, cat_label in categories %}
