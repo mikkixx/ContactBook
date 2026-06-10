@@ -382,6 +382,14 @@ form{
     color: rgb(107, 107, 107);
 }
 
+.mine-toggle input[type="checkbox"] {
+    width: 22px;
+    height: 22px;
+    margin-right: 10px;
+    cursor: pointer;
+    accent-color: #2b5192;  /* Цвет галочки в современных браузерах */
+}
+
 .list{
     width: 95%;
     height: 80%;
