@@ -6,7 +6,7 @@
 
 {% if owner_name %}
 <div>
-    <h3 class="uvedomlenie" title="Нажмите кнопку «Сбросить», чтобы увидеть все внешние контакты.">Контакты, добавленные: <span>{{ owner_name }}</span></h3>
+    <h3 class="uvedomlenie" title="Нажмите на вкладку «Внешние контакты», чтобы увидеть все внешние контакты.">Контакты, добавленные: <span>{{ owner_name }}</span></h3>
 </div>
 {% endif %}
 <button class="filter-toggle-btn" onclick="toggleFilter()">Фильтрация</button>
@@ -14,6 +14,9 @@
 <div class="filter" id="filterBlock">
     <div class="zagolovok"><p>Фильтрация</p></div>
     <form method="get" class="elements-contact">
+        {% if owner_id %}
+        <input type="hidden" name="owner_id" value="{{ owner_id }}">
+        {% endif %}
         <input type="text" name="search" value="{{ search }}" placeholder="Поиск по имени/фамилии">
         <input type="text" name="position" value="{{ position }}" placeholder="Поиск по должности" list="pos-list">
         <input type="text" name="organization" value="{{ organization }}" placeholder="Поиск по организации" list="org-list">
@@ -26,14 +29,16 @@
                 </option>
             {% endfor %}
         </select>
-        
+
+        {% if not owner_id %}
         <label for="mine_only" class="mine-toggle">
             <input type="checkbox" name="mine_only" value="on" {% if mine_only %}checked{% endif %}>
             <p>Только мои контакты</p>
         </label>
+        {% endif %}
         
         <button type="submit" class="btn btn-primary">Фильтровать</button>
-        <a href="{% url 'contactbook:contact_list' %}" class="btn btn-secondary">Сбросить</a>
+        <a href="{% url 'contactbook:contact_list' %}{% if owner_id %}?owner_id={{ owner_id }}{% endif %}" class="btn btn-secondary">Сбросить</a>
     </form>
 </div>
 
