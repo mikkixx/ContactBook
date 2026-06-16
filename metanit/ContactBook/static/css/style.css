@@ -1494,3 +1494,42 @@ form{
     margin:0;
     text-align: center;
 }
+
+.owner_filter_banner{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 25px;
+    border-radius: 12px;
+    margin: 15px auto;
+    max-width: 95%;
+}
+
+.owner_filter_text h3 {
+    margin: 0;
+    color: white;
+    font-size: 20px;
+    font-weight: 600;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.reset_owner_filter{
+    display: inline-block;
+    margin-left: 5px;
+    padding: 12px 15px;
+    background-color: #9abaff;
+    color: rgb(70, 70, 70);
+    text-decoration: none;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 16px;
+    border: 2px solid transparent;
+    box-shadow: 0 4px 12px rgba(81, 146, 231, 0.4);
+    transition: all 0.3s ease;
+}
+
+.reset_owner_filter:hover{
+    background-color: #5385f3;
+    box-shadow: 0 6px 16px rgba(81, 146, 231, 0.4);
+    border-color: rgba(255, 255, 255, 0.3);
+}

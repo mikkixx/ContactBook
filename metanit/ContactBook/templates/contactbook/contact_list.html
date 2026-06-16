@@ -5,8 +5,11 @@
 <h1>Внешние контакты</h1>
 
 {% if owner_name %}
-<div>
-    <h3 class="uvedomlenie" title="Нажмите на вкладку «Внешние контакты», чтобы увидеть все внешние контакты.">Контакты, добавленные: <span>{{ owner_name }}</span></h3>
+<div class="owner_filter_banner">
+    <div class="owner_filter_text">
+        <h3 class="uvedomlenie">Контакты, добавленные: <span>{{ owner_name }}</span></h3>
+    </div>
+    <a href="{% url 'contactbook:contact_list' %}" class="reset_owner_filter" title="Сбросить фильтрацию по ответственному">X</a>
 </div>
 {% endif %}
 <button class="filter-toggle-btn" onclick="toggleFilter()">Фильтрация</button>
