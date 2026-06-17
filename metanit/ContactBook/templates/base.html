@@ -7,6 +7,7 @@
     <title>{% block title %}ContactBook{% endblock %}</title>
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
     <link rel="stylesheet" href="{% static 'css/responsive.css' %}">
+    <link rel="stylesheet" href="{% static 'css/dark-theme.css' %}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
@@ -54,14 +55,56 @@
 
         {% block content %}{% endblock %}
     </main>
+
+    <div class="theme-switch-wrapper">
+        <span class="theme-label" id="theme-label">Светлая тема</span>
+        <label class="theme-switch" for="theme-toggle">
+            <input type="checkbox" id="theme-toggle">
+            <span class="theme-slider">
+                <span class="icon sun"></span>
+                <span class="icon moon"></span>
+            </span>
+        </label>
+    </div>
+
+
 </body>
 <script>
     function toggleMobileMenu() {
         const nav = document.getElementById('mainNav');
         const burger = document.querySelector('.burger-menu');
         
-        nav.classList.toggle('active'); // Показываем/скрываем меню
-        burger.classList.toggle('toggle'); // Превращаем бургер в крестик
+        nav.classList.toggle('active');
+        burger.classList.toggle('toggle');
     }
+    // ===============Тёмная тема================
+    document.addEventListener('DOMContentLoaded', function() {
+        const themeToggle = document.getElementById('theme-toggle');
+        const themeLabel = document.getElementById('theme-label');
+        const body = document.body;
+
+        const savedTheme = localStorage.getItem('theme');
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+        if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+            body.classList.add('dark-theme');
+            themeToggle.checked = true;
+            if (themeLabel) themeLabel.textContent = 'Тёмная тема';
+        } else {
+            if (themeLabel) themeLabel.textContent = 'Светлая тема';
+        }
+
+        themeToggle.addEventListener('change', function() {
+            if (this.checked) {
+                body.classList.add('dark-theme');
+                localStorage.setItem('theme', 'dark');
+                if (themeLabel) themeLabel.textContent = 'Тёмная тема';
+            } else {
+                body.classList.remove('dark-theme');
+                localStorage.setItem('theme', 'light');
+                if (themeLabel) themeLabel.textContent = 'Светлая тема';
+            }
+        });
+    });
 </script>
 </html>

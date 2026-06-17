@@ -1,0 +1,633 @@
+body.dark-theme {
+    --bg-primary: #1a1d23;
+    --bg-secondary: #252830;
+    --bg-tertiary: #2d3139;
+    --text-primary: #e5e7eb;
+    --text-secondary: #919191;
+    --text-muted: #6b7280;
+    --border-color: #4b5563;
+    --border-light: #374151;
+    --header-bg: #1e293b;
+    --header-text: #cbd5e1;
+    --header-text-hover: #ffffff;
+    --accent-color: #3b82f6;
+    --accent-hover: #60a5fa;
+    --btn-primary-bg: #5f6979;
+    --btn-primary-text: #ffffff;
+    --btn-secondary-bg: #254d8f;
+    --btn-secondary-text: #ffffff;
+    --btn-danger-bg: #dc2626;
+    --btn-danger-text: #ffffff;
+    --input-bg: #2d3139;
+    --input-border: #4b5563;
+    --input-text: #949494;
+    --table-header-bg: #122b58;
+    --table-row-hover: #3b82f620;
+    --table-border: #4b5563;
+    --card-bg: #252830;
+    --card-shadow: rgba(0, 0, 0, 0.3);
+    --modal-bg: #252830;
+    --modal-overlay: rgba(0, 0, 0, 0.7);
+    --filter-bg: #1a1d23;
+    --tab-bg: #374151;
+    --tab-text: #cbd5e1;
+    --tab-active-bg: #3b82f6;
+    --tab-active-text: #ffffff;
+    --link-color: #60a5fa;
+    --success-color: #4ade80;
+    --error-color: #f87171;
+    --warning-bg: #7f1d1d;
+    --warning-text: #fca5a5;
+    --checkbox-accent: #3b82f6;
+    --leave-btn-bg: #454953;
+    --leave-btn-border-hover: #47494e;
+    --btn-danger-hover: #b55252;
+    --unconfirmed-hover: #ff7a87;
+    --owner-filter-text: #1e293b;
+    --owner-filter-bg: #60a5fa;
+    --owner-filter-hover: #3b82f6;
+    --theme-slider-bg: #2b5192;
+    --theme-slider-checked-bg: #323742;
+    --theme-slider-checked-dot: #4162f5;
+    --theme-sun-color: #2439fb;
+    --placeholder-color: #9ca3af;
+    --label-color: #cbd5e1;
+    --sub-row-bg: #1e3a6f30;
+}
+
+body.dark-theme {
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+}
+
+body.dark-theme header {
+    background-color: var(--header-bg);
+}
+
+body.dark-theme .header > ul > li > a {
+    color: var(--header-text);
+}
+
+body.dark-theme .header > ul > li > a:hover {
+    color: var(--header-text-hover);
+}
+
+body.dark-theme .header > ul > li > a.nav-active {
+    color: var(--header-text-hover);
+    border-bottom-color: rgba(255, 255, 255, 0.9);
+}
+
+body.dark-theme main > h1 {
+    color: var(--text-primary);
+}
+
+body.dark-theme .form > h1 {
+    color: var(--text-primary);
+}
+
+body.dark-theme .row > input {
+    background-color: var(--input-bg);
+    border-color: var(--input-border);
+    color: var(--input-text);
+}
+
+body.dark-theme .row > input::placeholder {
+    color: var(--placeholder-color);
+}
+
+body.dark-theme .row > label {
+    color: var(--text-primary);
+}
+
+body.dark-theme .form > button {
+    background-color: var(--btn-secondary-bg);
+}
+
+body.dark-theme .form > button:hover {
+    background-color: var(--accent-hover);
+}
+
+body.dark-theme .link > a {
+    color: var(--accent-color);
+}
+
+body.dark-theme .zagolovok {
+    color: var(--text-primary);
+}
+
+body.dark-theme .elements > input,
+body.dark-theme .elements-contact > input {
+    background-color: var(--input-bg);
+    border-color: var(--input-border);
+    color: var(--input-text);
+}
+
+body.dark-theme .elements > input::placeholder,
+body.dark-theme .elements-contact > input::placeholder {
+    color: var(--placeholder-color);
+}
+
+body.dark-theme .elements > select,
+body.dark-theme .elements-contact > select {
+    background-color: var(--input-bg);
+    border-color: var(--input-border);
+    color: var(--text-secondary);
+}
+
+body.dark-theme .elements > button,
+body.dark-theme .elements-contact > button {
+    background-color: var(--btn-primary-bg);
+    color: var(--btn-primary-text);
+}
+
+body.dark-theme .elements > button:hover,
+body.dark-theme .elements-contact > button:hover {
+    border-color: var(--btn-primary-bg);
+    color: var(--btn-primary-bg);
+}
+
+body.dark-theme .elements > a {
+    background-color: var(--btn-secondary-bg);
+}
+
+body.dark-theme .elements > a:hover {
+    border-color: var(--btn-secondary-bg);
+    color: var(--btn-secondary-bg);
+}
+
+body.dark-theme .mine-toggle {
+    background-color: var(--input-bg);
+    border-color: var(--input-border);
+    color: var(--text-secondary);
+}
+
+body.dark-theme .mine-toggle input[type="checkbox"] {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 25px;
+    height: 20px;
+    border: 2px solid var(--input-border);
+    background-color: var(--input-bg);
+    border-radius: 4px;
+    cursor: pointer;
+    position: relative;
+    margin-right: 10px;
+}
+
+body.dark-theme .mine-toggle input[type="checkbox"]:checked {
+    background-color: var(--checkbox-accent);
+    border-color: var(--checkbox-accent);
+}
+
+body.dark-theme .mine-toggle input[type="checkbox"]:checked::after {
+    content: "✓";
+    position: absolute;
+    color: white;
+    font-size: 16px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+body.dark-theme .list > table {
+    background-color: var(--card-bg);
+    border-color: var(--border-light);
+    box-shadow: 0 0 10px var(--card-shadow);
+}
+
+body.dark-theme .list > table > thead {
+    background-color: var(--table-header-bg);
+}
+
+body.dark-theme .list > table > thead > tr > th,
+body.dark-theme .list > table > tbody > tr > td {
+    border-color: var(--table-border);
+    color: var(--text-primary);
+}
+
+body.dark-theme .list > table > tbody > tr > td > a,
+body.dark-theme .list > table > tbody > tr > td > button {
+    color: var(--text-primary);
+    border-color: var(--table-border);
+}
+
+body.dark-theme .list > table > tbody > tr > td > a:hover,
+body.dark-theme .list > table > tbody > tr > td > button:hover {
+    background-color: var(--table-row-hover);
+}
+
+body.dark-theme .pagination {
+    color: var(--text-primary);
+}
+
+body.dark-theme .pagination > a {
+    color: var(--text-primary);
+}
+
+body.dark-theme .pole-vvoda > label {
+    color: var(--text-primary);
+}
+
+body.dark-theme .pole-vvoda > input,
+body.dark-theme #dept,
+body.dark-theme #sub {
+    background-color: var(--input-bg);
+    border-color: var(--input-border);
+    color: var(--input-text);
+}
+
+body.dark-theme #dept-select {
+    background-color: var(--input-bg);
+    border-color: var(--input-border);
+}
+
+body.dark-theme #sub-select,
+body.dark-theme #sub,
+body.dark-theme #dept {
+    color: var(--text-secondary);
+}
+
+body.dark-theme .reg > button {
+    background-color: var(--btn-secondary-bg);
+}
+
+body.dark-theme .reg > button:hover {
+    background-color: var(--accent-hover);
+}
+
+body.dark-theme .profile-card {
+    background-color: var(--card-bg);
+    border-color: var(--border-color);
+    box-shadow: 0 4px 12px var(--card-shadow);
+}
+
+body.dark-theme .profile-info > h2 {
+    color: var(--text-primary);
+}
+
+body.dark-theme .profile-position {
+    color: var(--accent-color);
+}
+
+body.dark-theme .profile-details {
+    border-top-color: var(--border-light);
+}
+
+body.dark-theme .detail-item {
+    background-color: var(--bg-secondary);
+}
+
+body.dark-theme .detail-label {
+    color: var(--text-secondary);
+}
+
+body.dark-theme .detail-value {
+    color: var(--text-primary);
+}
+
+body.dark-theme .detail-item > a {
+    color: var(--link-color);
+}
+
+body.dark-theme .profile-actions {
+    border-top-color: var(--border-light);
+}
+
+body.dark-theme .btn-primary {
+    background-color: var(--btn-primary-bg);
+}
+
+body.dark-theme .btn-primary:hover {
+    background-color: var(--bg-tertiary);
+}
+
+body.dark-theme .btn-secondary {
+    background-color: var(--btn-secondary-bg);
+}
+
+body.dark-theme .btn-secondary:hover {
+    background-color: var(--accent-hover);
+}
+
+body.dark-theme .btn-danger,
+body.dark-theme .btn-delete {
+    background-color: var(--btn-danger-bg);
+}
+
+body.dark-theme .btn-danger:hover,
+body.dark-theme .btn-delete:hover {
+    background-color: var(--btn-danger-hover);
+}
+
+body.dark-theme .back-link {
+    background-color: var(--btn-secondary-bg);
+}
+
+body.dark-theme .back-link:hover {
+    background-color: var(--accent-hover);
+}
+
+body.dark-theme .copy-data {
+    color: var(--link-color);
+}
+
+body.dark-theme #employee-none,
+body.dark-theme #contact-none {
+    color: var(--text-muted);
+}
+
+body.dark-theme .modal,
+body.dark-theme .modal-custom {
+    background-color: var(--modal-bg);
+}
+
+body.dark-theme .modal-field label,
+body.dark-theme .modal > form > label {
+    color: var(--label-color);
+}
+
+body.dark-theme .modal-field input,
+body.dark-theme .modal-field select,
+body.dark-theme .modal > form > input,
+body.dark-theme .modal > form > select {
+    background-color: var(--input-bg);
+    border-color: var(--input-border);
+    color: var(--text-primary);
+}
+
+body.dark-theme .modal-field input::placeholder,
+body.dark-theme .modal > form > input::placeholder,
+body.dark-theme .modal-custom input::placeholder {
+    color: var(--placeholder-color);
+}
+
+body.dark-theme .modal-grid #dept-select {
+    background-color: var(--input-bg);
+    border-color: var(--input-border);
+    color: var(--input-text);
+}
+
+body.dark-theme .modal-field-pass > label {
+    color: var(--label-color);
+}
+
+body.dark-theme .modal-field-pass > input {
+    background-color: var(--input-bg);
+    border-color: var(--input-border);
+    color: var(--input-text);
+}
+
+body.dark-theme .modal-field select {
+    background-color: var(--input-bg) !important;
+    border-color: var(--input-border) !important;
+    color: var(--input-text) !important;
+}
+
+body.dark-theme .modal-field select option {
+    background-color: var(--input-bg);
+    color: var(--input-text);
+}
+
+body.dark-theme #dept-select,
+body.dark-theme #sub-select {
+    background-color: var(--input-bg) !important;
+    border-color: var(--input-border) !important;
+    color: var(--input-text) !important;
+}
+
+body.dark-theme #dept-select option,
+body.dark-theme #sub-select option {
+    background-color: var(--input-bg);
+    color: var(--input-text);
+}
+
+body.dark-theme .error-box,
+body.dark-theme .alert {
+    color: var(--error-color);
+}
+
+body.dark-theme .tab-link {
+    background-color: var(--tab-bg);
+    color: var(--tab-text);
+}
+
+body.dark-theme .tab-link:hover {
+    background-color: var(--bg-tertiary);
+    color: var(--accent-color);
+}
+
+body.dark-theme .tab-link.active {
+    background-color: var(--tab-active-bg);
+    color: var(--tab-active-text);
+    border-color: var(--tab-active-bg);
+}
+
+body.dark-theme .tab-link.active:hover {
+    background-color: var(--accent-hover);
+}
+
+body.dark-theme .sub-row {
+    background-color: var(--sub-row-bg);
+    color: var(--text-primary);
+}
+
+body.dark-theme .sub-name {
+    color: var(--text-secondary);
+}
+
+body.dark-theme .unconfirmed {
+    background-color: var(--warning-bg) !important;
+    color: var(--warning-text);
+}
+
+body.dark-theme .unconfirmed td {
+    border-bottom-color: var(--warning-bg) !important;
+}
+
+body.dark-theme .unconfirmed:hover {
+    background-color: var(--unconfirmed-hover) !important;
+}
+
+body.dark-theme .create-contact > button {
+    background-color: var(--btn-secondary-bg);
+}
+
+body.dark-theme .structure-list > table {
+    background-color: var(--card-bg);
+    border-color: var(--border-light);
+    box-shadow: 0 0 10px var(--card-shadow);
+}
+
+body.dark-theme .structure-list > table > thead {
+    background-color: var(--table-header-bg);
+}
+
+body.dark-theme .structure-list > table > thead > tr > th,
+body.dark-theme .structure-list > table > tbody > tr > td {
+    border-color: var(--table-border);
+    color: var(--text-primary);
+}
+
+body.dark-theme .btn-dept-actions,
+body.dark-theme .btn-actions {
+    background-color: var(--card-bg);
+    border-color: var(--border-light);
+    color: var(--text-primary);
+}
+
+body.dark-theme .btn-dept-actions:hover,
+body.dark-theme .btn-actions:hover {
+    border-color: var(--text-primary);
+}
+
+body.dark-theme .leave > form > button {
+    background-color: var(--leave-btn-bg);
+    color: var(--text-primary);
+}
+
+body.dark-theme .leave > form > button:hover {
+    background-color: var(--leave-btn-bg);
+    border-color: var(--leave-btn-border-hover);
+    color: white;
+}
+
+body.dark-theme .overflow {
+    background-color: var(--modal-overlay);
+}
+
+body.dark-theme .filter {
+    background-color: var(--filter-bg);
+}
+
+body.dark-theme .owner_filter_banner {
+    background: linear-gradient(135deg, var(--accent-color) 0%, #7c3aed 100%);
+}
+
+body.dark-theme .reset_owner_filter {
+    background-color: var(--owner-filter-bg);
+    color: var(--owner-filter-text);
+}
+
+body.dark-theme .reset_owner_filter:hover {
+    background-color: var(--owner-filter-hover);
+}
+
+.theme-switch-wrapper {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.theme-switch {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 30px;
+}
+
+.theme-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.theme-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #2b5192;
+    transition: all 0.4s ease;
+    border-radius: 30px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.theme-slider:before {
+    position: absolute;
+    content: "";
+    height: 24px;
+    width: 24px;
+    left: 3px;
+    bottom: 3px;
+    background-color: rgb(255, 255, 255);
+    transition: all 0.4s ease;
+    border-radius: 50%;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.theme-switch input:checked + .theme-slider {
+    background-color: var(--theme-slider-checked-bg);
+}
+
+.theme-switch input:checked + .theme-slider:before {
+    transform: translateX(30px);
+    background-color: var(--theme-slider-checked-dot);
+}
+
+.theme-slider .icon {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 16px;
+    transition: all 0.4s ease;
+}
+
+.theme-slider .sun {
+    left: 6px;
+    opacity: 1;
+    color: var(--theme-sun-color);
+}
+
+.theme-slider .moon {
+    right: 6px;
+    opacity: 0;
+    color: var(--header-text);
+}
+
+.theme-switch input:checked + .theme-slider .sun {
+    opacity: 0;
+}
+
+.theme-switch input:checked + .theme-slider .moon {
+    opacity: 1;
+}
+
+.theme-label {
+    font-size: 14px;
+    color: var(--text-muted);
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+body.dark-theme .theme-label {
+    color: var(--text-secondary);
+}
+
+@media (max-width: 768px) {
+    .theme-switch-wrapper {
+        bottom: 20px;
+        right: 20px;
+    }
+    .theme-switch {
+        width: 50px;
+        height: 26px;
+    }
+    .theme-slider:before {
+        height: 20px;
+        width: 20px;
+        left: 3px;
+        bottom: 3px;
+    }
+    .theme-switch input:checked + .theme-slider:before {
+        transform: translateX(24px);
+    }
+    .theme-label {
+        font-size: 12px;
+    }
+}
